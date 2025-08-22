@@ -1,0 +1,156 @@
+/* Tailwind temporaneamente disabilitato per il build */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+body {
+  background-color: white;
+  color: #111827;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Audio-specific styles */
+.waveform-container {
+  @apply relative overflow-hidden rounded-lg bg-muted/50;
+}
+
+.waveform-bar {
+  @apply bg-primary transition-all duration-200 ease-in-out;
+}
+
+.waveform-bar.active {
+  @apply bg-primary/80 animate-pulse-audio;
+}
+
+.audio-level-meter {
+  @apply relative h-4 bg-muted rounded-full overflow-hidden;
+}
+
+.audio-level-fill {
+  @apply h-full transition-all duration-100 ease-out;
+}
+
+.audio-level-fill.safe {
+  @apply bg-green-500;
+}
+
+.audio-level-fill.warning {
+  @apply bg-yellow-500;
+}
+
+.audio-level-fill.danger {
+  @apply bg-red-500;
+}
+
+.clipping-indicator {
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.clipping-indicator.active {
+  @apply bg-red-100 text-red-800 animate-pulse;
+}
+
+.clipping-indicator.inactive {
+  @apply bg-green-100 text-green-800;
+}
+
+/* Upload area styles */
+.upload-area {
+  @apply border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center transition-colors;
+}
+
+.upload-area.dragover {
+  @apply border-primary bg-primary/5;
+}
+
+.upload-area:hover {
+  @apply border-primary/50 bg-primary/5;
+}
+
+/* Progress bar styles */
+.progress-bar {
+  @apply relative h-2 bg-muted rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-primary transition-all duration-300 ease-out;
+}
+
+.progress-fill.processing {
+  @apply animate-pulse;
+}
+
+/* File list styles */
+.file-item {
+  @apply flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors;
+}
+
+.file-item.processing {
+  @apply border-primary/50 bg-primary/5;
+}
+
+.file-item.completed {
+  @apply border-green-500/50 bg-green-50;
+}
+
+.file-item.error {
+  @apply border-red-500/50 bg-red-50;
+}
+
+/* Audio player styles */
+.audio-player {
+  @apply flex items-center gap-3 p-3 bg-card rounded-lg border;
+}
+
+.audio-player button {
+  @apply flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors;
+}
+
+.audio-player .time-display {
+  @apply text-sm text-muted-foreground font-mono;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .upload-area {
+    @apply p-4;
+  }
+  
+  .file-item {
+    @apply flex-col items-start gap-2;
+  }
+  
+  .audio-player {
+    @apply flex-col gap-2;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .waveform-bar,
+  .audio-level-fill,
+  .progress-fill {
+    @apply transition-none;
+  }
+  
+  .animate-pulse-audio,
+  .animate-pulse,
+  .animate-waveform {
+    @apply animate-none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .waveform-bar {
+    @apply border border-foreground;
+  }
+  
+  .audio-level-fill {
+    @apply border border-foreground;
+  }
+  
+  .file-item {
+    @apply border-2;
+  }
+}
