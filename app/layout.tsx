@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ErrorBoundary } from '@/components/error-boundary'
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   description: 'Normalize audio levels with professional peak and loudness normalization. Supports MP3, WAV, FLAC, AAC, M4A, and OGG formats. EBU R128 compliant.',
   keywords: 'audio normalization, loudness normalization, peak normalization, EBU R128, audio processing, LUFS, true peak',
   authors: [{ name: 'Audio Normalizer Team' }],
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'Audio Normalizer - Professional Audio Level Normalization',
@@ -23,6 +22,11 @@ export const metadata: Metadata = {
     title: 'Audio Normalizer - Professional Audio Level Normalization',
     description: 'Normalize audio levels with professional peak and loudness normalization. EBU R128 compliant.',
   }
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({

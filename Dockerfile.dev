@@ -1,0 +1,28 @@
+# Audio Normalizer - Development Docker Image
+FROM node:18-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    libc6-compat \
+    curl \
+    git
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Create required directories
+RUN mkdir -p temp/audio output/audio logs
+
+# Copy application code
+COPY . .
+
+# Expose development port
+EXPOSE 3000
+
+# Development command
+CMD ["npm", "run", "dev"]

@@ -95,24 +95,36 @@ async function processFilesAsync(
         await serverErrorHandler.logInfo(`Processing file ${fileId}`, { analysisId, fileId });
 
         // Get file info with timeout
-        const fileInfo = await Promise.race([
-          fileManager.getTempFileInfo(fileId),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('File info timeout')), 30000)
-          )
-        ]);
+        let fileInfo;
+        try {
+          fileInfo = await Promise.race([
+            fileManager.getTempFileInfo(fileId),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('File info timeout')), 30000)
+            )
+          ]);
+        } catch (error) {
+          await serverErrorHandler.logError(error as Error, { analysisId, fileId }, undefined, 'getTempFileInfo');
+          throw error;
+        }
 
         if (!fileInfo) {
           throw ErrorTypes.FILE_NOT_FOUND(fileId);
         }
 
         // Analyze audio file with timeout
-        const analysis = await Promise.race([
-          audioProcessor.analyzeAudio(fileInfo.path),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(ErrorTypes.TIMEOUT_ERROR('audio analysis', 60000)), 60000)
-          )
-        ]);
+        let analysis;
+        try {
+          analysis = await Promise.race([
+            audioProcessor.analyzeAudio(fileInfo.path),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(ErrorTypes.TIMEOUT_ERROR('audio analysis', 60000)), 60000)
+            )
+          ]);
+        } catch (error) {
+          await serverErrorHandler.logError(error as Error, { analysisId, fileId, filePath: fileInfo.path }, undefined, 'analyzeAudio');
+          throw error;
+        }
         
         AnalysisStorage.addResult(analysisId, {
           fileId,

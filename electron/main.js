@@ -7,7 +7,7 @@ console.log('🚀 Audio Normalizer Desktop starting...')
 
 let mainWindow
 let nextServer = null
-const port = 3002
+const port = 3004
 
 // Check if .next directory exists
 function checkBuildExists() {
@@ -42,16 +42,17 @@ function startNextServer() {
     const serverPath = path.join(__dirname, '..', 'server.js')
     const projectPath = path.join(__dirname, '..')
     
-    // Try server.js first if it exists
+    // Use next dev for development
     let command, args
-    if (fs.existsSync(serverPath)) {
-      command = 'node'
-      args = [serverPath]
-      console.log('📄 Using custom server.js')
+    const nextBin = path.join(__dirname, '..', 'node_modules', '.bin', 'next.cmd')
+    if (fs.existsSync(nextBin)) {
+      command = nextBin
+      args = ['dev', '-p', port]
+      console.log('📦 Using next dev')
     } else {
       command = 'node'
-      args = [nextPath, 'start', '-p', port]
-      console.log('📦 Using next start')
+      args = [path.join(__dirname, '..', 'node_modules', 'next', 'dist', 'bin', 'next'), 'dev', '-p', port]
+      console.log('📦 Using node next dev')
     }
     
     nextServer = spawn(command, args, {

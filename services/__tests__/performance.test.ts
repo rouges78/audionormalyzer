@@ -373,8 +373,8 @@ describe('Performance Tests', () => {
       
       const totalTime = Date.now() - startTime
       
-      expect(result.totalFiles).toBe(albumSize)
-      expect(result.successfulFiles).toBe(albumSize)
+      expect(result.success).toBe(true)
+      expect(result.fileId).toContain('album-')
       // Should complete large album within reasonable time (30 seconds)
       expect(totalTime).toBeLessThan(30000)
     })

@@ -25,6 +25,7 @@ export default function AudioNormalizerApp() {
   } = useAudioUpload()
   
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const folderInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -33,9 +34,12 @@ export default function AudioNormalizerApp() {
     const fileArray = Array.from(files)
     await uploadFiles(fileArray)
     
-    // Reset the input
+    // Reset both inputs
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
+    }
+    if (folderInputRef.current) {
+      folderInputRef.current.value = ''
     }
   }
 
@@ -93,23 +97,57 @@ export default function AudioNormalizerApp() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading || isAnalyzing}
-                  className="w-full h-20 border-2 border-dashed border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-800 dark:border-purple-600 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 dark:text-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  variant="outline"
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <Upload className="h-8 w-8" />
-                    <span className="font-medium">
-                      {isUploading ? 'Caricamento...' : isAnalyzing ? 'Analisi...' : 'Scegli File Audio'}
-                    </span>
-                    <span className="text-sm opacity-70">MP3, WAV, FLAC, AAC supportati</span>
-                  </div>
-                </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading || isAnalyzing}
+                    className="h-20 border-2 border-dashed border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-800 dark:border-purple-600 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 dark:text-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="outline"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="h-8 w-8" />
+                      <span className="font-medium">
+                        {isUploading ? 'Caricamento...' : isAnalyzing ? 'Analisi...' : 'Scegli File'}
+                      </span>
+                      <span className="text-sm opacity-70">File singoli</span>
+                    </div>
+                  </Button>
+                  
+                  <Button
+                    onClick={() => folderInputRef.current?.click()}
+                    disabled={isUploading || isAnalyzing}
+                    className="h-20 border-2 border-dashed border-green-300 bg-green-50 hover:bg-green-100 text-green-800 dark:border-green-600 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="outline"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="h-8 w-8" />
+                      <span className="font-medium">
+                        {isUploading ? 'Caricamento...' : isAnalyzing ? 'Analisi...' : 'Scegli Cartella'}
+                      </span>
+                      <span className="text-sm opacity-70">Album completo</span>
+                    </div>
+                  </Button>
+                </div>
+                
+                <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+                  MP3, WAV, FLAC, AAC, M4A, OGG supportati
+                </div>
+                
                 <input
                   ref={fileInputRef}
                   type="file"
+                  multiple
+                  accept="audio/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={isUploading || isAnalyzing}
+                />
+                
+                <input
+                  ref={folderInputRef}
+                  type="file"
+                  webkitdirectory=""
+                  directory=""
                   multiple
                   accept="audio/*"
                   onChange={handleFileUpload}

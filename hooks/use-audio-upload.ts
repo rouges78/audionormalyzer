@@ -154,7 +154,9 @@ export function useAudioUpload(): UseAudioUploadReturn {
           const response = await fetch(`/api/analysis/${analysisId}`)
           
           if (!response.ok) {
-            throw new Error('Errore nel recupero risultati analisi')
+            const errorData = await response.json().catch(() => ({}))
+            console.error('Analysis API error:', response.status, errorData)
+            throw new Error(errorData.error || `Errore nel recupero risultati analisi (${response.status})`)
           }
 
           const result = await response.json()

@@ -485,6 +485,14 @@ export class AlbumProcessorImpl implements AlbumProcessor {
       notes
     }
   }
+
+  /**
+   * Pulisce i dati temporanei di processing (per test)
+   */
+  private async cleanupProcessingData(): Promise<void> {
+    // Implementazione di cleanup per test
+    // In futuro potrebbe pulire cache, file temporanei, etc.
+  }
 }
 
 /**
