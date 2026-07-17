@@ -31,3 +31,6 @@ temp/audio/*
 output/audio/*
 !output/audio/.gitkeep
 logs/*.log
+
+# Build output desktop (Electron)
+/dist/

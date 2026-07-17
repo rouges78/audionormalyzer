@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap · Audio Normalizer</title>
+<style>
+  :root{
+    --bg:#0b0f17; --bg2:#111826; --card:#151d2c; --card2:#1b2536;
+    --line:#26324a; --txt:#e6ecf5; --mut:#93a1b8; --dim:#63718c;
+    --acc:#3da9fc; --acc2:#5eead4; --ok:#34d399; --warn:#fbbf24;
+    --hi:#f87171; --md:#fbbf24; --lo:#34d399; --new:#c084fc;
+    --shadow:0 8px 30px rgba(0,0,0,.35);
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%,rgba(61,169,252,.10),transparent 60%),
+               radial-gradient(1000px 500px at -10% 10%,rgba(94,234,212,.08),transparent 55%),
+               var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+  header.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between;margin-bottom:8px}
+  h1{font-size:26px;margin:0;letter-spacing:.3px;display:flex;align-items:center;gap:12px}
+  h1 .dot{width:12px;height:12px;border-radius:50%;background:var(--acc);box-shadow:0 0 16px var(--acc)}
+  .sub{color:var(--mut);font-size:13px;margin-top:2px}
+  .meta-badges{display:flex;gap:8px;flex-wrap:wrap}
+  .badge{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;color:var(--mut)}
+  .badge b{color:var(--txt)}
+
+  .overall{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin:18px 0 22px;box-shadow:var(--shadow)}
+  .overall .row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+  .overall .pct{font-size:40px;font-weight:700;line-height:1}
+  .overall .pct small{font-size:15px;color:var(--mut);font-weight:500;margin-left:6px}
+  .bar{height:14px;background:#0d1522;border:1px solid var(--line);border-radius:999px;overflow:hidden;position:relative}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:999px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .bar.sm{height:8px}
+  .stat-line{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--mut)}
+  .stat-line span b{color:var(--txt)}
+
+  .feas{display:grid;grid-template-columns:1.1fr 1.4fr;gap:16px;margin-bottom:24px}
+  @media(max-width:820px){.feas{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+  .panel h2{font-size:15px;margin:0 0 14px;display:flex;align-items:center;gap:8px;color:var(--txt)}
+  .panel h2 .ic{font-size:16px}
+  .gauge{display:flex;align-items:center;gap:18px}
+  .gauge .num{font-size:44px;font-weight:800;color:var(--ok)}
+  .gauge .num.warnc{color:var(--warn)}
+  .gauge p{margin:0;font-size:12.5px;color:var(--mut)}
+  .crit{margin:0;padding:0;list-style:none;font-size:13px}
+  .crit li{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+  .crit li:last-child{border-bottom:none}
+  .crit .clabel{flex:0 0 150px;color:var(--mut)}
+  .crit .cbar{flex:1;height:7px;background:#0d1522;border-radius:999px;overflow:hidden}
+  .crit .cbar i{display:block;height:100%;border-radius:999px}
+  .crit .cval{flex:0 0 42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--txt);font-size:12px}
+
+  .controls{position:sticky;top:0;z-index:20;background:rgba(11,15,23,.86);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .controls .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .controls label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-right:2px}
+  .chip{cursor:pointer;user-select:none;background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:5px 11px;font-size:12.5px;transition:.15s}
+  .chip:hover{border-color:var(--acc);color:var(--txt)}
+  .chip.on{background:var(--acc);border-color:var(--acc);color:#04121f;font-weight:600}
+  select,input[type=search]{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 10px;font-size:13px;outline:none}
+  input[type=search]{min-width:170px}
+  .spacer{flex:1}
+  .btn{cursor:pointer;background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:7px 12px;font-size:12.5px;transition:.15s}
+  .btn:hover{border-color:var(--acc);color:var(--txt)}
+  .btn.danger:hover{border-color:var(--hi);color:var(--hi)}
+
+  .cat{margin-bottom:16px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--bg2)}
+  .cat-head{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;background:linear-gradient(180deg,var(--card),var(--bg2))}
+  .cat-head .tw{font-size:16px}
+  .cat-head h3{margin:0;font-size:15px;flex:0 0 auto}
+  .cat-head .cbar{flex:1;max-width:340px}
+  .cat-head .cpct{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums;min-width:96px;text-align:right}
+  .cat-head .chev{color:var(--dim);transition:.2s;font-size:12px}
+  .cat.collapsed .chev{transform:rotate(-90deg)}
+  .cat.collapsed .cat-body{display:none}
+  .cat-body{padding:6px 10px 12px}
+
+  .task{display:flex;gap:12px;padding:11px 12px;border-radius:10px;align-items:flex-start;border:1px solid transparent;transition:.12s}
+  .task:hover{background:var(--card);border-color:var(--line)}
+  .task.done{opacity:.55}
+  .task.done .t-title{text-decoration:line-through;text-decoration-color:var(--dim)}
+  .cbox{appearance:none;-webkit-appearance:none;min-width:20px;height:20px;margin-top:2px;border:2px solid var(--dim);border-radius:6px;cursor:pointer;position:relative;transition:.15s;background:var(--bg)}
+  .cbox:checked{background:var(--ok);border-color:var(--ok)}
+  .cbox:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #062018;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  .cbox:hover{border-color:var(--acc)}
+  .t-main{flex:1;min-width:0}
+  .t-title{font-size:14px;color:var(--txt);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .t-desc{font-size:12.5px;color:var(--mut);margin-top:3px}
+  .t-desc code{background:#0d1522;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11.5px;color:var(--acc2)}
+  .t-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .tag{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mut);background:var(--bg)}
+  .tag.pri-hi{color:var(--hi);border-color:rgba(248,113,113,.4)}
+  .tag.pri-md{color:var(--md);border-color:rgba(251,191,36,.4)}
+  .tag.pri-lo{color:var(--lo);border-color:rgba(52,211,153,.4)}
+  .tag.new{color:var(--new);border-color:rgba(192,132,252,.45)}
+  .tag.phase{color:var(--acc);border-color:rgba(61,169,252,.35)}
+  .tag.dep{color:var(--dim)}
+  .prio-mark{font-size:13px}
+
+  .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0}
+  @media(max-width:820px){.status-grid{grid-template-columns:1fr}}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+  .scard h2{font-size:14px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .scard.done-c{border-left:3px solid var(--ok)}
+  .scard.prog-c{border-left:3px solid var(--acc)}
+  .scard.prob-c{border-left:3px solid var(--hi)}
+  .scard.next-c{border-left:3px solid var(--new)}
+  .scard ul{margin:0;padding:0;list-style:none;font-size:13px;max-height:280px;overflow:auto}
+  .scard li{padding:6px 0;border-bottom:1px dashed var(--line);color:var(--mut);display:flex;gap:8px}
+  .scard li:last-child{border-bottom:none}
+  .scard .empty{color:var(--dim);font-style:italic;padding:6px 0}
+  .prob-list li{color:var(--txt)}
+  .prob-sev{font-size:10px;padding:1px 7px;border-radius:999px;margin-left:auto;flex:0 0 auto;align-self:center}
+  .sev-hi{background:rgba(248,113,113,.15);color:var(--hi)}
+  .sev-md{background:rgba(251,191,36,.15);color:var(--md)}
+
+  h2.section{font-size:18px;margin:30px 0 4px;display:flex;align-items:center;gap:10px}
+  .section-sub{color:var(--mut);font-size:13px;margin:0 0 14px}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin:4px 0 0}
+  .no-match{text-align:center;color:var(--dim);padding:30px;font-style:italic}
+  details.hist{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:6px 18px}
+  details.hist summary{cursor:pointer;font-size:14px;padding:10px 0;color:var(--txt)}
+  details.hist .h-entry{font-size:12.5px;color:var(--mut);padding:7px 0;border-top:1px dashed var(--line)}
+  details.hist .h-entry b{color:var(--txt)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--acc);color:var(--txt);padding:10px 18px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
+
+  .android{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-bottom:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .android::before{content:"🤖";position:absolute;right:-10px;top:-20px;font-size:120px;opacity:.05}
+  .android h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .android .lead{color:var(--mut);font-size:13px;margin:0 0 16px;max-width:760px}
+  .verdict{display:inline-flex;align-items:center;gap:8px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:var(--ok);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;margin-bottom:16px}
+  .verdict.mid{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.4);color:var(--warn)}
+  .and-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 18px}
+  @media(max-width:820px){.and-grid{grid-template-columns:1fr}}
+  .scen{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .scen.real{border-color:rgba(61,169,252,.5)}
+  .scen .st{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);display:flex;justify-content:space-between;align-items:center}
+  .scen .prob{font-size:10.5px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--mut)}
+  .scen .money{font-size:24px;font-weight:800;margin:8px 0 2px}
+  .scen.pess .money{color:var(--dim)} .scen.real .money{color:var(--acc)} .scen.opt .money{color:var(--ok)}
+  .scen .yr{font-size:12px;color:var(--mut)}
+  .scen ul{margin:10px 0 0;padding-left:16px;font-size:12px;color:var(--mut)}
+  .scen li{margin:3px 0}
+  .and-two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:820px){.and-two{grid-template-columns:1fr}}
+  .and-two h4{font-size:13px;margin:0 0 8px;color:var(--txt)}
+  .and-two ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--mut)}
+  .and-two li{margin:5px 0}
+  .and-note{margin-top:16px;font-size:12px;color:var(--dim);border-top:1px dashed var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1><span class="dot"></span> Roadmap · Audio Normalizer</h1>
+      <div class="sub">Normalizzatore volume audio MP3/WAV · Next.js 15 + Electron · elaborazione FFmpeg / EBU R128</div>
+    </div>
+    <div class="meta-badges">
+      <span class="badge">Versione progetto <b>0.1.0</b></span>
+      <span class="badge">Roadmap <b id="roadmapVer">v1.4</b></span>
+      <span class="badge">Aggiornata <b id="updated">15 lug 2026</b></span>
+    </div>
+  </header>
+
+  <div class="overall">
+    <div class="row">
+      <div>
+        <div style="font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px">Avanzamento generale</div>
+        <div class="pct"><span id="ovPct">0</span>%<small id="ovCount">0/0 attività</small></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px">Peso per priorità</div>
+        <div class="stat-line" style="justify-content:flex-end">
+          <span>🔴 <b id="hiCount">0</b></span>
+          <span>🟡 <b id="mdCount">0</b></span>
+          <span>🟢 <b id="loCount">0</b></span>
+          <span>🆕 <b id="newCount">0</b></span>
+        </div>
+      </div>
+    </div>
+    <div class="bar"><i id="ovBar" style="width:0%"></i></div>
+    <div class="stat-line">
+      <span>✅ Completati: <b id="doneN">0</b></span>
+      <span>🔧 In corso: <b id="progN">0</b></span>
+      <span>⏳ Da fare: <b id="todoN">0</b></span>
+      <span>⚠️ Problemi aperti: <b id="probN">0</b></span>
+    </div>
+  </div>
+
+  <div class="feas">
+    <div class="panel">
+      <h2><span class="ic">🎯</span> Fattibilità complessiva</h2>
+      <div class="gauge">
+        <div class="num" id="feasNum">81%</div>
+        <p id="feasText">Progetto <b>altamente fattibile</b>. Le fondamenta (Next.js, UI Radix, API, suite di test, Docker) esistono già. Il rischio principale è tecnico e concentrato: rendere <b>reale</b> l'analisi audio (oggi in parte simulata) e rendere FFmpeg <b>offline</b> per il desktop. Sono problemi noti con soluzioni mature.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <h2><span class="ic">📊</span> Criteri di valutazione</h2>
+      <ul class="crit" id="critList"></ul>
+    </div>
+  </div>
+
+  <!-- ANDROID BUSINESS PANEL -->
+  <div class="android">
+    <h2>🤖 App Android: conviene? Quanto si può ricavare?</h2>
+    <p class="lead">Valutazione onesta dell'opportunità di portare Audio Normalizer su Android, con fattibilità tecnica e stime di ricavo <b>realistiche</b> per uno sviluppatore singolo. Cifre basate su dati di mercato Google Play 2025–2026 e sul comportamento tipico delle app di utilità di nicchia.</p>
+    <div class="verdict mid">⚖️ Verdetto: fattibile e utile come progetto complementare — <b>non</b> come fonte di reddito primaria</div>
+
+    <div class="and-grid">
+      <div class="scen pess">
+        <div class="st">Pessimistico <span class="prob">~45% prob.</span></div>
+        <div class="money">€0–30 <span style="font-size:13px;color:var(--dim)">/mese</span></div>
+        <div class="yr">≈ €0–350 / anno</div>
+        <ul>
+          <li>500–3.000 download totali</li>
+          <li>Solo ads, pochi utenti attivi</li>
+          <li>Di fatto un hobby / portfolio</li>
+        </ul>
+      </div>
+      <div class="scen real">
+        <div class="st">Realistico <span class="prob">~40% prob.</span></div>
+        <div class="money">€80–400 <span style="font-size:13px;color:var(--mut)">/mese</span></div>
+        <div class="yr">≈ €1.000–4.500 / anno</div>
+        <ul>
+          <li>10k–40k download con buona ASO</li>
+          <li>Ads + sblocco una-tantum €2,99</li>
+          <li>Conversione a pagamento 1–2%</li>
+        </ul>
+      </div>
+      <div class="scen opt">
+        <div class="st">Ottimistico <span class="prob">~15% prob.</span></div>
+        <div class="money">€600–2.500 <span style="font-size:13px;color:var(--mut)">/mese</span></div>
+        <div class="yr">≈ €7k–30k / anno</div>
+        <ul>
+          <li>100k+ download, recensioni forti</li>
+          <li>Feature nello Store o passaparola</li>
+          <li>Mix ads + Pro + eventuale abbonamento</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="and-two">
+      <div>
+        <h4>✅ Perché può convenire</h4>
+        <ul>
+          <li><b>Domanda reale e costante</b>: "normalizzare volume MP3" è una ricerca ricorrente su Android.</li>
+          <li><b>Concorrenza debole</b>: le app esistenti (es. MP3 Volume Normalizer, Precise Volume) sono poche e spesso datate.</li>
+          <li><b>Logica già scritta</b>: gli algoritmi EBU R128 / peak del progetto web sono riusabili come specifica.</li>
+          <li><b>Costo di ingresso minimo</b>: licenza Play Console una-tantum ~25 $, nessun canone.</li>
+          <li><b>Elaborazione on-device</b> = privacy come argomento di vendita e zero costi server.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>⚠️ Perché non aspettarsi molto</h4>
+        <ul>
+          <li><b>Non è portabile "così com'è"</b>: lo stack Next.js/Electron va riscritto (Kotlin nativo, oppure Capacitor/React Native).</li>
+          <li><b>Audio pesante su mobile</b>: serve un motore come <code>ffmpeg-kit</code>, con attenzione a batteria e memoria.</li>
+          <li><b>ARPU basso</b>: le app di utilità monetizzano poco; gli abbonamenti sono difficili da giustificare.</li>
+          <li><b>Store cut 15–30%</b> + costo tempo di sviluppo (il vero costo qui è il tuo tempo).</li>
+          <li><b>Marketing/ASO</b> determinano il 90% dell'esito: senza visibilità si resta nello scenario pessimistico.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="and-note">💡 <b>Raccomandazione:</b> valuta prima una <b>PWA installabile</b> dallo stesso codice web (costo quasi nullo) per testare la domanda; se i numeri sono buoni, investi in una vera app nativa. Modello di monetizzazione consigliato: gratis con ads + <b>sblocco "Pro" una-tantum €2,99–4,99</b> (batch illimitato, formati extra, no ads) — più adatto di un abbonamento per un'utility. Fattibilità tecnica Android: <b>~70%</b> (richiede riscrittura, ma nessun ostacolo bloccante).</p>
+  </div>
+
+  <div class="controls">
+    <div class="grp">
+      <label>Priorità</label>
+      <span class="chip on" data-f="prio" data-v="all">Tutte</span>
+      <span class="chip" data-f="prio" data-v="hi">🔴</span>
+      <span class="chip" data-f="prio" data-v="md">🟡</span>
+      <span class="chip" data-f="prio" data-v="lo">🟢</span>
+    </div>
+    <div class="grp">
+      <label>Stato</label>
+      <span class="chip on" data-f="stat" data-v="all">Tutti</span>
+      <span class="chip" data-f="stat" data-v="todo">Da fare</span>
+      <span class="chip" data-f="stat" data-v="prog">In corso</span>
+      <span class="chip" data-f="stat" data-v="done">Fatti</span>
+    </div>
+    <div class="grp">
+      <label>Solo</label>
+      <span class="chip" data-f="onlynew" data-v="1">🆕 Nuove</span>
+    </div>
+    <div class="grp">
+      <select id="catFilter"><option value="all">Tutte le categorie</option></select>
+    </div>
+    <input type="search" id="search" placeholder="Cerca attività…">
+    <div class="spacer"></div>
+    <button class="btn" id="expandAll">Espandi tutto</button>
+    <button class="btn" id="exportBtn">Esporta stato</button>
+    <button class="btn danger" id="resetBtn">Reset</button>
+  </div>
+
+  <div id="cats"></div>
+  <div class="no-match" id="noMatch" style="display:none">Nessuna attività corrisponde ai filtri.</div>
+
+  <h2 class="section">📌 Quadro operativo</h2>
+  <p class="section-sub">Sintesi automatica dello stato corrente: cosa è concluso, cosa è in lavorazione, i problemi individuati e i prossimi obiettivi.</p>
+  <div class="status-grid">
+    <div class="scard done-c">
+      <h2>✅ Completati</h2>
+      <ul id="listDone"></ul>
+    </div>
+    <div class="scard prog-c">
+      <h2>🔧 In corso</h2>
+      <ul id="listProg"></ul>
+    </div>
+    <div class="scard prob-c">
+      <h2>⚠️ Problemi individuati</h2>
+      <ul id="listProb"></ul>
+    </div>
+    <div class="scard next-c">
+      <h2>🎯 Prossimi obiettivi</h2>
+      <ul id="listNext"></ul>
+    </div>
+  </div>
+
+  <details class="hist">
+    <summary>🕓 Storico della roadmap</summary>
+    <div id="histList"></div>
+  </details>
+
+  <footer>
+    <div class="legend">
+      <span>🔴 Alta</span><span>🟡 Media</span><span>🟢 Bassa</span>
+      <span>🆕 Nuova proposta</span><span>✅ Fatto</span><span>🔧 In corso</span>
+    </div>
+    <div>Stato salvato localmente nel browser (localStorage) · File autonomo, nessuna dipendenza esterna</div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   AUDIO NORMALIZER — ROADMAP DATA
+   Ogni task: id, cat, phase, prio (hi|md|lo), isNew, def (default done),
+   title, desc, dep (dipendenze opzionali)
+   ============================================================ */
+const ROADMAP_VERSION = "1.4";
+const LAST_UPDATE = "2026-07-15";
+
+const CATEGORIES = {
+  arch:   {icon:"🏗️", name:"Architettura"},
+  core:   {icon:"🎚️", name:"Core Audio & Elaborazione"},
+  uxui:   {icon:"🎨", name:"UX / UI"},
+  a11y:   {icon:"♿", name:"Accessibilità"},
+  resp:   {icon:"📱", name:"Responsive Design"},
+  perf:   {icon:"⚡", name:"Prestazioni"},
+  sec:    {icon:"🔒", name:"Sicurezza"},
+  err:    {icon:"🧯", name:"Gestione errori"},
+  quality:{icon:"✨", name:"Qualità del codice"},
+  test:   {icon:"🧪", name:"Test automatici e manuali"},
+  compat: {icon:"🧩", name:"Compatibilità"},
+  docs:   {icon:"📚", name:"Documentazione"},
+  dist:   {icon:"📦", name:"Installazione e distribuzione"},
+  backup: {icon:"💾", name:"Backup e recupero dati"},
+  privacy:{icon:"🛡️", name:"Privacy"},
+  maint:  {icon:"🔧", name:"Manutenzione"},
+  scale:  {icon:"📈", name:"Scalabilità"},
+  risk:   {icon:"⚠️", name:"Analisi dei rischi"},
+  feedback:{icon:"💬", name:"Feedback degli utenti"},
+  future: {icon:"🚀", name:"Funzionalità future (stato dell'arte)"},
+  mobile: {icon:"🤖", name:"App Android / Mobile"}
+};
+
+const PHASES = {
+  0:"Fase 0 · Consolidamento",
+  1:"Fase 1 · Core audio reale",
+  2:"Fase 2 · UX & Qualità",
+  3:"Fase 3 · Distribuzione desktop",
+  4:"Fase 4 · Avanzato / Stato dell'arte"
+};
+
+const TASKS = [
+  // ---------- ARCHITETTURA ----------
+  {id:"arch-01", cat:"arch", phase:0, prio:"lo", def:true,  title:"Scaffolding Next.js 15 + React 19 + TypeScript", desc:"App Router, tsconfig, struttura <code>app/</code> e <code>services/</code> operativa."},
+  {id:"arch-02", cat:"arch", phase:0, prio:"lo", def:true,  title:"Layer di servizi separato dal routing API", desc:"Servizi in <code>services/</code> (audio-processor, album-processor, download-manager, file/metadata-manager, processing-queue)."},
+  {id:"arch-03", cat:"arch", phase:0, prio:"lo", def:true,  title:"Wrapper desktop Electron", desc:"Integrazione Electron con preload e main process."},
+  {id:"arch-04", cat:"arch", phase:3, prio:"hi", def:true, title:"Unificare l'entry-point Electron", desc:"✅ Fatto (15/07/2026): <code>electron/main.js</code> (ex main-professional-viz) è l'unico main autorevole; gli altri 8 spostati in <code>electron/legacy/</code>. Aggiornati package.json, electron-builder.config.js e gli script. <b>Verificato a runtime (15/07):</b> la build desktop parte con <code>electron/main.js</code> — app avviata da <code>dist\\win-unpacked\\</code> senza crash."},
+  {id:"arch-05", cat:"arch", phase:1, prio:"hi", def:false, title:"Definire i contratti dei tipi audio", desc:"Consolidare <code>types/audio.ts</code> come fonte unica per AudioAnalysis / NormalizationOptions.", isNew:true},
+  {id:"arch-06", cat:"arch", phase:2, prio:"md", def:false, title:"Separare logica browser (WASM) da logica server (ffmpeg nativo)", desc:"Chiarire quando gira FFmpeg WASM lato client vs ffmpeg nativo lato server/desktop."},
+  {id:"arch-07", cat:"arch", phase:4, prio:"lo", def:false, title:"Astrazione 'engine' pluggabile per il processing", desc:"Interfaccia comune per motori diversi (WASM, nativo, futuro GPU).", isNew:true},
+  {id:"arch-08", cat:"arch", phase:3, prio:"lo", def:false, title:"Rimuovere definitivamente electron/legacy/ dopo verifica build", desc:"Confermato che la build desktop parte con <code>electron/main.js</code>, eliminare i main archiviati e gli script legacy che li usano.", isNew:true, dep:["arch-04","qual-02"]},
+
+  // ---------- CORE AUDIO ----------
+  {id:"core-01", cat:"core", phase:0, prio:"lo", def:true,  title:"Endpoint upload / analyze / normalize / process / download", desc:"Rotte API principali presenti e testate."},
+  {id:"core-02", cat:"core", phase:0, prio:"lo", def:true,  title:"Coda di elaborazione e processing batch/album", desc:"<code>processing-queue.ts</code> e <code>album-processor.ts</code> con test dedicati."},
+  {id:"core-03", cat:"core", phase:1, prio:"hi", def:false, title:"Sostituire l'analisi audio SIMULATA con analisi reale", desc:"Oggi <code>audio-processor.ts</code> genera valori deterministici dall'hash del file invece di misurare LUFS/peak reali. Collegare misurazione vera (ffmpeg <code>ebur128</code> / loudness).", dep:["core-05"]},
+  {id:"core-04", cat:"core", phase:1, prio:"hi", def:false, title:"Normalizzazione EBU R128 (LUFS) verificata su file reali", desc:"Loudness integrato, target -23/-16/-14 LUFS, tolleranza conforme allo standard."},
+  {id:"core-05", cat:"core", phase:1, prio:"hi", def:false, title:"Bundle FFmpeg offline (no CDN unpkg)", desc:"FFmpeg core caricato da <code>unpkg.com</code>: rompe l'uso offline del desktop. Impacchettare i binari/WASM localmente."},
+  {id:"core-06", cat:"core", phase:1, prio:"hi", def:false, title:"True Peak limiting reale (oversampling)", desc:"Limitazione true-peak per evitare clipping inter-sample, non solo peak campionato."},
+  {id:"core-07", cat:"core", phase:2, prio:"md", def:false, title:"Preservazione metadati ID3 / tag su tutti i formati", desc:"<code>metadata-manager.ts</code> presente; verificare copertura MP3/FLAC/M4A/OGG dopo la normalizzazione."},
+  {id:"core-08", cat:"core", phase:2, prio:"md", def:false, title:"Normalizzazione per album (gain relativo)", desc:"Mantenere le differenze dinamiche fra tracce dello stesso album (album gain vs track gain).", isNew:true},
+  {id:"core-09", cat:"core", phase:4, prio:"lo", def:false, title:"Loudness normalization a due passate", desc:"Prima passata di misura, seconda di applicazione: massima precisione EBU R128.", isNew:true},
+  {id:"core-10", cat:"core", phase:4, prio:"lo", def:false, title:"Supporto -14 LUFS 'streaming presets' (Spotify/YouTube/Apple)", desc:"Preset dedicati alle piattaforme con true-peak -1 dBTP.", isNew:true},
+
+  // ---------- UX / UI ----------
+  {id:"uxui-01", cat:"uxui", phase:0, prio:"lo", def:true,  title:"Componenti UI Radix + Tailwind", desc:"Libreria componenti (dialog, slider, tabs, toast…) integrata."},
+  {id:"uxui-02", cat:"uxui", phase:0, prio:"lo", def:true,  title:"Visualizzazioni audio (waveform, spettrogramma, vettorscopio, istogramma)", desc:"Componenti di visualizzazione presenti in <code>components/</code>."},
+  {id:"uxui-03", cat:"uxui", phase:2, prio:"md", def:true, title:"Flusso guidato upload → configura → anteprima → processa → scarica", desc:"✅ Fatto (16/07): wizard a 5 step (<code>components/normalization-wizard.tsx</code>) con stepper, stati chiari e navigazione. Processing e download funzionano interamente lato browser."},
+  {id:"uxui-04", cat:"uxui", phase:2, prio:"md", def:true, title:"Anteprima A/B (originale vs normalizzato)", desc:"✅ Fatto (16/07): confronto A/B reale via Web Audio (<code>lib/audio-preview.ts</code>) — l'originale e la versione col guadagno applicato, più before/after numerico. Anteprima approssimata (gain-based), non dipende da FFmpeg."},
+  {id:"uxui-05", cat:"uxui", phase:2, prio:"md", def:false, title:"Stati vuoti, di caricamento e di errore curati", desc:"Empty state, skeleton e messaggi d'errore comprensibili."},
+  {id:"uxui-06", cat:"uxui", phase:2, prio:"lo", def:false, title:"Tema chiaro/scuro con next-themes", desc:"Toggle tema e persistenza preferenza."},
+  {id:"uxui-07", cat:"uxui", phase:4, prio:"lo", def:false, title:"Editor preset personalizzati salvabili", desc:"L'utente crea e riusa i propri profili di normalizzazione.", isNew:true},
+
+  // ---------- ACCESSIBILITÀ ----------
+  {id:"a11y-01", cat:"a11y", phase:2, prio:"md", def:false, title:"Navigazione da tastiera completa", desc:"Focus visibile, ordine logico, tutte le azioni raggiungibili senza mouse."},
+  {id:"a11y-02", cat:"a11y", phase:2, prio:"md", def:false, title:"Etichette ARIA e ruoli su controlli e visualizzazioni", desc:"Slider, dropzone e grafici annunciati correttamente dagli screen reader."},
+  {id:"a11y-03", cat:"a11y", phase:2, prio:"md", def:false, title:"Contrasto colori WCAG 2.1 AA", desc:"Verificare rapporti di contrasto testo/sfondo e stati."},
+  {id:"a11y-04", cat:"a11y", phase:2, prio:"lo", def:false, title:"Alternative testuali per dati solo-visivi", desc:"Valori numerici (LUFS/peak) leggibili oltre ai grafici.", isNew:true},
+  {id:"a11y-05", cat:"a11y", phase:4, prio:"lo", def:false, title:"Rispetto di prefers-reduced-motion", desc:"Ridurre animazioni per utenti sensibili al movimento.", isNew:true},
+
+  // ---------- RESPONSIVE ----------
+  {id:"resp-01", cat:"resp", phase:2, prio:"md", def:false, title:"Layout responsive mobile / tablet / desktop", desc:"Griglie e controlli adattivi; upload e liste usabili su schermi piccoli."},
+  {id:"resp-02", cat:"resp", phase:2, prio:"lo", def:false, title:"Visualizzazioni audio adattive", desc:"Waveform/spettrogramma ridimensionabili senza perdita di leggibilità."},
+  {id:"resp-03", cat:"resp", phase:2, prio:"lo", def:false, title:"Target touch ≥ 44px", desc:"Aree di tocco adeguate su mobile.", isNew:true},
+
+  // ---------- PRESTAZIONI ----------
+  {id:"perf-01", cat:"perf", phase:0, prio:"lo", def:true,  title:"Elaborazione concorrente multi-file", desc:"Coda con parallelismo controllato già presente."},
+  {id:"perf-02", cat:"perf", phase:1, prio:"md", def:false, title:"Elaborazione in Web Worker / off-main-thread", desc:"<code>workers/gpu-audio-processor.worker.ts</code> esiste: completare l'offload per non bloccare la UI."},
+  {id:"perf-03", cat:"perf", phase:2, prio:"md", def:false, title:"Streaming download per file di grandi dimensioni", desc:"Evitare di caricare interi file in memoria durante il download."},
+  {id:"perf-04", cat:"perf", phase:2, prio:"md", def:false, title:"Pulizia automatica file temporanei", desc:"<code>npm run clean:temp</code> esiste; automatizzare TTL su <code>temp/</code> e <code>output/</code>."},
+  {id:"perf-05", cat:"perf", phase:4, prio:"lo", def:false, title:"Accelerazione GPU / WebGPU per visualizzazioni", desc:"<code>lib/gpu-renderer.ts</code> presente: valutare rendering GPU dello spettrogramma.", isNew:true},
+  {id:"perf-06", cat:"perf", phase:2, prio:"lo", def:false, title:"Budget di performance e misura (Lighthouse/Web Vitals)", desc:"Definire soglie e monitorarle in CI.", isNew:true},
+
+  // ---------- SICUREZZA ----------
+  {id:"sec-01", cat:"sec", phase:1, prio:"hi", def:false, title:"Validazione robusta dei file caricati", desc:"Verifica magic-number oltre all'estensione, limiti dimensione, rifiuto payload non-audio."},
+  {id:"sec-02", cat:"sec", phase:1, prio:"hi", def:false, title:"Sanificazione nomi file e prevenzione path traversal", desc:"Nessun percorso derivato da input utente senza normalizzazione."},
+  {id:"sec-03", cat:"sec", phase:3, prio:"hi", def:false, title:"Hardening Electron (contextIsolation, no nodeIntegration)", desc:"Verificare preload sicuro, disabilitare nodeIntegration nel renderer, CSP."},
+  {id:"sec-04", cat:"sec", phase:2, prio:"md", def:false, title:"Rate limiting e limiti risorse sulle API", desc:"Proteggere endpoint di upload/process da abuso e DoS."},
+  {id:"sec-05", cat:"sec", phase:2, prio:"md", def:false, title:"Audit dipendenze (npm audit) in CI", desc:"Scansione vulnerabilità automatica e aggiornamenti pianificati."},
+  {id:"sec-06", cat:"sec", phase:3, prio:"md", def:false, title:"Firma del codice dell'eseguibile Windows", desc:"Evita blocchi antivirus/SmartScreen (vedi ANTIVIRUS-PROBLEM-SOLVED.md).", isNew:true},
+
+  // ---------- GESTIONE ERRORI ----------
+  {id:"err-01", cat:"err", phase:0, prio:"lo", def:true,  title:"Error boundary e componenti di display errore", desc:"<code>error-boundary.tsx</code>, <code>error-display.tsx</code>, <code>server-error-handler.ts</code> presenti."},
+  {id:"err-02", cat:"err", phase:1, prio:"md", def:false, title:"Gestione errori FFmpeg con messaggi azionabili", desc:"Tradurre errori di codifica in messaggi comprensibili + retry."},
+  {id:"err-03", cat:"err", phase:2, prio:"md", def:false, title:"Recupero da fallimento parziale del batch", desc:"Se una traccia fallisce, le altre proseguono; report finale con esiti."},
+  {id:"err-04", cat:"err", phase:2, prio:"lo", def:false, title:"Logging strutturato lato server/desktop", desc:"Log con livelli e rotazione (cartella <code>logs/</code> già presente).", isNew:true},
+
+  // ---------- QUALITÀ CODICE ----------
+  {id:"qual-01", cat:"quality", phase:0, prio:"md", def:false, title:"Eliminare i 15+ file README di troubleshooting alla radice", desc:"Consolidare BUGFIX/FIXED/FINAL/EXECUTABLE*.md in <code>docs/</code> o storico."},
+  {id:"qual-02", cat:"quality", phase:0, prio:"md", def:false, title:"Ridurre i ~20 script di build legacy", desc:"CLAUDE.md indica di preferire <code>build:exe:quick</code>/<code>build:desktop</code>: rimuovere le varianti morte."},
+  {id:"qual-03", cat:"quality", phase:2, prio:"md", def:false, title:"Config ESLint + Prettier applicata e verde", desc:"<code>npm run lint</code> pulito su tutto il codice."},
+  {id:"qual-04", cat:"quality", phase:2, prio:"md", def:false, title:"TypeScript strict senza any impliciti", desc:"Abilitare strict e rimuovere cast/any nei servizi."},
+  {id:"qual-05", cat:"quality", phase:2, prio:"lo", def:false, title:"Pre-commit hook (lint + type-check + test)", desc:"Cartella <code>hooks/</code> presente: cablare husky/lefthook.", isNew:true},
+
+  // ---------- TEST ----------
+  {id:"test-01", cat:"test", phase:0, prio:"lo", def:true,  title:"Suite Vitest unit/integration/api", desc:"~29 file di test su servizi e rotte API già presenti."},
+  {id:"test-02", cat:"test", phase:1, prio:"hi", def:false, title:"Test di conformità LUFS su file audio reali", desc:"<code>loudness-compliance.test.ts</code> esiste: alimentarlo con veri campioni e soglie EBU R128."},
+  {id:"test-03", cat:"test", phase:2, prio:"md", def:false, title:"Report di coverage con soglia minima", desc:"<code>test:coverage</code> in CI con gate (es. ≥70%)."},
+  {id:"test-04", cat:"test", phase:2, prio:"md", def:false, title:"Test end-to-end del workflow (upload→download)", desc:"E2E su browser (Playwright) del percorso completo.", isNew:true},
+  {id:"test-05", cat:"test", phase:3, prio:"md", def:false, title:"Test di avvio dell'eseguibile desktop", desc:"Smoke test post-build che l'exe portable si avvia e processa un file."},
+  {id:"test-06", cat:"test", phase:2, prio:"lo", def:false, title:"Checklist di test manuale documentata", desc:"Scenari manuali per formati/edge case difficili da automatizzare.", isNew:true},
+
+  // ---------- COMPATIBILITÀ ----------
+  {id:"compat-01", cat:"compat", phase:1, prio:"md", def:false, title:"Matrice formati supportati verificata", desc:"MP3, WAV, FLAC, AAC, M4A, OGG in ingresso/uscita testati realmente."},
+  {id:"compat-02", cat:"compat", phase:3, prio:"md", def:false, title:"Compatibilità Windows / macOS / Linux (desktop)", desc:"Target build multipiattaforma o dichiarazione esplicita del supporto."},
+  {id:"compat-03", cat:"compat", phase:2, prio:"lo", def:false, title:"Compatibilità browser (Chromium/Firefox/Safari)", desc:"Verifica WASM/AudioContext sui principali browser."},
+  {id:"compat-04", cat:"compat", phase:2, prio:"lo", def:false, title:"Fallback anteprima per formati non decodificabili dal browser", desc:"L'anteprima A/B usa <code>decodeAudioData</code>: alcuni FLAC/formati potrebbero non decodificare. Prevedere fallback (motore server) o messaggio chiaro.", isNew:true, dep:["core-05"]},
+
+  // ---------- DOCUMENTAZIONE ----------
+  {id:"docs-01", cat:"docs", phase:0, prio:"lo", def:true,  title:"README principale con feature e quick start", desc:"Presente e completo."},
+  {id:"docs-02", cat:"docs", phase:2, prio:"md", def:false, title:"Guida utente finale (non tecnica)", desc:"Come normalizzare, scegliere target, batch, formati."},
+  {id:"docs-03", cat:"docs", phase:2, prio:"md", def:false, title:"Documentazione API interna e servizi", desc:"Contratti endpoint e responsabilità dei servizi."},
+  {id:"docs-04", cat:"docs", phase:0, prio:"lo", def:true,  title:"Convenzioni per agenti AI (CLAUDE.md)", desc:"Presente con build/test/note."},
+  {id:"docs-05", cat:"docs", phase:3, prio:"lo", def:false, title:"CHANGELOG e note di versione", desc:"Storico rilasci strutturato (SemVer).", isNew:true},
+
+  // ---------- DISTRIBUZIONE ----------
+  {id:"dist-01", cat:"dist", phase:0, prio:"lo", def:true,  title:"Supporto Docker (dev/prod)", desc:"Dockerfile, docker-compose e script <code>docker:*</code> presenti."},
+  {id:"dist-02", cat:"dist", phase:3, prio:"hi", def:false, title:"Build desktop portable Windows affidabile", desc:"<code>build:exe:quick</code> stabile e riproducibile; ridurre le varianti di emergenza."},
+  {id:"dist-03", cat:"dist", phase:3, prio:"md", def:false, title:"Installer con auto-update", desc:"NSIS/Squirrel + canale di aggiornamento (electron-updater).", isNew:true},
+  {id:"dist-04", cat:"dist", phase:3, prio:"md", def:false, title:"Pipeline CI/CD per build e release", desc:"Cartella <code>.github/</code> presente: workflow di build/test/release automatici."},
+  {id:"dist-05", cat:"dist", phase:2, prio:"lo", def:false, title:"Deploy web (Vercel/container) documentato", desc:"Istruzioni riproducibili per l'ambiente web."},
+  {id:"dist-06", cat:"dist", phase:3, prio:"md", def:true, title:"Correggere l'ordine argomenti degli script build:exe", desc:"✅ Fatto (15/07): <code>electron-builder --win --x64 portable</code> dava 'Unknown argument: portable'. Corretto in <code>--win portable --x64</code> in build:exe:quick/safe/force.", isNew:true},
+  {id:"dist-07", cat:"dist", phase:3, prio:"md", def:false, title:"Sbloccare l'estrazione winCodeSign per il portable single-file", desc:"La build produce <code>dist\\win-unpacked\\</code> (app funzionante), ma il <code>.exe</code> portable fallisce perché 7-Zip non crea i symlink macOS dentro winCodeSign senza privilegio. Fix: Modalità sviluppatore Windows o esecuzione come amministratore.", isNew:true, dep:["dist-06"]},
+
+  // ---------- BACKUP / RECUPERO ----------
+  {id:"backup-01", cat:"backup", phase:2, prio:"md", def:false, title:"Ripresa job dopo crash / riavvio", desc:"Persistere stato coda per recuperare batch interrotti (<code>processing-storage.ts</code> presente)."},
+  {id:"backup-02", cat:"backup", phase:2, prio:"lo", def:false, title:"Non sovrascrivere gli originali", desc:"Output separato e conferma prima di sostituire file sorgente.", isNew:true},
+  {id:"backup-03", cat:"backup", phase:4, prio:"lo", def:false, title:"Cronologia elaborazioni esportabile", desc:"Registro dei job con parametri, ripetibile/esportabile.", isNew:true},
+
+  // ---------- PRIVACY ----------
+  {id:"priv-01", cat:"privacy", phase:2, prio:"md", def:false, title:"Elaborazione locale, nessun upload a terzi", desc:"Dichiarare e garantire che l'audio non lasci la macchina (soprattutto desktop)."},
+  {id:"priv-02", cat:"privacy", phase:2, prio:"lo", def:false, title:"Nessuna telemetria non consensuale", desc:"Eventuale analytics opt-in e trasparente."},
+  {id:"priv-03", cat:"privacy", phase:2, prio:"lo", def:false, title:"Cancellazione garantita dei temporanei", desc:"I file caricati vengono rimossi dopo l'elaborazione.", isNew:true},
+
+  // ---------- MANUTENZIONE ----------
+  {id:"maint-01", cat:"maint", phase:2, prio:"md", def:false, title:"Aggiornamento dipendenze pianificato", desc:"Dependabot/renovate + verifica breaking (Next 15/React 19)."},
+  {id:"maint-02", cat:"maint", phase:0, prio:"md", def:false, title:"Rimuovere artefatti dal repo (.next, dist, temp, logs)", desc:"Assicurare .gitignore corretto; evitare build committate."},
+  {id:"maint-03", cat:"maint", phase:2, prio:"lo", def:false, title:"Script di diagnosi manutenuto", desc:"<code>npm run diagnose</code> aggiornato agli errori reali ricorrenti."},
+
+  // ---------- SCALABILITÀ ----------
+  {id:"scale-01", cat:"scale", phase:4, prio:"lo", def:false, title:"Elaborazione di code lunghe / cartelle intere", desc:"Gestire centinaia di file senza esaurire memoria."},
+  {id:"scale-02", cat:"scale", phase:4, prio:"lo", def:false, title:"Modalità server multi-utente (opzionale)", desc:"Isolamento job per utente e limiti risorse, se si offre come servizio web.", isNew:true},
+  {id:"scale-03", cat:"scale", phase:4, prio:"lo", def:false, title:"Elaborazione via CLI / batch headless", desc:"Interfaccia a riga di comando per automazioni.", isNew:true},
+
+  // ---------- RISCHI ----------
+  {id:"risk-01", cat:"risk", phase:1, prio:"hi", def:false, title:"Rischio: analisi audio non realistica", desc:"Se resta simulata, il prodotto non fa ciò che promette. Mitigazione: task core-03/core-04.", dep:["core-03"]},
+  {id:"risk-02", cat:"risk", phase:1, prio:"hi", def:false, title:"Rischio: dipendenza da CDN per FFmpeg", desc:"Offline rotto e fragilità di rete. Mitigazione: core-05 (bundle locale).", dep:["core-05"]},
+  {id:"risk-03", cat:"risk", phase:3, prio:"md", def:false, title:"Rischio: falsi positivi antivirus sull'exe", desc:"Storico di problemi (vari .md). Mitigazione: firma del codice (sec-06).", dep:["sec-06"]},
+  {id:"risk-04", cat:"risk", phase:2, prio:"md", def:false, title:"Rischio: debito tecnico da proliferazione file", desc:"Molti main/script/README duplicati aumentano confusione. Mitigazione: qual-01/02, arch-04."},
+
+  // ---------- FEEDBACK UTENTI ----------
+  {id:"fb-01", cat:"feedback", phase:4, prio:"lo", def:false, title:"Canale di feedback in-app", desc:"Pulsante per segnalare problemi/idee.", isNew:true},
+  {id:"fb-02", cat:"feedback", phase:4, prio:"lo", def:false, title:"Test di usabilità con utenti reali", desc:"Sessioni osservate sul workflow di normalizzazione."},
+
+  // ---------- FUNZIONALITÀ FUTURE ----------
+  {id:"fut-01", cat:"future", phase:4, prio:"lo", def:false, title:"Preset piattaforme streaming aggiornati", desc:"Loudness target per Spotify/YT/Apple/Broadcast sempre allineati.", isNew:true},
+  {id:"fut-02", cat:"future", phase:4, prio:"lo", def:false, title:"Analisi loudness in tempo reale durante la riproduzione", desc:"Metro LUFS live nel player.", isNew:true},
+  {id:"fut-03", cat:"future", phase:4, prio:"lo", def:false, title:"Rimozione rumore / normalizzazione dialoghi (AI)", desc:"Modelli di denoise/dialog leveling. Beneficio alto, complessità alta.", isNew:true},
+  {id:"fut-04", cat:"future", phase:4, prio:"lo", def:false, title:"Batch watch-folder automatico", desc:"Normalizza automaticamente i file che compaiono in una cartella.", isNew:true},
+  {id:"fut-05", cat:"future", phase:4, prio:"lo", def:false, title:"Internazionalizzazione (i18n) IT/EN", desc:"Interfaccia multilingua.", isNew:true},
+  {id:"fut-06", cat:"future", phase:4, prio:"lo", def:false, title:"Sistema di plugin per effetti utente", desc:"<code>lib/plugin-system.ts</code> e <code>plugin-manager.tsx</code> presenti: aprire un'API plugin documentata.", isNew:true},
+
+  // ---------- APP ANDROID / MOBILE ----------
+  {id:"mob-01", cat:"mobile", phase:4, prio:"md", def:false, title:"Validare la domanda con una PWA installabile", desc:"Trasformare l'app web in PWA (manifest + service worker) per testare l'interesse a costo quasi nullo prima di investire su nativo.", isNew:true},
+  {id:"mob-02", cat:"mobile", phase:4, prio:"md", def:false, title:"Scegliere lo stack mobile (Kotlin vs Capacitor vs React Native)", desc:"Decisione architetturale: nativo per prestazioni audio, o wrapper per riuso del codice web.", isNew:true, dep:["mob-01"]},
+  {id:"mob-03", cat:"mobile", phase:4, prio:"md", def:false, title:"Motore audio on-device (ffmpeg-kit)", desc:"Integrare un FFmpeg mobile per analisi LUFS/peak e normalizzazione locale, con attenzione a batteria e RAM.", isNew:true, dep:["mob-02","core-04"]},
+  {id:"mob-04", cat:"mobile", phase:4, prio:"lo", def:false, title:"UI mobile-first e integrazione file/condivisione", desc:"Picker file, 'Condividi con', batch e stati adatti al touch.", isNew:true, dep:["mob-02"]},
+  {id:"mob-05", cat:"mobile", phase:4, prio:"lo", def:false, title:"Monetizzazione: gratis + ads + sblocco Pro una-tantum", desc:"Modello €2,99–4,99 per batch illimitato/no-ads/formati extra. Evitare abbonamento su un'utility.", isNew:true, dep:["mob-03"]},
+  {id:"mob-06", cat:"mobile", phase:4, prio:"lo", def:false, title:"Pubblicazione Google Play + ASO", desc:"Play Console, scheda ottimizzata (keyword 'normalizza volume MP3'), screenshot, privacy policy. L'ASO decide il 90% dei ricavi.", isNew:true, dep:["mob-05"]}
+];
+
+// Criteri di fattibilità (0-100)
+const FEAS_CRITERIA = [
+  {label:"Complessità tecnica", val:70, note:"gestibile, dominio noto"},
+  {label:"Tempo necessario", val:75, note:"basi già pronte"},
+  {label:"Risorse disponibili", val:80, note:"stack completo installato"},
+  {label:"Dipendenze esterne", val:72, note:"FFmpeg da mettere offline"},
+  {label:"Rischi", val:78, note:"concentrati e noti"},
+  {label:"Costi", val:92, note:"open-source, nessuna licenza"},
+  {label:"Maturità tecnologie", val:95, note:"Next/Electron/FFmpeg maturi"},
+  {label:"Completabilità reale", val:88, note:"scope chiaro e finito"}
+];
+
+const PROBLEMS = [
+  {id:"core-03", sev:"hi", text:"Analisi audio simulata (valori da hash del file, non misure reali)"},
+  {id:"core-05", sev:"hi", text:"FFmpeg caricato da CDN unpkg → uso offline del desktop non funziona"},
+  {id:"arch-04", sev:"md", text:"9 file electron/main-* : entry-point ambiguo"},
+  {id:"qual-01", sev:"md", text:"15+ README di troubleshooting alla radice del repo"},
+  {id:"qual-02", sev:"md", text:"~20 script di build legacy sovrapposti"},
+  {id:"sec-03", sev:"md", text:"Hardening Electron (contextIsolation/CSP) da verificare"}
+];
+
+const HISTORY = [
+  {date:"2026-07-16", ver:"1.4", text:"Completati uxui-03 e uxui-04. Nuovo wizard a 5 step (Carica→Configura→Anteprima→Processa→Scarica) che sostituisce la vecchia pagina singola, con stepper e stati chiari. Anteprima A/B reale via Web Audio (lib/audio-preview.ts): decodifica il file nel browser, applica il guadagno previsto (con tetto true-peak -1 dBTP anti-clipping) e confronta originale vs normalizzato; il rendering finale produce WAV scaricabili lato client, senza dipendere da FFmpeg. Riusati i componenti AudioPlayer e NormalizationFeedback esistenti. tsc: 0 errori sui file nuovi; logica gain/WAV testata. Nuovo task compat-04 (fallback formati non decodificabili). Nota: l'anteprima usa ancora i numeri dell'analisi simulata → dipende da core-03/04 per la precisione reale."},
+  {date:"2026-07-15", ver:"1.3", text:"Verifica desktop su Windows. next build OK (12 pagine); electron-builder impacchetta l'app in dist\\win-unpacked usando electron/main.js e l'app si avvia senza crash → arch-04 confermato a runtime. Corretto un bug pre-esistente negli script build:exe (ordine argomenti --win portable --x64) → nuovo task dist-06 (fatto). Il portable single-file resta bloccato dall'estrazione di winCodeSign (symlink macOS, serve Modalità sviluppatore/admin) → nuovo task dist-07."},
+  {date:"2026-07-15", ver:"1.2", text:"Task arch-04 COMPLETATO: unificato l'entry-point Electron. main-professional-viz.js promosso a electron/main.js (unico main autorevole); gli altri 8 main archiviati in electron/legacy/ con README. Aggiornati package.json (main + files), electron-builder.config.js, script build:professional e 6 script legacy (percorsi → legacy/). Il problema 'entry-point ambiguo' si è risolto automaticamente. Aggiunto task arch-08 per la rimozione definitiva dopo verifica build."},
+  {date:"2026-07-15", ver:"1.1", text:"Aggiunto riquadro 'App Android': analisi di convenienza e stime di ricavo realistiche (pessimistico €0–350/anno · realistico €1k–4,5k/anno · ottimistico €7k–30k/anno) basate su dati Google Play 2025–2026. Aggiunta la categoria 'App Android / Mobile' con 6 attività concrete (PWA di validazione → stack → ffmpeg-kit → UI → monetizzazione → pubblicazione+ASO)."},
+  {date:"2026-07-15", ver:"1.0", text:"Creazione roadmap iniziale. Analisi del codice: censite ~90 attività su 20 aree. Identificati 2 problemi critici (analisi audio simulata, FFmpeg da CDN) e debito tecnico su file di build/README duplicati. Segnate come completate le fondamenta esistenti (scaffolding, servizi, API, suite test, Docker, visualizzazioni)."}
+];
+
+/* ============================================================
+   RENDER + LOGIC
+   ============================================================ */
+const LS_KEY = "audionorm_roadmap_state_v1";
+const state = loadState();
+const collapsed = loadCollapsed();
+const filters = {prio:"all", stat:"all", onlynew:false, cat:"all", q:""};
+
+function loadState(){ try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}catch(e){return {};} }
+function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function loadCollapsed(){ try{return JSON.parse(localStorage.getItem(LS_KEY+"_col"))||{};}catch(e){return {};} }
+function saveCollapsed(){ localStorage.setItem(LS_KEY+"_col", JSON.stringify(collapsed)); }
+
+function statusOf(t){ return state[t.id] || (t.def ? "done" : "todo"); }
+const PRIOMAP = {hi:"🔴", md:"🟡", lo:"🟢"};
+
+function catFilterOptions(){
+  const sel = document.getElementById("catFilter");
+  Object.entries(CATEGORIES).forEach(([k,c])=>{
+    const o=document.createElement("option"); o.value=k; o.textContent=`${c.icon} ${c.name}`; sel.appendChild(o);
+  });
+}
+
+function matches(t){
+  const s = statusOf(t);
+  if(filters.prio!=="all" && t.prio!==filters.prio) return false;
+  if(filters.stat!=="all" && s!==filters.stat) return false;
+  if(filters.onlynew && !t.isNew) return false;
+  if(filters.cat!=="all" && t.cat!==filters.cat) return false;
+  if(filters.q){
+    const hay=(t.title+" "+t.desc+" "+CATEGORIES[t.cat].name).toLowerCase();
+    if(!hay.includes(filters.q.toLowerCase())) return false;
+  }
+  return true;
+}
+
+function render(){
+  const root=document.getElementById("cats");
+  root.innerHTML="";
+  let anyVisible=false;
+
+  Object.entries(CATEGORIES).forEach(([key,cat])=>{
+    const all=TASKS.filter(t=>t.cat===key);
+    if(!all.length) return;
+    const visible=all.filter(matches);
+    const done=all.filter(t=>statusOf(t)==="done").length;
+    const pct=Math.round(done/all.length*100);
+
+    if(visible.length) anyVisible=true;
+    if(!visible.length && (filters.prio!=="all"||filters.stat!=="all"||filters.onlynew||filters.cat!=="all"||filters.q)) return;
+
+    const el=document.createElement("section");
+    el.className="cat"+(collapsed[key]?" collapsed":"");
+    el.innerHTML=`
+      <div class="cat-head" data-cat="${key}">
+        <span class="tw">${cat.icon}</span>
+        <h3>${cat.name}</h3>
+        <div class="cbar bar sm"><i style="width:${pct}%"></i></div>
+        <span class="cpct">${done}/${all.length} · ${pct}%</span>
+        <span class="chev">▾</span>
+      </div>
+      <div class="cat-body"></div>`;
+    const body=el.querySelector(".cat-body");
+    (visible.length?visible:all).forEach(t=>body.appendChild(taskEl(t)));
+    root.appendChild(el);
+  });
+
+  document.getElementById("noMatch").style.display=anyVisible?"none":"block";
+  updateStats();
+  updateStatusLists();
+}
+
+function taskEl(t){
+  const s=statusOf(t);
+  const d=document.createElement("div");
+  d.className="task"+(s==="done"?" done":"");
+  const depTxt = t.dep ? `<span class="tag dep">↳ dip: ${t.dep.join(", ")}</span>` : "";
+  const newTxt = t.isNew ? `<span class="tag new">🆕 Nuova</span>` : "";
+  const progTxt = s==="prog" ? `<span class="tag" style="color:var(--acc);border-color:rgba(61,169,252,.35)">🔧 In corso</span>` : "";
+  d.innerHTML=`
+    <input type="checkbox" class="cbox" ${s==="done"?"checked":""} data-id="${t.id}" title="Segna come completato">
+    <div class="t-main">
+      <div class="t-title"><span class="prio-mark">${PRIOMAP[t.prio]}</span> ${t.title}</div>
+      <div class="t-desc">${t.desc}</div>
+      <div class="t-tags">
+        <span class="tag phase">${PHASES[t.phase]}</span>
+        <span class="tag pri-${t.prio}">${t.prio==="hi"?"Alta":t.prio==="md"?"Media":"Bassa"} priorità</span>
+        ${newTxt}${progTxt}${depTxt}
+      </div>
+    </div>`;
+  const cb=d.querySelector(".cbox");
+  cb.addEventListener("change",()=>toggleDone(t,cb.checked));
+  d.querySelector(".t-title").addEventListener("click",(e)=>{
+    if(e.detail===2){ toggleProg(t); }
+  });
+  return d;
+}
+
+function toggleDone(t,checked){
+  if(checked) state[t.id]="done";
+  else state[t.id]="todo";
+  saveState(); render(); toast(checked?"Completato ✓":"Riaperto");
+}
+function toggleProg(t){
+  state[t.id] = statusOf(t)==="prog" ? "todo" : "prog";
+  saveState(); render(); toast(state[t.id]==="prog"?"Segnato in corso 🔧":"Rimesso da fare");
+}
+
+function updateStats(){
+  const total=TASKS.length;
+  const done=TASKS.filter(t=>statusOf(t)==="done").length;
+  const prog=TASKS.filter(t=>statusOf(t)==="prog").length;
+  const todo=total-done-prog;
+  const pct=Math.round(done/total*100);
+  document.getElementById("ovPct").textContent=pct;
+  document.getElementById("ovBar").style.width=pct+"%";
+  document.getElementById("ovCount").textContent=`${done}/${total} attività`;
+  document.getElementById("doneN").textContent=done;
+  document.getElementById("progN").textContent=prog;
+  document.getElementById("todoN").textContent=todo;
+  document.getElementById("hiCount").textContent=TASKS.filter(t=>t.prio==="hi").length;
+  document.getElementById("mdCount").textContent=TASKS.filter(t=>t.prio==="md").length;
+  document.getElementById("loCount").textContent=TASKS.filter(t=>t.prio==="lo").length;
+  document.getElementById("newCount").textContent=TASKS.filter(t=>t.isNew).length;
+  document.getElementById("probN").textContent=PROBLEMS.filter(p=>{const t=TASKS.find(x=>x.id===p.id);return t&&statusOf(t)!=="done";}).length;
+}
+
+function updateStatusLists(){
+  const done=TASKS.filter(t=>statusOf(t)==="done");
+  const prog=TASKS.filter(t=>statusOf(t)==="prog");
+  fill("listDone", done.map(t=>`<li><span class="mk">✅</span>${t.title}</li>`), "Nessun task completato.");
+  fill("listProg", prog.map(t=>`<li><span class="mk">🔧</span>${t.title}</li>`), "Nessun task in corso. Doppio-click sul titolo per segnarne uno.");
+
+  const probEl=document.getElementById("listProb");
+  const openProb=PROBLEMS.filter(p=>{const t=TASKS.find(x=>x.id===p.id); return t && statusOf(t)!=="done";});
+  probEl.innerHTML = openProb.length ? openProb.map(p=>`<li><span class="mk">${p.sev==="hi"?"🔴":"🟡"}</span>${p.text}<span class="prob-sev ${p.sev==="hi"?"sev-hi":"sev-md"}">${p.sev==="hi"?"critico":"medio"}</span></li>`).join("") : '<li class="empty">Nessun problema aperto 🎉</li>';
+
+  const rank={hi:0,md:1,lo:2};
+  const next=TASKS.filter(t=>statusOf(t)!=="done")
+    .sort((a,b)=> rank[a.prio]-rank[b.prio] || a.phase-b.phase)
+    .slice(0,8);
+  fill("listNext", next.map(t=>`<li><span class="mk">${PRIOMAP[t.prio]}</span>${t.title} <span style="color:var(--dim);margin-left:auto;font-size:11px">${PHASES[t.phase].split(" · ")[0]}</span></li>`), "Tutto completato!");
+}
+function fill(id,arr,empty){ document.getElementById(id).innerHTML = arr.length?arr.join(""):`<li class="empty">${empty}</li>`; }
+
+function renderFeas(){
+  const ul=document.getElementById("critList");
+  FEAS_CRITERIA.forEach(c=>{
+    const col = c.val>=85?"var(--ok)":c.val>=70?"var(--acc)":"var(--warn)";
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="clabel" title="${c.note}">${c.label}</span>
+      <span class="cbar"><i style="width:${c.val}%;background:${col}"></i></span>
+      <span class="cval">${c.val}%</span>`;
+    ul.appendChild(li);
+  });
+  const avg=Math.round(FEAS_CRITERIA.reduce((s,c)=>s+c.val,0)/FEAS_CRITERIA.length);
+  document.getElementById("feasNum").textContent=avg+"%";
+}
+
+function renderHistory(){
+  document.getElementById("histList").innerHTML=HISTORY.map(h=>
+    `<div class="h-entry"><b>${h.date} · Roadmap v${h.ver}</b><br>${h.text}</div>`).join("");
+  document.getElementById("roadmapVer").textContent="v"+ROADMAP_VERSION;
+  const d=new Date(LAST_UPDATE);
+  document.getElementById("updated").textContent=d.toLocaleDateString("it-IT",{day:"numeric",month:"short",year:"numeric"});
+}
+
+document.querySelectorAll(".chip[data-f]").forEach(ch=>{
+  ch.addEventListener("click",()=>{
+    const f=ch.dataset.f, v=ch.dataset.v;
+    if(f==="onlynew"){ filters.onlynew=!filters.onlynew; ch.classList.toggle("on",filters.onlynew); render(); return; }
+    filters[f]=v;
+    ch.parentElement.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+    ch.classList.add("on");
+    render();
+  });
+});
+document.getElementById("catFilter").addEventListener("change",e=>{filters.cat=e.target.value;render();});
+document.getElementById("search").addEventListener("input",e=>{filters.q=e.target.value;render();});
+document.getElementById("cats").addEventListener("click",e=>{
+  const h=e.target.closest(".cat-head"); if(!h) return;
+  if(e.target.classList.contains("cbox")) return;
+  const k=h.dataset.cat; collapsed[k]=!collapsed[k]; saveCollapsed(); render();
+});
+document.getElementById("expandAll").addEventListener("click",function(){
+  const anyCollapsed=Object.values(collapsed).some(Boolean);
+  Object.keys(CATEGORIES).forEach(k=>collapsed[k]=anyCollapsed?false:true);
+  saveCollapsed(); render();
+  this.textContent=anyCollapsed?"Comprimi tutto":"Espandi tutto";
+});
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(confirm("Ripristinare tutti i task allo stato di default? Le tue spunte verranno perse.")){
+    for(const k in state) delete state[k]; saveState(); render(); toast("Stato ripristinato");
+  }
+});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const done=TASKS.filter(t=>statusOf(t)==="done").length;
+  const data={generato:new Date().toISOString(),completati:done,totale:TASKS.length,percentuale:Math.round(done/TASKS.length*100),stato:state};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="roadmap-audionormalizer-stato.json"; a.click();
+  toast("Stato esportato");
+});
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1600);
+}
+
+catFilterOptions();
+renderFeas();
+renderHistory();
+render();
+</script>
+</body>
+</html>
