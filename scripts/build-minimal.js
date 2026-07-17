@@ -33,7 +33,7 @@ function createMinimalPackageConfig() {
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   
   // Set main to the working simple version
-  packageJson.main = 'electron/main-simple.js';
+  packageJson.main = 'electron/legacy/main-simple.js';
   
   // Minimal build config
   packageJson.build = {
@@ -41,7 +41,7 @@ function createMinimalPackageConfig() {
     productName: 'Audio Normalizer',
     directories: { output: 'dist' },
     files: [
-      'electron/main-simple.js',
+      'electron/legacy/main-simple.js',
       'package.json',
       'node_modules/**/*'
     ],

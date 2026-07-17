@@ -74,7 +74,7 @@ async function main() {
     console.log('🔧 Applying fixes...');
     
     // Replace main.js with improved version
-    replaceFile('electron/main-fixed.js', 'electron/main.js', 'Updated Electron main process');
+    replaceFile('electron/legacy/main-fixed.js', 'electron/main.js', 'Updated Electron main process');
     
     // Replace server.js with improved version
     replaceFile('server-improved.js', 'server.js', 'Updated Next.js server');

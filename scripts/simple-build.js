@@ -85,7 +85,7 @@ app.on('activate', () => {
 })
 `;
 
-  fs.writeFileSync('electron/main-simple.js', electronMain);
+  fs.writeFileSync('electron/legacy/main-simple.js', electronMain);
   console.log('✅ Created simplified Electron main file');
 }
 
@@ -118,7 +118,7 @@ async function main() {
   const packagePath = 'package.json';
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   
-  packageJson.main = 'electron/main-simple.js';
+  packageJson.main = 'electron/legacy/main-simple.js';
   packageJson.scripts = {
     ...packageJson.scripts,
     'build:simple': 'npm run build && electron-builder --win --x64'

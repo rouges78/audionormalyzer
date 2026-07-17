@@ -21,7 +21,7 @@ try {
   console.log('⚙️ Configuring for real audio processing...');
   const packagePath = path.join(projectRoot, 'package.json');
   const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-  packageData.main = 'electron/main-with-real-audio.js';
+  packageData.main = 'electron/legacy/main-with-real-audio.js';
   packageData.build.productName = 'Audio Normalizer - Real Audio Processing';
   fs.writeFileSync(packagePath, JSON.stringify(packageData, null, 2));
 

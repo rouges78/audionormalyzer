@@ -127,7 +127,7 @@ function updateElectronConfig() {
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   
   // Ensure we're using the full main file
-  packageJson.main = 'electron/main-full.js';
+  packageJson.main = 'electron/legacy/main-full.js';
   
   // Update build configuration
   if (!packageJson.build) {

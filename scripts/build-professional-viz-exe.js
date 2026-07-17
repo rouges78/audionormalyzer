@@ -151,7 +151,7 @@ try {
   console.log('⚙️ Configuring for professional visualizations...');
   const packagePath = path.join(projectRoot, 'package.json');
   const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-  packageData.main = 'electron/main-professional-viz.js';
+  packageData.main = 'electron/main.js';
   packageData.build.productName = 'Audio Normalizer Professional';
   fs.writeFileSync(packagePath, JSON.stringify(packageData, null, 2));
   console.log('   ✅ Configuration updated');

@@ -11,23 +11,23 @@ module.exports = {
   copyright: `Copyright © 2024 ${author}`,
   asar: true,
   compression: 'maximum',
-  
+
   // Fix per problemi di file locking su Windows
   buildDependenciesFromSource: false,
   npmRebuild: false,
   nodeGypRebuild: false,
-  
+
   // Evita conflitti durante il build
   removePackageScripts: true,
   removePackageKeywords: true,
-  
+
   directories: {
     output: 'dist',
     buildResources: 'build'
   },
 
   files: [
-    'electron/main-professional-viz.js',
+    'electron/main.js',
     'electron/preload.js',
     '.next/standalone/**/*',
     '.next/static/**/*',
@@ -184,7 +184,7 @@ module.exports = {
 
   // Code Signing (when certificates are available)
   forceCodeSigning: false,
-  
+
   // Metadata
   buildVersion: version,
   buildDependenciesFromSource: false,

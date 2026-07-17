@@ -26,9 +26,9 @@
     "electron:pack": "npm run build && electron-builder",
     "electron:dist": "npm run build && electron-builder --publish=never",
     "build:exe": "node scripts/build-exe.js",
-    "build:exe:quick": "npm run build && electron-builder --win --x64 portable",
-    "build:exe:safe": "npm run build && timeout /t 3 && electron-builder --win --x64 portable --config electron-builder.config.js",
-    "build:exe:force": "rimraf dist && npm run build && electron-builder --win --x64 portable",
+    "build:exe:quick": "npm run build && electron-builder --win portable --x64",
+    "build:exe:safe": "npm run build && timeout /t 3 && electron-builder --win portable --x64 --config electron-builder.config.js",
+    "build:exe:force": "rimraf dist && npm run build && electron-builder --win portable --x64",
     "build:simple": "npm run build && electron-builder --win --x64",
     "diagnose": "node scripts/diagnose.js",
     "fix-build": "node scripts/fix-build.js",
@@ -54,7 +54,7 @@
     "release": "npm run build:all && npm run test:comprehensive",
     "postinstall": "electron-builder install-app-deps"
   },
-  "main": "electron/main-professional-viz.js",
+  "main": "electron/main.js",
   "homepage": "./",
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
@@ -143,9 +143,7 @@
       "buildResources": "build"
     },
     "files": [
-      "electron/main-professional-viz.js",
-      "electron/main-with-real-audio.js",
-      "electron/main-fixed-final.js",
+      "electron/main.js",
       "electron/preload.js",
       "package.json",
       "!**/*.test.*",

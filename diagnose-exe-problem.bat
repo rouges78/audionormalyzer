@@ -66,7 +66,7 @@ echo ✅ Build Next.js riuscito!
 echo.
 
 echo 📁 Controllo file necessari per Electron...
-if not exist "electron\main-professional-viz.js" (
+if not exist "electron\main.js" (
     echo ❌ File Electron main mancante!
     echo Creo un file Electron semplice...
     
