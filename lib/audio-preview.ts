@@ -11,7 +11,7 @@
  * (misura a due passate + true-peak limiting) resta il task core-04.
  */
 
-import type { AudioAnalysis, NormalizationOptions } from '@/types/audio'
+import type { AudioAnalysis, NormalizationOptions, AnalysisPrediction } from '@/types/audio'
 
 export interface GainComputation {
   /** Guadagno da applicare, in dB. */
@@ -66,7 +66,7 @@ export function computeGain(
  * Proietta l'analisi originale dopo l'applicazione di un guadagno costante.
  * Un gain puro trasla tutti i livelli in dB della stessa quantità.
  */
-export function predictAnalysis(analysis: AudioAnalysis, gainDb: number) {
+export function predictAnalysis(analysis: AudioAnalysis, gainDb: number): AnalysisPrediction {
   return {
     peakLevel: analysis.peakLevel + gainDb,
     rmsLevel: analysis.rmsLevel + gainDb,

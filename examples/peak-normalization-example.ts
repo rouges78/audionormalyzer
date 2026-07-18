@@ -6,7 +6,7 @@
  */
 
 import { createAudioProcessor } from '../services/audio-processor'
-import { NormalizationOptions } from '../types/audio'
+import { NormalizationOptions } from '@/types/audio'
 import path from 'path'
 
 async function demonstratePeakNormalization() {

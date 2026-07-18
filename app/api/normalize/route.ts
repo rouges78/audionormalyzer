@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAudioProcessor } from '@/services/audio-processor'
 import { createFileManager } from '@/services/file-manager'
 import { createAlbumProcessor } from '@/services/album-processor'
+import { resolveAudioEngine } from '@/lib/engines'
+import type { NormalizationResult } from '@/types/audio'
 import { ProcessingStorage, ProcessingResult } from '@/lib/processing-storage'
 import { withErrorHandling, serverErrorHandler, ErrorTypes } from '@/lib/server-error-handler'
 import { v4 as uuidv4 } from 'uuid'
@@ -138,7 +139,9 @@ async function processFilesAsync(
   const tempPaths: string[] = [];
 
   try {
-    const audioProcessor = createAudioProcessor()
+    // Engine di processing selezionato per il runtime (server → WASM finché
+    // il NativeEngine non è pronto in core-04).
+    const engine = await resolveAudioEngine()
 
     for (const fileId of fileIds) {
       const fileStartTime = Date.now();
@@ -171,22 +174,26 @@ async function processFilesAsync(
         }
 
         const result = await Promise.race([
-          audioProcessor.normalizeAudio(fileInfo.path, normalizeOptions),
-          new Promise((_, reject) => 
+          engine.normalize({ kind: 'path', path: fileInfo.path }, normalizeOptions),
+          new Promise<NormalizationResult>((_, reject) =>
             setTimeout(() => reject(ErrorTypes.TIMEOUT_ERROR('audio normalization', 300000)), 300000) // 5 minutes
           )
         ]);
 
+        if (!result.success) {
+          throw new Error(result.error || 'Normalizzazione fallita')
+        }
+
         const fileProcessingTime = Date.now() - fileStartTime;
-        
+
         processingData.results.push({
           fileId,
           fileName: fileInfo.originalName || `file-${fileId}`,
           success: true,
-          outputPath: result as string,
+          outputPath: result.outputPath as string,
           originalLoudness: 0, // Will be filled by actual analysis
-          finalLoudness: processingData.targetLevel,
-          gainApplied: 0, // Will be calculated
+          finalLoudness: result.finalLoudness,
+          gainApplied: result.gainApplied,
           processingTime: fileProcessingTime
         })
 
@@ -196,7 +203,7 @@ async function processFilesAsync(
           processId,
           fileId,
           fileName: fileInfo.originalName,
-          outputPath: result,
+          outputPath: result.outputPath,
           processingTime: fileProcessingTime,
         });
         

@@ -1,19 +1,48 @@
 // Core audio processing interfaces based on design document
 
 export interface AudioAnalysis {
-  duration: number
-  sampleRate: number
+  duration: number // secondi
+  sampleRate: number // Hz
   channels: number
-  peakLevel: number // dB
+  peakLevel: number // dBFS
+  rmsLevel: number // dB
+  lufsIntegrated: number // LUFS (EBU R128 integrated)
+  truePeak: number // dBTP
+  hasClipping: boolean
+  /**
+   * Formato/estensione rilevato (es. "MP3", "WAV"). Opzionale: non tutti i
+   * produttori lo popolano (l'anteprima client, ad esempio, può ometterlo).
+   */
+  format?: string
+  /**
+   * Loudness Range in LU (EBU R128 LRA). Opzionale: disponibile solo dagli
+   * engine che eseguono una misura loudnorm reale (WASM/nativo), non
+   * dall'anteprima basata sul gain.
+   */
+  loudnessRange?: number
+}
+
+/**
+ * Predizione dell'analisi dopo l'applicazione di un guadagno costante.
+ * Un gain puro trasla tutti i livelli in dB della stessa quantità; LUFS/LRA
+ * "veri" richiedono comunque una nuova misura (vedi engine WASM/nativo).
+ */
+export interface AnalysisPrediction {
+  peakLevel: number // dBFS
   rmsLevel: number // dB
   lufsIntegrated: number // LUFS
   truePeak: number // dBTP
-  hasClipping: boolean
+  gainApplied: number // dB
 }
 
 export interface NormalizationOptions {
   method: 'peak' | 'loudness'
-  targetLevel: number // dB or LUFS
+  /**
+   * Livello target. L'unità dipende dal metodo:
+   *  - method === 'peak'     → dBFS (tipicamente <= 0)
+   *  - method === 'loudness' → LUFS (tipicamente tra -30 e -6)
+   */
+  targetLevel: number
   preserveFormat: boolean
   outputPath: string
 }
@@ -102,10 +131,15 @@ export interface AudioFile {
 
 export interface NormalizationResult {
   success: boolean
+  /** Percorso file di output (engine server/desktop). */
   outputPath?: string
-  gainApplied: number
-  finalLoudness: number
-  processingTime: number
+  /** Blob di output (engine browser: l'anteprima non scrive su filesystem). */
+  outputBlob?: Blob
+  /** Object URL del blob di output (browser), pronto per <audio>/download. */
+  outputUrl?: string
+  gainApplied: number // dB
+  finalLoudness: number // LUFS (o stima, per anteprime basate sul gain)
+  processingTime: number // ms
   error?: string
 }
 
