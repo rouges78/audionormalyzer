@@ -24,13 +24,13 @@ export function UploadProgress({ items, isUploading, isAnalyzing }: UploadProgre
   const getStatusIcon = (status: UploadProgressItem['status']) => {
     switch (status) {
       case 'uploading':
-        return <Upload className="h-4 w-4 text-blue-500" />
+        return <Upload className="h-4 w-4 text-[color:var(--info)]" />
       case 'analyzing':
-        return <BarChart3 className="h-4 w-4 text-yellow-500" />
+        return <BarChart3 className="h-4 w-4 text-[color:var(--warning)]" />
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-[color:var(--success)]" />
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4 text-[color:var(--danger)]" />
     }
   }
 
@@ -38,21 +38,21 @@ export function UploadProgress({ items, isUploading, isAnalyzing }: UploadProgre
     switch (status) {
       case 'uploading':
         return (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          <Badge variant="secondary" className="bg-[color:var(--tint-info)] text-[color:var(--info)]">
             <Loader2 className="h-3 w-3 mr-1 animate-spin" />
             Caricamento...
           </Badge>
         )
       case 'analyzing':
         return (
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+          <Badge variant="secondary" className="bg-[color:var(--tint-warning)] text-[color:var(--warning)]">
             <Loader2 className="h-3 w-3 mr-1 animate-spin" />
             Analisi...
           </Badge>
         )
       case 'completed':
         return (
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+          <Badge className="bg-[color:var(--tint-success)] text-[color:var(--success)]">
             Completato
           </Badge>
         )
@@ -83,7 +83,7 @@ export function UploadProgress({ items, isUploading, isAnalyzing }: UploadProgre
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm">
               <span className="font-medium">{getStatusText()}</span>
-              <span className="text-gray-500">{overallProgress}%</span>
+              <span className="text-muted-foreground">{overallProgress}%</span>
             </div>
             <Progress value={overallProgress} className="w-full" />
           </div>
@@ -91,14 +91,14 @@ export function UploadProgress({ items, isUploading, isAnalyzing }: UploadProgre
           {/* Individual File Progress */}
           <div className="space-y-3">
             {items.map((item) => (
-              <div key={item.fileId} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div key={item.fileId} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
                 <div className="flex-shrink-0">
                   {getStatusIcon(item.status)}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {item.fileName}
                     </p>
                     {getStatusBadge(item.status)}
@@ -107,14 +107,14 @@ export function UploadProgress({ items, isUploading, isAnalyzing }: UploadProgre
                   {item.status !== 'completed' && (
                     <div className="flex items-center gap-2">
                       <Progress value={item.progress} className="flex-1 h-2" />
-                      <span className="text-xs text-gray-500 min-w-[3rem]">
+                      <span className="text-xs text-muted-foreground min-w-[3rem]">
                         {item.progress}%
                       </span>
                     </div>
                   )}
                   
                   {item.error && (
-                    <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                    <p className="text-xs text-[color:var(--danger)] mt-1">
                       {item.error}
                     </p>
                   )}

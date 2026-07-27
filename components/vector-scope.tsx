@@ -402,17 +402,17 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading flex items-center gap-2 text-base">
-            <Radio className="h-4 w-4 text-purple-800" />
+            <Radio className="h-4 w-4 text-[color:var(--primary-ink)]" />
             Vector Scope - {fileName}
           </CardTitle>
           
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+            <Badge variant="secondary" className="bg-[color:var(--tint-primary)] text-[color:var(--primary-ink)]">
               {settings.size}x{settings.size}
             </Badge>
             
             {isRunning && (
-              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+              <Badge variant="secondary" className="bg-[color:var(--tint-success)] text-[color:var(--success)]">
                 <Activity className="h-3 w-3 mr-1 animate-pulse" />
                 Live
               </Badge>
@@ -446,7 +446,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
             </Button>
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Target className="h-4 w-4" />
             <span>Frame: {currentFrame}</span>
           </div>
@@ -454,7 +454,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
 
         {/* Settings Panel */}
         {showSettings && (
-          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-4">
+          <div className="mb-4 p-4 bg-muted rounded-lg space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Persistence</label>
@@ -466,7 +466,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
                   step={0.01}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.persistence.toFixed(2)}</span>
+                <span className="text-xs text-muted-foreground">{settings.persistence.toFixed(2)}</span>
               </div>
               
               <div>
@@ -479,7 +479,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
                   step={0.1}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.gain.toFixed(1)}x</span>
+                <span className="text-xs text-muted-foreground">{settings.gain.toFixed(1)}x</span>
               </div>
               
               <div>
@@ -492,7 +492,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
                   step={5}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.frameRate} fps</span>
+                <span className="text-xs text-muted-foreground">{settings.frameRate} fps</span>
               </div>
               
               <div>
@@ -505,7 +505,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
                   step={128}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.size}px</span>
+                <span className="text-xs text-muted-foreground">{settings.size}px</span>
               </div>
             </div>
             
@@ -569,38 +569,38 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
           {/* Stereo Metrics */}
           {stereoMetrics && (
             <div className="lg:w-48 space-y-3">
-              <h4 className="font-medium text-gray-900 dark:text-white">Stereo Analysis</h4>
+              <h4 className="font-medium text-foreground">Stereo Analysis</h4>
               
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Correlation:</span>
-                  <span className={`font-mono ${stereoMetrics.correlation > 0.7 ? 'text-green-600' : stereoMetrics.correlation < -0.3 ? 'text-red-600' : 'text-yellow-600'}`}>
+                  <span className="text-muted-foreground">Correlation:</span>
+                  <span className={`font-mono ${stereoMetrics.correlation > 0.7 ? 'text-[color:var(--success)]' : stereoMetrics.correlation < -0.3 ? 'text-[color:var(--danger)]' : 'text-[color:var(--warning)]'}`}>
                     {stereoMetrics.correlation.toFixed(3)}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Width:</span>
+                  <span className="text-muted-foreground">Width:</span>
                   <span className="font-mono">{stereoMetrics.stereoWidth.toFixed(3)}</span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Mono Compat:</span>
+                  <span className="text-muted-foreground">Mono Compat:</span>
                   <span className="font-mono">{stereoMetrics.monoCompatibility.toFixed(3)}</span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Coherence:</span>
+                  <span className="text-muted-foreground">Coherence:</span>
                   <span className="font-mono">{stereoMetrics.phaseCoherence.toFixed(3)}</span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Pattern:</span>
-                  <span className="capitalize text-purple-600 dark:text-purple-400">{stereoMetrics.lissajousShape}</span>
+                  <span className="text-muted-foreground">Pattern:</span>
+                  <span className="capitalize text-[color:var(--primary-ink)]">{stereoMetrics.lissajousShape}</span>
                 </div>
               </div>
               
-              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
+              <div className="p-2 bg-[color:var(--tint-info)] rounded text-xs text-[color:var(--info)]">
                 <p className="mb-1"><strong>Interpretazione:</strong></p>
                 <p>
                   {stereoMetrics.correlation > 0.8 ? 'Segnale principalmente mono' :
@@ -614,7 +614,7 @@ export function VectorScope({ analysis, fileName, leftChannel, rightChannel, cla
         </div>
 
         {/* Info */}
-        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-4 text-sm text-muted-foreground">
           <p>
             Vector Scope mostra la relazione fase-ampiezza tra canali L/R. 
             {leftChannel && rightChannel ? ' Basato su dati audio reali.' : ' Simulazione basata su analisi.'}

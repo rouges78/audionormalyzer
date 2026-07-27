@@ -198,7 +198,7 @@ export function AudioPlayer({
     <Card className={`audio-card ${className}`}>
       <CardHeader className="pb-3">
         <CardTitle className="font-heading flex items-center gap-2 text-base">
-          <Headphones className="h-4 w-4 text-purple-800" />
+          <Headphones className="h-4 w-4 text-[color:var(--primary-ink)]" />
           Audio Player - {fileName}
         </CardTitle>
       </CardHeader>
@@ -227,7 +227,7 @@ export function AudioPlayer({
               size="sm"
               onClick={() => switchVersion('original')}
               disabled={!originalFile}
-              className={activeVersion === 'original' ? 'bg-purple-800 hover:bg-purple-900' : ''}
+              className={activeVersion === 'original' ? 'bg-[color:var(--cta)] text-[color:var(--cta-foreground)] hover:opacity-90' : ''}
             >
               Originale
             </Button>
@@ -236,7 +236,7 @@ export function AudioPlayer({
               size="sm"
               onClick={() => switchVersion('processed')}
               disabled={!hasProcessedVersion}
-              className={activeVersion === 'processed' ? 'bg-purple-800 hover:bg-purple-900' : ''}
+              className={activeVersion === 'processed' ? 'bg-[color:var(--cta)] text-[color:var(--cta-foreground)] hover:opacity-90' : ''}
             >
               Elaborato
               {!hasProcessedVersion && (
@@ -249,7 +249,7 @@ export function AudioPlayer({
 
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>{formatTime(currentTime)}</span>
               <Badge variant="outline" className="text-xs">
                 {activeVersion === 'original' ? 'Originale' : 'Elaborato'}
@@ -290,7 +290,7 @@ export function AudioPlayer({
               className="w-12 h-12"
             >
               {isLoading ? (
-                <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[color:var(--primary-ink)] border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
                 <Pause className="h-5 w-5" />
               ) : (
@@ -351,19 +351,19 @@ export function AudioPlayer({
               />
             </div>
             
-            <span className="text-sm text-gray-500 dark:text-gray-400 min-w-[3rem]">
+            <span className="text-sm text-muted-foreground min-w-[3rem]">
               {isMuted ? '0%' : `${volume[0]}%`}
             </span>
           </div>
 
           {/* A/B Comparison Info */}
           {hasProcessedVersion && (
-            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200 mb-2">
+            <div className="p-3 bg-[color:var(--tint-info)] border border-[color:var(--info)] rounded-lg">
+              <div className="flex items-center gap-2 text-[color:var(--info)] mb-2">
                 <Headphones className="h-4 w-4" />
                 <span className="font-medium">Confronto A/B</span>
               </div>
-              <p className="text-sm text-blue-600 dark:text-blue-300">
+              <p className="text-sm text-[color:var(--info)]">
                 Usa i pulsanti sopra per passare tra la versione originale e quella elaborata. 
                 La posizione di riproduzione viene sincronizzata automaticamente.
               </p>
@@ -372,8 +372,8 @@ export function AudioPlayer({
 
           {/* No Audio Warning */}
           {!originalFile && !processedFile && (
-            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="p-3 bg-muted border border-border rounded-lg text-center">
+              <p className="text-sm text-muted-foreground">
                 Nessun file audio disponibile per la riproduzione
               </p>
             </div>

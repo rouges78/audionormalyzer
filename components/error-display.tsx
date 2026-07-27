@@ -88,14 +88,14 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
     <div className={`space-y-3 ${className}`}>
       {errors.length > 1 && onClearAll && (
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {errors.length} errors occurred
           </span>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClearAll}
-            className="text-red-600 hover:text-red-700"
+            className="text-[color:var(--danger)] hover:opacity-80"
           >
             Clear All
           </Button>

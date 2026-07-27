@@ -62,13 +62,13 @@ export function ClippingIndicators({
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'severe':
-        return 'bg-red-500 text-white'
+        return 'bg-[color:var(--danger)] text-[color:var(--status-foreground)]'
       case 'moderate':
-        return 'bg-orange-500 text-white'
+        return 'bg-[color:var(--warning-strong)] text-[color:var(--status-foreground)]'
       case 'mild':
-        return 'bg-yellow-500 text-black'
+        return 'bg-[color:var(--warning)] text-[color:var(--status-foreground)]'
       default:
-        return 'bg-green-500 text-white'
+        return 'bg-[color:var(--success)] text-[color:var(--status-foreground)]'
     }
   }
 
@@ -101,7 +101,7 @@ export function ClippingIndicators({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading flex items-center gap-2 text-base">
-            <AlertTriangle className="h-4 w-4 text-purple-800" />
+            <AlertTriangle className="h-4 w-4 text-[color:var(--primary-ink)]" />
             Rilevamento Clipping - {fileName}
           </CardTitle>
           
@@ -110,7 +110,7 @@ export function ClippingIndicators({
               variant="ghost"
               size="sm"
               onClick={() => setIsMonitoring(!isMonitoring)}
-              className={`p-2 ${isMonitoring ? 'text-green-600' : 'text-gray-400'}`}
+              className={`p-2 ${isMonitoring ? 'text-[color:var(--success)]' : 'text-muted-foreground'}`}
             >
               <Activity className={`h-4 w-4 ${isMonitoring ? 'animate-pulse' : ''}`} />
             </Button>
@@ -120,14 +120,14 @@ export function ClippingIndicators({
       <CardContent>
         <div className="space-y-4">
           {/* Main Clipping Status */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
             <div className="flex items-center gap-3">
-              <div className={`w-4 h-4 rounded-full ${analysis.hasClipping ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
+              <div className={`w-4 h-4 rounded-full ${analysis.hasClipping ? 'bg-[color:var(--danger)] animate-pulse' : 'bg-[color:var(--success)]'}`}></div>
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">
+                <div className="font-medium text-foreground">
                   {analysis.hasClipping ? 'Clipping Rilevato' : 'Nessun Clipping'}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   Peak: {analysis.peakLevel.toFixed(2)} dB | True Peak: {analysis.truePeak.toFixed(2)} dBTP
                 </div>
               </div>
@@ -141,29 +141,29 @@ export function ClippingIndicators({
           {/* Clipping Metrics */}
           {analysis.hasClipping && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+              <div className="text-center p-3 bg-[color:var(--tint-danger)] rounded-lg">
+                <div className="text-2xl font-bold text-[color:var(--danger)]">
                   {clippingPercentage.toFixed(1)}%
                 </div>
-                <div className="text-sm text-red-600 dark:text-red-400">
+                <div className="text-sm text-[color:var(--danger)]">
                   Stima Clipping
                 </div>
               </div>
               
-              <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <div className="text-center p-3 bg-[color:var(--tint-warning-strong)] rounded-lg">
+                <div className="text-2xl font-bold text-[color:var(--warning-strong)]">
                   {Math.max(0, analysis.peakLevel).toFixed(1)} dB
                 </div>
-                <div className="text-sm text-orange-600 dark:text-orange-400">
+                <div className="text-sm text-[color:var(--warning-strong)]">
                   Eccesso Peak
                 </div>
               </div>
               
-              <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+              <div className="text-center p-3 bg-[color:var(--tint-warning)] rounded-lg">
+                <div className="text-2xl font-bold text-[color:var(--warning)]">
                   {Math.max(0, analysis.truePeak + 1).toFixed(1)} dB
                 </div>
-                <div className="text-sm text-yellow-600 dark:text-yellow-400">
+                <div className="text-sm text-[color:var(--warning)]">
                   Eccesso True Peak
                 </div>
               </div>
@@ -174,7 +174,7 @@ export function ClippingIndicators({
           {isRealTime && clippingEvents.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-gray-900 dark:text-white">Eventi Recenti</h4>
+                <h4 className="font-medium text-foreground">Eventi Recenti</h4>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -188,15 +188,15 @@ export function ClippingIndicators({
               {showDetails && (
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {clippingEvents.slice().reverse().map((event, index) => (
-                    <div key={event.timestamp} className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded text-sm">
+                    <div key={event.timestamp} className="flex items-center justify-between p-2 bg-[color:var(--tint-danger)] rounded text-sm">
                       <div className="flex items-center gap-2">
-                        <Zap className="h-3 w-3 text-red-500" />
+                        <Zap className="h-3 w-3 text-[color:var(--danger)]" />
                         <span>Ch {event.channel + 1}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+                      <div className="flex items-center gap-3 text-[color:var(--danger)]">
                         <span>{event.level.toFixed(1)} dB</span>
                         <span>{event.duration.toFixed(0)}ms</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           {new Date(event.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
@@ -209,48 +209,48 @@ export function ClippingIndicators({
 
           {/* Recommendations */}
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900 dark:text-white">Raccomandazioni</h4>
+            <h4 className="font-medium text-foreground">Raccomandazioni</h4>
             
             {!analysis.hasClipping ? (
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
+              <div className="p-3 bg-[color:var(--tint-success)] border border-[color:var(--success)] rounded-lg">
+                <div className="flex items-center gap-2 text-[color:var(--success)]">
                   <AlertTriangle className="h-4 w-4" />
                   <span className="font-medium">Audio Pulito</span>
                 </div>
-                <p className="text-sm text-green-600 dark:text-green-300 mt-1">
+                <p className="text-sm text-[color:var(--success)] mt-1">
                   Nessun clipping rilevato. Il segnale è entro i limiti accettabili.
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200 mb-2">
+                <div className="p-3 bg-[color:var(--tint-danger)] border border-[color:var(--danger)] rounded-lg">
+                  <div className="flex items-center gap-2 text-[color:var(--danger)] mb-2">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="font-medium">Azione Richiesta</span>
                   </div>
-                  <ul className="text-sm text-red-600 dark:text-red-300 space-y-1">
+                  <ul className="text-sm text-[color:var(--danger)] space-y-1">
                     <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 bg-red-600 dark:bg-red-300 rounded-full"></div>
+                      <div className="w-1 h-1 bg-[color:var(--danger)] rounded-full"></div>
                       Ridurre il gain di {Math.max(0, analysis.peakLevel + 1).toFixed(1)} dB
                     </li>
                     <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 bg-red-600 dark:bg-red-300 rounded-full"></div>
+                      <div className="w-1 h-1 bg-[color:var(--danger)] rounded-full"></div>
                       Applicare un limiter per prevenire clipping futuro
                     </li>
                     <li className="flex items-center gap-2">
-                      <div className="w-1 h-1 bg-red-600 dark:bg-red-300 rounded-full"></div>
+                      <div className="w-1 h-1 bg-[color:var(--danger)] rounded-full"></div>
                       Considerare la normalizzazione per ottimizzare i livelli
                     </li>
                   </ul>
                 </div>
                 
                 {severity === 'severe' && (
-                  <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-                    <div className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
+                  <div className="p-3 bg-[color:var(--tint-warning-strong)] border border-[color:var(--warning-strong)] rounded-lg">
+                    <div className="flex items-center gap-2 text-[color:var(--warning-strong)]">
                       <Zap className="h-4 w-4" />
                       <span className="font-medium">Clipping Severo</span>
                     </div>
-                    <p className="text-sm text-orange-600 dark:text-orange-300 mt-1">
+                    <p className="text-sm text-[color:var(--warning-strong)] mt-1">
                       Il clipping è molto evidente e può causare distorsione udibile. 
                       Si raccomanda vivamente la correzione prima della distribuzione.
                     </p>

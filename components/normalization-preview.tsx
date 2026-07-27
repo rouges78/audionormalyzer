@@ -136,7 +136,7 @@ export function NormalizationPreview({
       <Card className="audio-card">
         <CardHeader className="pb-3">
           <CardTitle className="font-heading flex items-center gap-2 text-base">
-            <Settings className="h-4 w-4 text-purple-800" />
+            <Settings className="h-4 w-4 text-[color:var(--primary-ink)]" />
             Anteprima Normalizzazione - {fileName}
           </CardTitle>
         </CardHeader>
@@ -160,13 +160,13 @@ export function NormalizationPreview({
             <TabsContent value="parameters" className="space-y-4">
               {/* Normalization Method */}
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900 dark:text-white">Metodo di Normalizzazione</h4>
+                <h4 className="font-medium text-foreground">Metodo di Normalizzazione</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Button
                     variant={normalizationMethod === 'peak' ? 'default' : 'outline'}
                     onClick={() => setNormalizationMethod('peak')}
                     className={`h-auto p-4 flex flex-col items-start gap-2 ${
-                      normalizationMethod === 'peak' ? 'bg-purple-800 hover:bg-purple-900' : ''
+                      normalizationMethod === 'peak' ? 'bg-[color:var(--cta)] text-[color:var(--cta-foreground)] hover:opacity-90' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export function NormalizationPreview({
                     variant={normalizationMethod === 'loudness' ? 'default' : 'outline'}
                     onClick={() => setNormalizationMethod('loudness')}
                     className={`h-auto p-4 flex flex-col items-start gap-2 ${
-                      normalizationMethod === 'loudness' ? 'bg-purple-800 hover:bg-purple-900' : ''
+                      normalizationMethod === 'loudness' ? 'bg-[color:var(--cta)] text-[color:var(--cta-foreground)] hover:opacity-90' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -195,8 +195,8 @@ export function NormalizationPreview({
                   </Button>
                 </div>
                 
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                <div className="p-3 bg-[color:var(--tint-info)] rounded-lg">
+                  <p className="text-sm text-[color:var(--info)]">
                     {getMethodDescription(normalizationMethod)}
                   </p>
                 </div>
@@ -205,7 +205,7 @@ export function NormalizationPreview({
               {/* Target Level */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-gray-900 dark:text-white">Livello Target</h4>
+                  <h4 className="font-medium text-foreground">Livello Target</h4>
                   <Badge variant="outline">
                     {targetLevel[0]} {normalizationMethod === 'peak' ? 'dB' : 'LUFS'}
                   </Badge>
@@ -220,10 +220,10 @@ export function NormalizationPreview({
                   className="w-full"
                 />
                 
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{range.min} {normalizationMethod === 'peak' ? 'dB' : 'LUFS'}</span>
                   {normalizationMethod === 'loudness' && (
-                    <span className="text-purple-600 dark:text-purple-400">-14 LUFS (Streaming)</span>
+                    <span className="text-[color:var(--primary-ink)]">-14 LUFS (Streaming)</span>
                   )}
                   <span>{range.max} {normalizationMethod === 'peak' ? 'dB' : 'LUFS'}</span>
                 </div>
@@ -231,40 +231,40 @@ export function NormalizationPreview({
 
               {/* Predicted Results */}
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900 dark:text-white">Risultati Previsti</h4>
+                <h4 className="font-medium text-foreground">Risultati Previsti</h4>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Gain</div>
+                  <div className="p-3 bg-muted rounded-lg text-center">
+                    <div className="text-sm text-muted-foreground">Gain</div>
                     <div className={`font-mono text-lg font-bold ${
-                      Math.abs(predicted.gainApplied) > 6 ? 'text-orange-600 dark:text-orange-400' : 'text-gray-900 dark:text-white'
+                      Math.abs(predicted.gainApplied) > 6 ? 'text-[color:var(--warning-strong)]' : 'text-foreground'
                     }`}>
                       {predicted.gainApplied > 0 ? '+' : ''}{predicted.gainApplied.toFixed(1)} dB
                     </div>
                   </div>
                   
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Peak</div>
+                  <div className="p-3 bg-muted rounded-lg text-center">
+                    <div className="text-sm text-muted-foreground">Peak</div>
                     <div className={`font-mono text-lg font-bold ${
-                      predicted.predictedPeak > -1 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
+                      predicted.predictedPeak > -1 ? 'text-[color:var(--danger)]' : 'text-foreground'
                     }`}>
                       {predicted.predictedPeak.toFixed(1)} dB
                     </div>
                   </div>
                   
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">LUFS</div>
+                  <div className="p-3 bg-muted rounded-lg text-center">
+                    <div className="text-sm text-muted-foreground">LUFS</div>
                     <div className={`font-mono text-lg font-bold ${
-                      predicted.predictedLufs > -14 ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-900 dark:text-white'
+                      predicted.predictedLufs > -14 ? 'text-[color:var(--warning)]' : 'text-foreground'
                     }`}>
                       {predicted.predictedLufs.toFixed(1)} LUFS
                     </div>
                   </div>
                   
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">True Peak</div>
+                  <div className="p-3 bg-muted rounded-lg text-center">
+                    <div className="text-sm text-muted-foreground">True Peak</div>
                     <div className={`font-mono text-lg font-bold ${
-                      predicted.predictedTruePeak > -1 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
+                      predicted.predictedTruePeak > -1 ? 'text-[color:var(--danger)]' : 'text-foreground'
                     }`}>
                       {predicted.predictedTruePeak.toFixed(1)} dBTP
                     </div>
@@ -275,24 +275,24 @@ export function NormalizationPreview({
                 {(predicted.willClip || predicted.willExceedTarget) && (
                   <div className="space-y-2">
                     {predicted.willClip && (
-                      <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                      <div className="p-3 bg-[color:var(--tint-danger)] border border-[color:var(--danger)] rounded-lg">
+                        <div className="flex items-center gap-2 text-[color:var(--danger)]">
                           <AlertTriangle className="h-4 w-4" />
                           <span className="font-medium">Rischio Clipping</span>
                         </div>
-                        <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+                        <p className="text-sm text-[color:var(--danger)] mt-1">
                           Il true peak supererà -1 dBTP. Si consiglia di ridurre il target level.
                         </p>
                       </div>
                     )}
                     
                     {predicted.willExceedTarget && (
-                      <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                        <div className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
+                      <div className="p-3 bg-[color:var(--tint-warning)] border border-[color:var(--warning)] rounded-lg">
+                        <div className="flex items-center gap-2 text-[color:var(--warning)]">
                           <AlertTriangle className="h-4 w-4" />
                           <span className="font-medium">Sopra Standard Streaming</span>
                         </div>
-                        <p className="text-sm text-yellow-600 dark:text-yellow-300 mt-1">
+                        <p className="text-sm text-[color:var(--warning)] mt-1">
                           Il risultato supererà -14 LUFS, potrebbe essere ridotto dalle piattaforme streaming.
                         </p>
                       </div>
@@ -306,8 +306,8 @@ export function NormalizationPreview({
               {/* Generate Preview Button */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white">Genera Anteprima</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <h4 className="font-medium text-foreground">Genera Anteprima</h4>
+                  <p className="text-sm text-muted-foreground">
                     Crea un'anteprima con i parametri attuali
                   </p>
                 </div>
@@ -315,7 +315,7 @@ export function NormalizationPreview({
                 <Button
                   onClick={generatePreview}
                   disabled={isGeneratingPreview || !onPreviewGenerate}
-                  className="bg-purple-800 hover:bg-purple-900"
+                  className="bg-[color:var(--cta)] text-[color:var(--cta-foreground)] hover:opacity-90"
                 >
                   {isGeneratingPreview ? (
                     <>
@@ -333,32 +333,32 @@ export function NormalizationPreview({
 
               {/* Preview Status */}
               {hasParametersChanged() && previewAudioUrl && (
-                <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-                  <div className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
+                <div className="p-3 bg-[color:var(--tint-warning-strong)] border border-[color:var(--warning-strong)] rounded-lg">
+                  <div className="flex items-center gap-2 text-[color:var(--warning-strong)]">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="font-medium">Parametri Modificati</span>
                   </div>
-                  <p className="text-sm text-orange-600 dark:text-orange-300 mt-1">
+                  <p className="text-sm text-[color:var(--warning-strong)] mt-1">
                     I parametri sono cambiati dall'ultima anteprima. Genera una nuova anteprima per sentire le modifiche.
                   </p>
                 </div>
               )}
 
               {previewError && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                <div className="p-3 bg-[color:var(--tint-danger)] border border-[color:var(--danger)] rounded-lg">
+                  <div className="flex items-center gap-2 text-[color:var(--danger)]">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="font-medium">Errore</span>
                   </div>
-                  <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+                  <p className="text-sm text-[color:var(--danger)] mt-1">
                     {previewError}
                   </p>
                 </div>
               )}
 
               {!onPreviewGenerate && (
-                <div className="p-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                <div className="p-3 bg-muted border border-border rounded-lg">
+                  <p className="text-sm text-muted-foreground text-center">
                     La funzionalità di anteprima sarà disponibile nel prossimo aggiornamento
                   </p>
                 </div>

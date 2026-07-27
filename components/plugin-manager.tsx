@@ -221,7 +221,7 @@ export function PluginManager({ className }: PluginManagerProps) {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading flex items-center gap-2 text-lg">
-            <Puzzle className="h-5 w-5 text-purple-800" />
+            <Puzzle className="h-5 w-5 text-[color:var(--primary-ink)]" />
             Plugin & Extension Manager
           </CardTitle>
           
@@ -299,7 +299,7 @@ export function PluginManager({ className }: PluginManagerProps) {
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search plugins, functions, workflows..."
                 value={searchQuery}
@@ -383,13 +383,13 @@ export function PluginManager({ className }: PluginManagerProps) {
 // Sub-components
 function StatCard({ icon, label, value, color }: any) {
   const colorClasses = {
-    blue: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20',
-    purple: 'text-purple-600 bg-purple-50 dark:bg-purple-900/20',
-    green: 'text-green-600 bg-green-50 dark:bg-green-900/20',
-    orange: 'text-orange-600 bg-orange-50 dark:bg-orange-900/20',
-    red: 'text-red-600 bg-red-50 dark:bg-red-900/20',
-    cyan: 'text-cyan-600 bg-cyan-50 dark:bg-cyan-900/20',
-    yellow: 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20'
+    blue: 'text-[color:var(--info)] bg-[color:var(--tint-info)]',
+    purple: 'text-[color:var(--primary-ink)] bg-[color:var(--tint-primary)]',
+    green: 'text-[color:var(--success)] bg-[color:var(--tint-success)]',
+    orange: 'text-[color:var(--warning-strong)] bg-[color:var(--tint-warning-strong)]',
+    red: 'text-[color:var(--danger)] bg-[color:var(--tint-danger)]',
+    cyan: 'text-[color:var(--info)] bg-[color:var(--tint-info)]',
+    yellow: 'text-[color:var(--warning)] bg-[color:var(--tint-warning)]'
   }
 
   return (
@@ -442,12 +442,12 @@ function PluginsList({ plugins, onToggle, onUnload, onLoad }: any) {
                       {isActive ? 'Active' : 'Inactive'}
                     </Badge>
                     <Badge variant="outline">{plugin.metadata.category}</Badge>
-                    <span className="text-sm text-gray-500">v{plugin.metadata.version}</span>
+                    <span className="text-sm text-muted-foreground">v{plugin.metadata.version}</span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-sm text-muted-foreground mb-2">
                     {plugin.metadata.description}
                   </p>
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <User className="h-3 w-3" />
                       {plugin.metadata.author}
@@ -497,18 +497,18 @@ function ExtensionsList({ extensions }: any) {
               <div>
                 <div className="font-medium mb-1">Methods ({extension.methods.length})</div>
                 {extension.methods.slice(0, 3).map(method => (
-                  <div key={method.name} className="text-gray-600 dark:text-gray-400">
+                  <div key={method.name} className="text-muted-foreground">
                     {extension.namespace}.{method.name}
                   </div>
                 ))}
                 {extension.methods.length > 3 && (
-                  <div className="text-gray-500">+{extension.methods.length - 3} more</div>
+                  <div className="text-muted-foreground">+{extension.methods.length - 3} more</div>
                 )}
               </div>
               <div>
                 <div className="font-medium mb-1">Events ({extension.events.length})</div>
                 {extension.events.slice(0, 3).map(event => (
-                  <div key={event.name} className="text-gray-600 dark:text-gray-400">
+                  <div key={event.name} className="text-muted-foreground">
                     {event.name}
                   </div>
                 ))}
@@ -516,7 +516,7 @@ function ExtensionsList({ extensions }: any) {
               <div>
                 <div className="font-medium mb-1">Middleware ({extension.middleware.length})</div>
                 {extension.middleware.slice(0, 3).map(middleware => (
-                  <div key={middleware.name} className="text-gray-600 dark:text-gray-400">
+                  <div key={middleware.name} className="text-muted-foreground">
                     {middleware.name}
                   </div>
                 ))}
@@ -551,10 +551,10 @@ function FunctionsList({ functions, onExecute, onDelete }: any) {
                 </Button>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               {func.description}
             </p>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <User className="h-3 w-3" />
                 {func.author}
@@ -587,10 +587,10 @@ function WorkflowsList({ workflows, onExecute }: any) {
                 Execute
               </Button>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               {workflow.description}
             </p>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span>Steps: {workflow.steps.length}</span>
               <span>Variables: {workflow.variables.length}</span>
               <span>Triggers: {workflow.triggers.filter(t => t.enabled).length} active</span>
@@ -620,9 +620,9 @@ function ModulesList({ modules }: any) {
                 </Badge>
                 <Badge variant="outline">{module.type}</Badge>
               </div>
-              <span className="text-sm text-gray-500">v{module.version}</span>
+              <span className="text-sm text-muted-foreground">v{module.version}</span>
             </div>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span>Path: {module.path}</span>
               {module.size && <span>Size: {(module.size / 1024).toFixed(1)}KB</span>}
               {module.loadTime && <span>Load Time: {module.loadTime.toFixed(2)}ms</span>}
@@ -740,7 +740,7 @@ function CreateFunctionForm({ onClose }: any) {
 function CreateWorkflowForm({ onClose }: any) {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">Workflow creation UI would go here...</p>
+      <p className="text-sm text-muted-foreground">Workflow creation UI would go here...</p>
       <Button variant="ghost" onClick={onClose}>
         Cancel
       </Button>
@@ -751,7 +751,7 @@ function CreateWorkflowForm({ onClose }: any) {
 function CreatePluginForm({ onClose }: any) {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">Plugin creation UI would go here...</p>
+      <p className="text-sm text-muted-foreground">Plugin creation UI would go here...</p>
       <Button variant="ghost" onClick={onClose}>
         Cancel
       </Button>

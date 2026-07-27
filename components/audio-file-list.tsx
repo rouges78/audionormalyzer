@@ -63,35 +63,35 @@ export function AudioFileList({
     switch (status) {
       case 'uploaded':
         return (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          <Badge variant="secondary" className="bg-[color:var(--tint-info)] text-[color:var(--info)]">
             <Clock className="h-3 w-3 mr-1" />
             Caricato
           </Badge>
         )
       case 'analyzing':
         return (
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+          <Badge variant="secondary" className="bg-[color:var(--tint-warning)] text-[color:var(--warning)]">
             <Clock className="h-3 w-3 mr-1 animate-spin" />
             Analisi...
           </Badge>
         )
       case 'ready':
         return (
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+          <Badge className="bg-[color:var(--tint-success)] text-[color:var(--success)]">
             <CheckCircle className="h-3 w-3 mr-1" />
             Pronto
           </Badge>
         )
       case 'processing':
         return (
-          <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+          <Badge variant="secondary" className="bg-[color:var(--tint-primary)] text-[color:var(--primary-ink)]">
             <Clock className="h-3 w-3 mr-1 animate-spin" />
             Elaborazione...
           </Badge>
         )
       case 'completed':
         return (
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+          <Badge className="bg-[color:var(--tint-success)] text-[color:var(--success)]">
             <CheckCircle className="h-3 w-3 mr-1" />
             Completato
           </Badge>
@@ -125,19 +125,19 @@ export function AudioFileList({
   }
 
   const getVolumeColor = (analysis?: AudioFile['analysis']) => {
-    if (!analysis) return 'text-gray-500'
+    if (!analysis) return 'text-muted-foreground'
     
     const lufs = analysis.lufsIntegrated
-    if (lufs > -14) return 'text-red-600 dark:text-red-400'
-    if (lufs > -18) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-green-600 dark:text-green-400'
+    if (lufs > -14) return 'text-[color:var(--danger)]'
+    if (lufs > -18) return 'text-[color:var(--warning)]'
+    return 'text-[color:var(--success)]'
   }
 
   return (
     <Card className={`audio-card ${className}`}>
       <CardHeader>
         <CardTitle className="font-heading flex items-center gap-2">
-          <Music className="h-5 w-5 text-purple-800" />
+          <Music className="h-5 w-5 text-[color:var(--primary-ink)]" />
           Tracce Album ({files.length})
         </CardTitle>
       </CardHeader>
@@ -156,18 +156,18 @@ export function AudioFileList({
             return (
               <div key={file.id} className="border rounded-lg overflow-hidden">
                 {/* File Header */}
-                <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800">
+                <div className="flex items-center gap-4 p-4 bg-card">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                      <Volume2 className="h-6 w-6 text-purple-800 dark:text-purple-300" />
+                    <div className="w-12 h-12 bg-[color:var(--tint-primary)] rounded-lg flex items-center justify-center">
+                      <Volume2 className="h-6 w-6 text-[color:var(--primary-ink)]" />
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                    <h3 className="font-medium text-foreground truncate">
                       {file.name}
                     </h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                       <span>{formatFileSize(file.size)}</span>
                       {file.analysis && (
                         <>
@@ -230,7 +230,7 @@ export function AudioFileList({
                     {onDownloadFile && file.status === 'completed' && (
                       <Button 
                         size="sm" 
-                        className="bg-purple-800 hover:bg-purple-900 text-white"
+                        className="bg-primary hover:opacity-90 text-primary-foreground"
                         onClick={() => {
                           try {
                             onDownloadFile(file.id)
@@ -247,7 +247,7 @@ export function AudioFileList({
                       size="sm"
                       variant="ghost"
                       onClick={() => onRemoveFile(file.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                      className="text-[color:var(--danger)] hover:opacity-80 hover:bg-[color:var(--tint-danger)]"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -256,8 +256,8 @@ export function AudioFileList({
 
                 {/* Error Message */}
                 {file.error && (
-                  <div className="px-4 py-2 bg-red-50 dark:bg-red-900/20 border-t">
-                    <p className="text-sm text-red-600 dark:text-red-400">
+                  <div className="px-4 py-2 bg-[color:var(--tint-danger)] border-t">
+                    <p className="text-sm text-[color:var(--danger)]">
                       <AlertTriangle className="h-4 w-4 inline mr-1" />
                       {file.error}
                     </p>
@@ -266,7 +266,7 @@ export function AudioFileList({
 
                 {/* Expanded Content */}
                 {isExpanded && file.analysis && (
-                  <div className="border-t bg-gray-50 dark:bg-gray-800/50">
+                  <div className="border-t bg-muted">
                     <div className="p-4">
                       <Tabs 
                         value={activeTab[file.id] || 'analysis'} 
@@ -305,8 +305,8 @@ export function AudioFileList({
                         </TabsContent>
 
                         <TabsContent value="feedback">
-                          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center">
-                            <p className="text-sm text-blue-800 dark:text-blue-200">
+                          <div className="p-4 bg-[color:var(--tint-info)] rounded-lg text-center">
+                            <p className="text-sm text-[color:var(--info)]">
                               Il feedback di normalizzazione sarà disponibile dopo aver generato un'anteprima
                             </p>
                           </div>
@@ -324,7 +324,7 @@ export function AudioFileList({
         {files.some(f => f.status === 'completed') && (
           <div className="mt-6 pt-4 border-t">
             <Button 
-              className="w-full bg-purple-800 hover:bg-purple-900 text-white"
+              className="w-full bg-primary hover:opacity-90 text-primary-foreground"
               onClick={() => {
                 // TODO: Implement bulk download
                 console.log('Bulk download not implemented yet')

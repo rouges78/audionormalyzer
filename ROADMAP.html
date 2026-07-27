@@ -170,8 +170,8 @@
     </div>
     <div class="meta-badges">
       <span class="badge">Versione progetto <b>0.1.0</b></span>
-      <span class="badge">Roadmap <b id="roadmapVer">v1.4</b></span>
-      <span class="badge">Aggiornata <b id="updated">15 lug 2026</b></span>
+      <span class="badge">Roadmap <b id="roadmapVer">v1.5</b></span>
+      <span class="badge">Aggiornata <b id="updated">26 lug 2026</b></span>
     </div>
   </header>
 
@@ -354,8 +354,8 @@
    Ogni task: id, cat, phase, prio (hi|md|lo), isNew, def (default done),
    title, desc, dep (dipendenze opzionali)
    ============================================================ */
-const ROADMAP_VERSION = "1.4";
-const LAST_UPDATE = "2026-07-15";
+const ROADMAP_VERSION = "1.5";
+const LAST_UPDATE = "2026-07-26";
 
 const CATEGORIES = {
   arch:   {icon:"🏗️", name:"Architettura"},
@@ -395,9 +395,9 @@ const TASKS = [
   {id:"arch-02", cat:"arch", phase:0, prio:"lo", def:true,  title:"Layer di servizi separato dal routing API", desc:"Servizi in <code>services/</code> (audio-processor, album-processor, download-manager, file/metadata-manager, processing-queue)."},
   {id:"arch-03", cat:"arch", phase:0, prio:"lo", def:true,  title:"Wrapper desktop Electron", desc:"Integrazione Electron con preload e main process."},
   {id:"arch-04", cat:"arch", phase:3, prio:"hi", def:true, title:"Unificare l'entry-point Electron", desc:"✅ Fatto (15/07/2026): <code>electron/main.js</code> (ex main-professional-viz) è l'unico main autorevole; gli altri 8 spostati in <code>electron/legacy/</code>. Aggiornati package.json, electron-builder.config.js e gli script. <b>Verificato a runtime (15/07):</b> la build desktop parte con <code>electron/main.js</code> — app avviata da <code>dist\\win-unpacked\\</code> senza crash."},
-  {id:"arch-05", cat:"arch", phase:1, prio:"hi", def:false, title:"Definire i contratti dei tipi audio", desc:"Consolidare <code>types/audio.ts</code> come fonte unica per AudioAnalysis / NormalizationOptions.", isNew:true},
-  {id:"arch-06", cat:"arch", phase:2, prio:"md", def:false, title:"Separare logica browser (WASM) da logica server (ffmpeg nativo)", desc:"Chiarire quando gira FFmpeg WASM lato client vs ffmpeg nativo lato server/desktop."},
-  {id:"arch-07", cat:"arch", phase:4, prio:"lo", def:false, title:"Astrazione 'engine' pluggabile per il processing", desc:"Interfaccia comune per motori diversi (WASM, nativo, futuro GPU).", isNew:true},
+  {id:"arch-05", cat:"arch", phase:1, prio:"hi", def:true, title:"Definire i contratti dei tipi audio", desc:"✅ Fatto (18/07): <code>types/audio.ts</code> è la fonte unica — AudioAnalysis con <code>format?</code> e <code>loudnessRange?</code> (LRA), NormalizationResult con <code>outputBlob?</code>/<code>outputUrl?</code> per il browser, nuovo tipo AnalysisPrediction; documentata la semantica di <code>targetLevel</code> (dBFS vs LUFS). Import uniformati a <code>@/types/audio</code> in examples e audio-preview.", isNew:true},
+  {id:"arch-06", cat:"arch", phase:2, prio:"md", def:false, title:"Separare logica browser (WASM) da logica server (ffmpeg nativo)", desc:"Chiarire quando gira FFmpeg WASM lato client vs ffmpeg nativo lato server/desktop. <b>Parzialmente coperto da arch-07</b>: la factory risolve già l'engine per runtime, ma NativeEngine è ancora uno stub → si chiude con core-04.", dep:["arch-07","core-04"]},
+  {id:"arch-07", cat:"arch", phase:4, prio:"lo", def:true, title:"Astrazione 'engine' pluggabile per il processing", desc:"✅ Fatto (18/07): <code>lib/engines/</code> con interfaccia <code>AudioEngine</code> (analyze/normalize/capabilities), EngineInput (path|file|buffer) ed errori tipizzati. Implementazioni: WasmEngine (@ffmpeg/ffmpeg), WebAudioEngine (anteprima gain-based), NativeEngine (stub, pieno a core-04). Factory <code>createAudioEngine()</code>/<code>resolveAudioEngine()</code> con auto-runtime e override via <code>AUDIO_ENGINE</code>. La rotta <code>normalize</code> delega all'engine. 14 test Vitest.", isNew:true},
   {id:"arch-08", cat:"arch", phase:3, prio:"lo", def:false, title:"Rimuovere definitivamente electron/legacy/ dopo verifica build", desc:"Confermato che la build desktop parte con <code>electron/main.js</code>, eliminare i main archiviati e gli script legacy che li usano.", isNew:true, dep:["arch-04","qual-02"]},
 
   // ---------- CORE AUDIO ----------
@@ -506,6 +506,7 @@ const TASKS = [
   {id:"maint-01", cat:"maint", phase:2, prio:"md", def:false, title:"Aggiornamento dipendenze pianificato", desc:"Dependabot/renovate + verifica breaking (Next 15/React 19)."},
   {id:"maint-02", cat:"maint", phase:0, prio:"md", def:false, title:"Rimuovere artefatti dal repo (.next, dist, temp, logs)", desc:"Assicurare .gitignore corretto; evitare build committate."},
   {id:"maint-03", cat:"maint", phase:2, prio:"lo", def:false, title:"Script di diagnosi manutenuto", desc:"<code>npm run diagnose</code> aggiornato agli errori reali ricorrenti."},
+  {id:"maint-04", cat:"maint", phase:0, prio:"hi", def:false, title:"Configurare un remote Git e pushare il repo", desc:"<b>Il repository non ha alcun remote configurato</b> (<code>git remote -v</code> vuoto): 5 commit esistono solo in locale su <code>G:\\dev\\audionormalyzer</code>. Un guasto disco = perdita totale del lavoro. Creare un repo GitHub (privato) e fare il primo push di <code>main</code>. Prerequisito anche per dist-04 (CI/CD).", isNew:true},
 
   // ---------- SCALABILITÀ ----------
   {id:"scale-01", cat:"scale", phase:4, prio:"lo", def:false, title:"Elaborazione di code lunghe / cartelle intere", desc:"Gestire centinaia di file senza esaurire memoria."},
@@ -552,15 +553,16 @@ const FEAS_CRITERIA = [
 ];
 
 const PROBLEMS = [
-  {id:"core-03", sev:"hi", text:"Analisi audio simulata (valori da hash del file, non misure reali)"},
-  {id:"core-05", sev:"hi", text:"FFmpeg caricato da CDN unpkg → uso offline del desktop non funziona"},
-  {id:"arch-04", sev:"md", text:"9 file electron/main-* : entry-point ambiguo"},
+  {id:"maint-04", sev:"hi", text:"Nessun remote Git configurato → 5 commit esistono solo in locale, nessun backup"},
+  {id:"core-03", sev:"hi", text:"Analisi audio simulata (valori da hash del file, non misure reali) — services/audio-processor.ts:57-99"},
+  {id:"core-05", sev:"hi", text:"FFmpeg caricato da CDN unpkg → uso offline del desktop non funziona — services/audio-processor.ts:30"},
   {id:"qual-01", sev:"md", text:"15+ README di troubleshooting alla radice del repo"},
   {id:"qual-02", sev:"md", text:"~20 script di build legacy sovrapposti"},
   {id:"sec-03", sev:"md", text:"Hardening Electron (contextIsolation/CSP) da verificare"}
 ];
 
 const HISTORY = [
+  {date:"2026-07-26", ver:"1.5", text:"Allineamento roadmap al codice. Registrati due task completati il 18/07 e mai riportati: arch-05 (contratti tipi audio consolidati in types/audio.ts — AudioAnalysis con format/loudnessRange, NormalizationResult con outputBlob/outputUrl, AnalysisPrediction, semantica targetLevel documentata) e arch-07 (astrazione AudioEngine pluggabile in lib/engines/: interfaccia analyze/normalize/capabilities, WasmEngine + WebAudioEngine + NativeEngine stub, factory con auto-runtime e override AUDIO_ENGINE, rotta normalize che delega all'engine, 14 test Vitest). arch-06 aggiornato: parzialmente coperto dalla factory, si chiude quando NativeEngine sarà reale (core-04). Nuovo problema critico individuato: il repository non ha alcun remote Git configurato — 5 commit vivono solo su disco locale (nuovo task maint-04). Restano bloccanti core-03 (analisi simulata) e core-05 (FFmpeg da unpkg)."},
   {date:"2026-07-16", ver:"1.4", text:"Completati uxui-03 e uxui-04. Nuovo wizard a 5 step (Carica→Configura→Anteprima→Processa→Scarica) che sostituisce la vecchia pagina singola, con stepper e stati chiari. Anteprima A/B reale via Web Audio (lib/audio-preview.ts): decodifica il file nel browser, applica il guadagno previsto (con tetto true-peak -1 dBTP anti-clipping) e confronta originale vs normalizzato; il rendering finale produce WAV scaricabili lato client, senza dipendere da FFmpeg. Riusati i componenti AudioPlayer e NormalizationFeedback esistenti. tsc: 0 errori sui file nuovi; logica gain/WAV testata. Nuovo task compat-04 (fallback formati non decodificabili). Nota: l'anteprima usa ancora i numeri dell'analisi simulata → dipende da core-03/04 per la precisione reale."},
   {date:"2026-07-15", ver:"1.3", text:"Verifica desktop su Windows. next build OK (12 pagine); electron-builder impacchetta l'app in dist\\win-unpacked usando electron/main.js e l'app si avvia senza crash → arch-04 confermato a runtime. Corretto un bug pre-esistente negli script build:exe (ordine argomenti --win portable --x64) → nuovo task dist-06 (fatto). Il portable single-file resta bloccato dall'estrazione di winCodeSign (symlink macOS, serve Modalità sviluppatore/admin) → nuovo task dist-07."},
   {date:"2026-07-15", ver:"1.2", text:"Task arch-04 COMPLETATO: unificato l'entry-point Electron. main-professional-viz.js promosso a electron/main.js (unico main autorevole); gli altri 8 main archiviati in electron/legacy/ con README. Aggiornati package.json (main + files), electron-builder.config.js, script build:professional e 6 script legacy (percorsi → legacy/). Il problema 'entry-point ambiguo' si è risolto automaticamente. Aggiunto task arch-08 per la rimozione definitiva dopo verifica build."},

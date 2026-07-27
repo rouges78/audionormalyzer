@@ -26,16 +26,16 @@ export function NormalizationFeedback({
   
   const getChangeIcon = (original: number, predicted: number) => {
     const diff = predicted - original
-    if (Math.abs(diff) < 0.1) return <Minus className="h-4 w-4 text-gray-500" />
-    if (diff > 0) return <TrendingUp className="h-4 w-4 text-green-600" />
-    return <TrendingDown className="h-4 w-4 text-red-600" />
+    if (Math.abs(diff) < 0.1) return <Minus className="h-4 w-4 text-muted-foreground" />
+    if (diff > 0) return <TrendingUp className="h-4 w-4 text-[color:var(--success)]" />
+    return <TrendingDown className="h-4 w-4 text-[color:var(--danger)]" />
   }
 
   const getChangeColor = (original: number, predicted: number) => {
     const diff = predicted - original
-    if (Math.abs(diff) < 0.1) return 'text-gray-600 dark:text-gray-400'
-    if (diff > 0) return 'text-green-600 dark:text-green-400'
-    return 'text-red-600 dark:text-red-400'
+    if (Math.abs(diff) < 0.1) return 'text-muted-foreground'
+    if (diff > 0) return 'text-[color:var(--success)]'
+    return 'text-[color:var(--danger)]'
   }
 
   const formatChange = (original: number, predicted: number) => {
@@ -84,7 +84,7 @@ export function NormalizationFeedback({
     <Card className={`audio-card ${className}`}>
       <CardHeader className="pb-3">
         <CardTitle className="font-heading flex items-center gap-2 text-base">
-          <BarChart3 className="h-4 w-4 text-purple-800" />
+          <BarChart3 className="h-4 w-4 text-[color:var(--primary-ink)]" />
           Feedback Normalizzazione - {fileName}
         </CardTitle>
       </CardHeader>
@@ -92,23 +92,23 @@ export function NormalizationFeedback({
         <div className="space-y-6">
           {/* Before/After Comparison */}
           <div className="space-y-4">
-            <h4 className="font-medium text-gray-900 dark:text-white">Confronto Prima/Dopo</h4>
+            <h4 className="font-medium text-foreground">Confronto Prima/Dopo</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Peak Level */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div className="p-4 bg-muted rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Peak Level</span>
+                  <span className="text-sm font-medium text-muted-foreground">Peak Level</span>
                   {getChangeIcon(originalAnalysis.peakLevel, predictedAnalysis.peakLevel)}
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Prima:</span>
+                    <span className="text-xs text-muted-foreground">Prima:</span>
                     <span className="font-mono text-sm">{originalAnalysis.peakLevel.toFixed(1)} dB</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Dopo:</span>
+                    <span className="text-xs text-muted-foreground">Dopo:</span>
                     <span className="font-mono text-sm">{predictedAnalysis.peakLevel.toFixed(1)} dB</span>
                   </div>
                   <div className="flex justify-between items-center border-t pt-2">
@@ -121,19 +121,19 @@ export function NormalizationFeedback({
               </div>
 
               {/* RMS Level */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div className="p-4 bg-muted rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">RMS Level</span>
+                  <span className="text-sm font-medium text-muted-foreground">RMS Level</span>
                   {getChangeIcon(originalAnalysis.rmsLevel, predictedAnalysis.rmsLevel)}
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Prima:</span>
+                    <span className="text-xs text-muted-foreground">Prima:</span>
                     <span className="font-mono text-sm">{originalAnalysis.rmsLevel.toFixed(1)} dB</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Dopo:</span>
+                    <span className="text-xs text-muted-foreground">Dopo:</span>
                     <span className="font-mono text-sm">{predictedAnalysis.rmsLevel.toFixed(1)} dB</span>
                   </div>
                   <div className="flex justify-between items-center border-t pt-2">
@@ -146,19 +146,19 @@ export function NormalizationFeedback({
               </div>
 
               {/* LUFS */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div className="p-4 bg-muted rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Loudness (LUFS)</span>
+                  <span className="text-sm font-medium text-muted-foreground">Loudness (LUFS)</span>
                   {getChangeIcon(originalAnalysis.lufsIntegrated, predictedAnalysis.lufsIntegrated)}
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Prima:</span>
+                    <span className="text-xs text-muted-foreground">Prima:</span>
                     <span className="font-mono text-sm">{originalAnalysis.lufsIntegrated.toFixed(1)} LUFS</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Dopo:</span>
+                    <span className="text-xs text-muted-foreground">Dopo:</span>
                     <span className="font-mono text-sm">{predictedAnalysis.lufsIntegrated.toFixed(1)} LUFS</span>
                   </div>
                   <div className="flex justify-between items-center border-t pt-2">
@@ -171,19 +171,19 @@ export function NormalizationFeedback({
               </div>
 
               {/* True Peak */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div className="p-4 bg-muted rounded-lg">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">True Peak</span>
+                  <span className="text-sm font-medium text-muted-foreground">True Peak</span>
                   {getChangeIcon(originalAnalysis.truePeak, predictedAnalysis.truePeak)}
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Prima:</span>
+                    <span className="text-xs text-muted-foreground">Prima:</span>
                     <span className="font-mono text-sm">{originalAnalysis.truePeak.toFixed(1)} dBTP</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Dopo:</span>
+                    <span className="text-xs text-muted-foreground">Dopo:</span>
                     <span className="font-mono text-sm">{predictedAnalysis.truePeak.toFixed(1)} dBTP</span>
                   </div>
                   <div className="flex justify-between items-center border-t pt-2">
@@ -198,19 +198,19 @@ export function NormalizationFeedback({
           </div>
 
           {/* Gain Applied */}
-          <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div className="p-4 bg-[color:var(--tint-primary)] rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h5 className="font-medium text-purple-900 dark:text-purple-100">Gain Applicato</h5>
-                <p className="text-sm text-purple-700 dark:text-purple-300">
+                <h5 className="font-medium text-[color:var(--primary-ink)]">Gain Applicato</h5>
+                <p className="text-sm text-[color:var(--primary-ink)]">
                   Modifica del volume applicata al segnale
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold font-mono text-purple-900 dark:text-purple-100">
+                <div className="text-2xl font-bold font-mono text-[color:var(--primary-ink)]">
                   {predictedAnalysis.gainApplied > 0 ? '+' : ''}{predictedAnalysis.gainApplied.toFixed(1)} dB
                 </div>
-                <div className="text-sm text-purple-700 dark:text-purple-300">
+                <div className="text-sm text-[color:var(--primary-ink)]">
                   {Math.abs(predictedAnalysis.gainApplied) > 6 ? 'Gain elevato' : 'Gain moderato'}
                 </div>
               </div>
@@ -219,13 +219,13 @@ export function NormalizationFeedback({
 
           {/* Quality Assessment */}
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900 dark:text-white">Valutazione Qualità</h4>
+            <h4 className="font-medium text-foreground">Valutazione Qualità</h4>
             
             {/* Improvements */}
             {assessment.improvements.length > 0 && (
               <div className="space-y-2">
                 {assessment.improvements.map((improvement, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-green-800 dark:text-green-200">
+                  <div key={index} className="flex items-center gap-2 p-2 bg-[color:var(--tint-success)] rounded text-[color:var(--success)]">
                     <CheckCircle className="h-4 w-4 flex-shrink-0" />
                     <span className="text-sm">{improvement}</span>
                   </div>
@@ -237,7 +237,7 @@ export function NormalizationFeedback({
             {assessment.issues.length > 0 && (
               <div className="space-y-2">
                 {assessment.issues.map((issue, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-yellow-800 dark:text-yellow-200">
+                  <div key={index} className="flex items-center gap-2 p-2 bg-[color:var(--tint-warning)] rounded text-[color:var(--warning)]">
                     <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                     <span className="text-sm">{issue}</span>
                   </div>
@@ -247,7 +247,7 @@ export function NormalizationFeedback({
 
             {/* All Good */}
             {assessment.issues.length === 0 && assessment.improvements.length === 0 && (
-              <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded text-blue-800 dark:text-blue-200">
+              <div className="flex items-center gap-2 p-3 bg-[color:var(--tint-info)] rounded text-[color:var(--info)]">
                 <CheckCircle className="h-4 w-4" />
                 <span className="text-sm">Nessun problema rilevato. La normalizzazione sembra appropriata.</span>
               </div>
@@ -256,26 +256,26 @@ export function NormalizationFeedback({
 
           {/* Dynamic Range Analysis */}
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-900 dark:text-white">Analisi Dynamic Range</h4>
+            <h4 className="font-medium text-foreground">Analisi Dynamic Range</h4>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-center">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Originale</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
+              <div className="p-3 bg-muted rounded-lg text-center">
+                <div className="text-sm text-muted-foreground">Originale</div>
+                <div className="text-lg font-bold text-foreground">
                   {Math.abs(originalAnalysis.peakLevel - originalAnalysis.rmsLevel).toFixed(1)} dB
                 </div>
               </div>
               
-              <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg text-center">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Dopo Normalizzazione</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">
+              <div className="p-3 bg-muted rounded-lg text-center">
+                <div className="text-sm text-muted-foreground">Dopo Normalizzazione</div>
+                <div className="text-lg font-bold text-foreground">
                   {Math.abs(predictedAnalysis.peakLevel - predictedAnalysis.rmsLevel).toFixed(1)} dB
                 </div>
               </div>
             </div>
             
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-center">
-              <span className="text-sm text-blue-800 dark:text-blue-200">
+            <div className="p-2 bg-[color:var(--tint-info)] rounded text-center">
+              <span className="text-sm text-[color:var(--info)]">
                 La normalizzazione preserva il dynamic range originale
               </span>
             </div>

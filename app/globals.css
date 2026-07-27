@@ -1,106 +1,543 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ============================================================
+   AUDIO NORMALIZER — foglio di stile unico
+   Tailwind v4 (CSS-first). Questo è l'UNICO globals.css:
+   styles/globals.css è stato rimosso perché non era importato
+   da nessuno e usava token che l'app non caricava mai.
 
+   Struttura:
+     1. Token          — palette Soft UI, chiaro e scuro
+     2. Bridge shadcn  — mappatura @theme per le 50 ui/*
+     3. Base
+     4. Primitive .nu-* — la scala di elevazione neumorfica
+     5. Override slot   — shadcn diventa Soft UI senza toccarne il TSX
+     6. Classi app      — waveform, meter, upload, file item
+   ============================================================ */
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------- 1. TOKEN ---------------- */
+:root {
+  --radius: 1rem;
+
+  /* Soft UI — tema chiaro.
+     card e background COINCIDONO: nel neumorfismo la forma nasce
+     dalle ombre, non dal riempimento. Non è un errore. */
+  --background:            #e6e9ef;
+  --foreground:            #2b3044;
+  --card:                  #e6e9ef;
+  --card-foreground:       #2b3044;
+  --popover:               #eef0f5;
+  --popover-foreground:    #2b3044;
+  --primary:               #ff3b52;
+  --primary-foreground:    #ffffff;
+  --secondary:             #2b3044;
+  --secondary-foreground:  #eef0f5;
+  --muted:                 #d6dbe6;   /* deve staccare da --background #e6e9ef */
+  --muted-foreground:      #565d73;   /* 4.5:1 su background E su muted */
+  --accent:                #ff9a3c;
+  --accent-foreground:     #2b3044;
+  --destructive:           #b91c1c;
+  --destructive-foreground:#ffffff;
+  --border:                #d3d8e2;
+  --input:                 #d3d8e2;
+  --ring:                  #ff3b52;
+
+  /* Colori di STATO — pensati per il testo, quindi scuri quanto basta
+     a superare 4.5:1 sia su --background che sulle tinte qui sotto. */
+  --info:           #1d4ed8;
+  --success:        #116b33;
+  --warning:        #855105;   /* giallo   → avviso lieve   */
+  --warning-strong: #a3370b;   /* arancio  → avviso marcato */
+  --danger:         #b91c1c;
+  --primary-ink:    #c81232;   /* rosso brand leggibile come testo */
+
+  /* Tinte di SFONDO — devono distinguersi da --background (#e6e9ef),
+     altrimenti i pannelli informativi spariscono. */
+  --tint-info:           #dbe6fb;
+  --tint-success:        #d9f2e2;
+  --tint-warning:        #f9eed2;
+  --tint-warning-strong: #fbe4d6;
+  --tint-danger:         #fadadd;
+  --tint-primary:        #fbdce1;
+  --tint-neutral:        #dfe3ea;
+
+  /* testo sopra un colore di stato pieno: in chiaro gli stati sono scuri
+     (serve bianco), in scuro sono chiari (serve inchiostro scuro) */
+  --status-foreground:   #ffffff;
+
+  /* Sfondo delle CTA piene. NON è --primary: il corallo #ff3b52 col bianco
+     sopra dà 3.5:1, sotto il minimo per il testo. Il corallo resta per barre,
+     gradienti e range degli slider, dove non ci va testo sopra. */
+  --cta:      #c81232;
+  --cta-2:    #a8102c;
+  --cta-foreground: #ffffff;
+
+  /* ombre speculari: l'intero linguaggio visivo si regge su queste due */
+  --sh-dark:  rgba(160, 169, 190, 0.58);
+  --sh-light: rgba(255, 255, 255, 0.95);
+  --hairline: rgba(43, 48, 68, 0.07);
+
+  --chart-1: #ff3b52;
+  --chart-2: #ff9a3c;
+  --chart-3: #2b3044;
+  --chart-4: #16a34a;
+  --chart-5: #6f7690;
+
+  --sidebar:                    #e6e9ef;
+  --sidebar-foreground:         #2b3044;
+  --sidebar-primary:            #ff3b52;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             #dfe3ea;
+  --sidebar-accent-foreground:  #2b3044;
+  --sidebar-border:             #d3d8e2;
+  --sidebar-ring:               #ff3b52;
+}
+
+.dark {
+  --background:            #23273a;
+  --foreground:            #e9ecf5;
+  --card:                  #23273a;
+  --card-foreground:       #e9ecf5;
+  --popover:               #282d43;
+  --popover-foreground:    #e9ecf5;
+  --primary:               #ff3b52;
+  --primary-foreground:    #ffffff;
+  --secondary:             #171a28;
+  --secondary-foreground:  #e9ecf5;
+  --muted:                 #2e3450;   /* deve staccare da --background #23273a */
+  --muted-foreground:      #a8afc6;
+  --accent:                #ff9a3c;
+  --accent-foreground:     #171a28;
+  --destructive:           #ff6b7d;
+  --destructive-foreground:#1a0d10;
+  --border:                #333a58;
+  --input:                 #333a58;
+  --ring:                  #ff3b52;
+
+  --info:           #93b4ff;
+  --success:        #5ee08c;
+  --warning:        #fcd34d;
+  --warning-strong: #fb923c;
+  --danger:         #ff8a97;
+  --primary-ink:    #ff8a97;
+
+  --tint-info:           #1b2542;
+  --tint-success:        #16331f;
+  --tint-warning:        #3a2f12;
+  --tint-warning-strong: #3b2415;
+  --tint-danger:         #3a1a20;
+  --tint-primary:        #3a1a22;
+  --tint-neutral:        #282d43;
+
+  --status-foreground:   #171a28;
+
+  --cta:      #cf1b36;
+  --cta-2:    #b3172f;
+  --cta-foreground: #ffffff;
+
+  --sh-dark:  rgba(12, 14, 22, 0.72);
+  --sh-light: rgba(60, 67, 95, 0.55);
+  --hairline: rgba(255, 255, 255, 0.06);
+
+  --chart-1: #ff3b52;
+  --chart-2: #ff9a3c;
+  --chart-3: #e9ecf5;
+  --chart-4: #4ade80;
+  --chart-5: #a2a9c0;
+
+  --sidebar:                    #23273a;
+  --sidebar-foreground:         #e9ecf5;
+  --sidebar-primary:            #ff3b52;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             #282d43;
+  --sidebar-accent-foreground:  #e9ecf5;
+  --sidebar-border:             #333a58;
+  --sidebar-ring:               #ff3b52;
+}
+
+/* ---------------- 2. BRIDGE SHADCN ---------------- */
+@theme inline {
+  --color-background:            var(--background);
+  --color-foreground:            var(--foreground);
+  --color-card:                  var(--card);
+  --color-card-foreground:       var(--card-foreground);
+  --color-popover:               var(--popover);
+  --color-popover-foreground:    var(--popover-foreground);
+  --color-primary:               var(--primary);
+  --color-primary-foreground:    var(--primary-foreground);
+  --color-secondary:             var(--secondary);
+  --color-secondary-foreground:  var(--secondary-foreground);
+  --color-muted:                 var(--muted);
+  --color-muted-foreground:      var(--muted-foreground);
+  --color-accent:                var(--accent);
+  --color-accent-foreground:     var(--accent-foreground);
+  --color-destructive:           var(--destructive);
+  --color-destructive-foreground:var(--destructive-foreground);
+  --color-info:                  var(--info);
+  --color-success:               var(--success);
+  --color-warning:               var(--warning);
+  --color-warning-strong:        var(--warning-strong);
+  --color-danger:                var(--danger);
+  --color-primary-ink:           var(--primary-ink);
+  --color-tint-info:             var(--tint-info);
+  --color-tint-success:          var(--tint-success);
+  --color-tint-warning:          var(--tint-warning);
+  --color-tint-warning-strong:   var(--tint-warning-strong);
+  --color-tint-danger:           var(--tint-danger);
+  --color-tint-primary:          var(--tint-primary);
+  --color-tint-neutral:          var(--tint-neutral);
+  --color-border:                var(--border);
+  --color-input:                 var(--input);
+  --color-ring:                  var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar:                    var(--sidebar);
+  --color-sidebar-foreground:         var(--sidebar-foreground);
+  --color-sidebar-primary:            var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent:             var(--sidebar-accent);
+  --color-sidebar-accent-foreground:  var(--sidebar-accent-foreground);
+  --color-sidebar-border:             var(--sidebar-border);
+  --color-sidebar-ring:               var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
+/* ---------------- 3. BASE ---------------- */
 @layer base {
+  * {
+    border-color: var(--border);
+  }
   body {
-    background-color: white;
-    color: #111827;
-    font-family: system-ui, -apple-system, sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* il focus resta sempre visibile: il neumorfismo da solo non lo comunica */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
   }
 }
 
+/* ---------------- 4. PRIMITIVE ---------------- */
 @layer components {
-  /* Audio-specific styles */
+  .nu-xs { box-shadow:  2px  2px  4px var(--sh-dark), -2px  -2px  4px var(--sh-light); }
+  .nu-sm { box-shadow:  4px  4px  8px var(--sh-dark), -4px  -4px  8px var(--sh-light); }
+  .nu    { box-shadow:  6px  6px 13px var(--sh-dark), -6px  -6px 13px var(--sh-light); }
+  .nu-lg { box-shadow: 11px 11px 22px var(--sh-dark), -11px -11px 22px var(--sh-light); }
+  .nu-in    { box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light); }
+  .nu-in-sm { box-shadow: inset 2px 2px 5px var(--sh-dark), inset -2px -2px 5px var(--sh-light); }
+  .nu-flat  { box-shadow: none; }
+
+  /* superficie scura di contrasto (transport, dropdown, chip) */
+  .nu-contrast {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+  .nu-accent {
+    background-image: linear-gradient(135deg, var(--primary), #ff5f52);
+    color: var(--primary-foreground);
+    box-shadow: 6px 6px 14px rgba(255, 59, 82, 0.32), -5px -5px 12px var(--sh-light);
+  }
+  .nu-gradient {
+    background-image: linear-gradient(90deg, var(--primary), var(--accent));
+  }
+}
+
+/* ---------------- 5. OVERRIDE SLOT SHADCN ----------------
+   Le ui/* usano tutte data-slot: si restilizzano da qui, senza
+   toccare un solo file TSX. Se un componente viene rigenerato
+   da shadcn, questi stili continuano a valere.
+
+   ATTENZIONE — queste regole NON stanno dentro @layer.
+   Tailwind v4 dichiara `@layer theme, base, components, utilities`:
+   qualsiasi cosa dentro @layer components perde contro le utility
+   che shadcn mette già sui componenti (shadow-sm, border, bg-popover…).
+   Il CSS non in layer vince su tutto il CSS in layer, a prescindere
+   dalla specificità: è l'unico modo perché questi override attecchiscano.
+   Spostarle dentro un @layer = card senza ombra, dropdown non stilati. */
+
+  [data-slot='card'] {
+    border: none;
+    border-radius: var(--radius-xl);
+    background-color: var(--card);
+    box-shadow: 6px 6px 13px var(--sh-dark), -6px -6px 13px var(--sh-light);
+    transition: box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* --- Button --- */
+  [data-slot='button'] {
+    border-radius: var(--radius-md);
+    transition: box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* variante default: accento pieno */
+  [data-slot='button'].bg-primary {
+    background-image: linear-gradient(135deg, var(--cta), var(--cta-2));
+    color: var(--cta-foreground);
+    box-shadow: 5px 5px 12px rgba(255, 59, 82, 0.3), -4px -4px 10px var(--sh-light);
+  }
+  [data-slot='button'].bg-primary:hover:not(:disabled) {
+    box-shadow: 7px 7px 17px rgba(255, 59, 82, 0.4), -5px -5px 12px var(--sh-light);
+  }
+  [data-slot='button'].bg-primary:active:not(:disabled) {
+    box-shadow: inset 3px 3px 8px rgba(150, 20, 35, 0.5),
+                inset -2px -2px 6px rgba(255, 255, 255, 0.22);
+  }
+  /* Varianti in rilievo sulla superficie.
+     NOTA: qui NON si dichiara `color`. Queste regole sono fuori da @layer e
+     quindi batterebbero qualsiasi utility text-*: dichiarare il colore qui
+     cancellava il rosso di "Cancella tutto" e il verde/grigio del toggle di
+     monitoraggio, uccidendo il segnale semantico. Il colore lo decide il
+     componente; qui si gestiscono solo sfondo, bordo e ombra. */
+  [data-slot='button'].bg-background,
+  [data-slot='button'].bg-secondary,
+  [data-slot='button'].hover\:bg-accent {
+    background-color: var(--background);
+    border: none;
+    box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light);
+  }
+  [data-slot='button'].bg-background:hover:not(:disabled),
+  [data-slot='button'].bg-secondary:hover:not(:disabled),
+  [data-slot='button'].hover\:bg-accent:hover:not(:disabled) {
+    background-color: var(--background);
+    box-shadow: 7px 7px 15px var(--sh-dark), -7px -7px 15px var(--sh-light);
+  }
+  [data-slot='button'].bg-background:active:not(:disabled),
+  [data-slot='button'].bg-secondary:active:not(:disabled),
+  [data-slot='button'].hover\:bg-accent:active:not(:disabled) {
+    box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light);
+  }
+  [data-slot='button']:disabled { box-shadow: none; }
+
+  /* --- Slider --- */
+  [data-slot='slider-track'] {
+    background-color: var(--secondary) !important;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.42),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.08);
+  }
+  [data-slot='slider-track'][data-orientation='horizontal'] { height: 0.875rem; }
+  [data-slot='slider-track'][data-orientation='vertical']   { width: 0.875rem; }
+  [data-slot='slider-range'] {
+    background-image: linear-gradient(90deg, var(--primary), var(--accent));
+    background-color: transparent;
+  }
+  [data-slot='slider-thumb'] {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    background-color: #f4f6fa;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4), -1px -1px 4px rgba(255, 255, 255, 0.5);
+  }
+
+  /* --- Progress --- */
+  [data-slot='progress'] {
+    height: 0.875rem;
+    background-color: var(--background) !important;
+    box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
+  }
+  [data-slot='progress-indicator'] {
+    background-image: linear-gradient(90deg, var(--primary), var(--accent));
+    background-color: transparent;
+    border-radius: 999px;
+  }
+
+  /* --- Badge --- */
+  [data-slot='badge'] {
+    border: none;
+    border-radius: 999px;
+    padding: 0.4rem 0.85rem;
+    box-shadow: 3px 3px 7px var(--sh-dark), -3px -3px 7px var(--sh-light);
+  }
+  [data-slot='badge'].bg-primary {
+    background-image: linear-gradient(135deg, var(--primary), #ff5f52);
+    box-shadow: 3px 3px 10px rgba(255, 59, 82, 0.35);
+  }
+
+  /* --- Input / Textarea / Select --- */
+  [data-slot='input'],
+  [data-slot='textarea'],
+  [data-slot='select-trigger'] {
+    border: none;
+    border-radius: var(--radius-md);
+    background-color: var(--background);
+    box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
+  }
+
+  /* --- Popover / Dropdown / Select content --- */
+  [data-slot='popover-content'],
+  [data-slot='dropdown-menu-content'],
+  [data-slot='select-content'] {
+    border: none;
+    border-radius: var(--radius-lg);
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    box-shadow: 8px 8px 20px var(--sh-dark), -6px -6px 16px var(--sh-light);
+  }
+
+  /* --- Alert --- */
+  [data-slot='alert'] {
+    border: none;
+    border-radius: var(--radius-lg);
+    background-color: var(--background);
+    box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
+  }
+
+  /* --- Tabs --- */
+  [data-slot='tabs-list'] {
+    border-radius: 999px;
+    background-color: var(--background);
+    box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
+  }
+  [data-slot='tabs-trigger'] {
+    border: none;
+    border-radius: 999px;
+    color: var(--muted-foreground);
+  }
+  [data-slot='tabs-trigger'][data-state='active'] {
+    background-color: var(--background);
+    color: var(--primary);
+    box-shadow: 4px 4px 9px var(--sh-dark), -4px -4px 9px var(--sh-light);
+  }
+
+  /* --- Switch --- */
+  [data-slot='switch'] {
+    border: none;
+    background-color: var(--secondary);
+    box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.55),
+                inset -2px -2px 6px rgba(255, 255, 255, 0.06);
+  }
+  [data-slot='switch'][data-state='checked'] {
+    background-image: linear-gradient(135deg, var(--primary), #ff6a4d);
+  }
+  [data-slot='switch-thumb'] {
+    background-color: #f2f4f8;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.45);
+  }
+
+  /* --- Separator --- */
+  [data-slot='separator'] {
+    background-color: var(--hairline);
+  }
+
+/* ---------------- 6. CLASSI APP ---------------- */
+@layer components {
   .waveform-container {
     position: relative;
     overflow: hidden;
-    border-radius: 0.5rem;
-    background-color: rgb(248 250 252);
+    border-radius: var(--radius-lg);
+    background-color: var(--background);
+    box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light);
   }
-
+  /* niente ombra sulle singole barre: sono centinaia di nodi, lo scroll ne soffrirebbe */
   .waveform-bar {
-    background-color: rgb(59 130 246);
-    transition: all 0.2s ease-in-out;
+    background-image: linear-gradient(180deg, var(--primary), var(--accent));
+    transition: opacity 0.2s ease-in-out;
   }
 
   .audio-level-meter {
     position: relative;
-    height: 1rem;
-    background-color: rgb(248 250 252);
-    border-radius: 9999px;
+    height: 0.875rem;
+    background-color: var(--background);
+    border-radius: 999px;
     overflow: hidden;
+    box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
   }
-
   .audio-level-fill {
     height: 100%;
-    transition: all 0.1s ease-out;
+    border-radius: 999px;
+    transition: width 0.1s ease-out;
   }
+  .audio-level-fill.safe    { background-image: linear-gradient(90deg, var(--success), #4ade80); }
+  .audio-level-fill.warning { background-image: linear-gradient(90deg, var(--warning), var(--accent)); }
+  .audio-level-fill.danger  { background-image: linear-gradient(90deg, var(--destructive), var(--primary)); }
 
-  .audio-level-fill.safe {
-    background-color: rgb(34 197 94);
-  }
-
-  .audio-level-fill.warning {
-    background-color: rgb(234 179 8);
-  }
-
-  .audio-level-fill.danger {
-    background-color: rgb(239 68 68);
-  }
-
-  /* Upload area styles */
   .upload-area {
-    border: 2px dashed rgb(156 163 175);
-    border-radius: 0.5rem;
-    padding: 2rem;
+    border: none;
+    border-radius: var(--radius-xl);
+    padding: 2.5rem 1.5rem;
     text-align: center;
-    transition: all 0.2s ease-in-out;
+    background-color: var(--background);
+    box-shadow: inset 5px 5px 12px var(--sh-dark), inset -5px -5px 12px var(--sh-light);
+    transition: box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .upload-area:hover,
+  .upload-area.is-dragging {
+    box-shadow: inset 5px 5px 12px rgba(255, 59, 82, 0.28),
+                inset -5px -5px 12px var(--sh-light);
   }
 
-  .upload-area:hover {
-    border-color: rgb(59 130 246);
-    background-color: rgb(59 130 246 / 0.05);
-  }
-
-  /* Progress bar styles */
   .progress-bar {
     position: relative;
-    height: 0.5rem;
-    background-color: rgb(248 250 252);
-    border-radius: 9999px;
+    height: 0.875rem;
+    background-color: var(--background);
+    border-radius: 999px;
     overflow: hidden;
+    box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light);
   }
-
   .progress-fill {
     height: 100%;
-    background-color: rgb(59 130 246);
-    transition: all 0.3s ease-out;
+    border-radius: 999px;
+    background-image: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width 0.3s ease-out;
   }
 
-  /* File item styles */
   .file-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid rgb(229 231 235);
-    background-color: white;
-    transition: all 0.2s ease-in-out;
+    gap: 0.875rem;
+    padding: 0.9rem 1.1rem;
+    border: none;
+    border-radius: var(--radius-lg);
+    background-color: var(--background);
+    box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light);
+    transition: box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
   .file-item:hover {
-    background-color: rgb(248 250 252);
+    box-shadow: 7px 7px 15px var(--sh-dark), -7px -7px 15px var(--sh-light);
   }
+  .file-item.completed { box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light), inset 0 0 0 2px var(--success); }
+  .file-item.error     { box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light), inset 0 0 0 2px var(--destructive); }
 
-  .file-item.completed {
-    border-color: rgb(34 197 94);
-    background-color: rgb(240 253 244);
+  /* stepper del wizard */
+  .nu-step-bubble {
+    background-color: var(--background);
+    color: var(--muted-foreground);
+    box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light);
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  .nu-step-bubble[data-state='done'] {
+    background-image: linear-gradient(135deg, var(--primary), #ff5f52);
+    color: var(--primary-foreground);
+    box-shadow: 4px 4px 12px rgba(255, 59, 82, 0.35), -4px -4px 10px var(--sh-light);
+  }
+  .nu-step-bubble[data-state='active'] {
+    color: var(--primary);
+    box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light);
+  }
+  .nu-step-line {
+    background-color: var(--background);
+    box-shadow: inset 2px 2px 4px var(--sh-dark), inset -2px -2px 4px var(--sh-light);
+  }
+}
 
-  .file-item.error {
-    border-color: rgb(239 68 68);
-    background-color: rgb(254 242 242);
+/* ---------------- ACCESSIBILITÀ ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

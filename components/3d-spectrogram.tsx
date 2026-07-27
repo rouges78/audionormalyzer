@@ -515,12 +515,12 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading flex items-center gap-2 text-base">
-            <Zap className="h-4 w-4 text-purple-800" />
+            <Zap className="h-4 w-4 text-[color:var(--primary-ink)]" />
             Spettrografica 3D - {fileName}
           </CardTitle>
           
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+            <Badge variant="secondary" className="bg-[color:var(--tint-primary)] text-[color:var(--primary-ink)]">
               WebGL
             </Badge>
             
@@ -564,7 +564,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
             </Button>
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Volume2 className="h-4 w-4" />
             <span>{settings.frequencyBands} bands × {settings.timeSegments} segments</span>
           </div>
@@ -572,7 +572,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
 
         {/* Settings Panel */}
         {showSettings && (
-          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-4">
+          <div className="mb-4 p-4 bg-muted rounded-lg space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Frequency Bands</label>
@@ -584,7 +584,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
                   step={16}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.frequencyBands}</span>
+                <span className="text-xs text-muted-foreground">{settings.frequencyBands}</span>
               </div>
               
               <div>
@@ -597,7 +597,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
                   step={32}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.timeSegments}</span>
+                <span className="text-xs text-muted-foreground">{settings.timeSegments}</span>
               </div>
               
               <div>
@@ -610,7 +610,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
                   step={0.1}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.heightScale.toFixed(1)}</span>
+                <span className="text-xs text-muted-foreground">{settings.heightScale.toFixed(1)}</span>
               </div>
               
               <div>
@@ -623,7 +623,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
                   step={0.1}
                   className="w-full"
                 />
-                <span className="text-xs text-gray-500">{settings.rotationSpeed.toFixed(1)}</span>
+                <span className="text-xs text-muted-foreground">{settings.rotationSpeed.toFixed(1)}</span>
               </div>
             </div>
             
@@ -647,7 +647,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
         )}
 
         {/* 3D Canvas */}
-        <div className={`relative ${isFullscreen ? 'h-full' : 'h-96'} bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden`}>
+        <div className={`relative ${isFullscreen ? 'h-full' : 'h-96'} bg-gradient-to-br from-secondary to-black rounded-lg overflow-hidden`}>
           <canvas
             ref={canvasRef}
             className="w-full h-full"
@@ -655,7 +655,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
           />
           
           {!webglRef.current.isInitialized && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50">
+            <div className="absolute inset-0 flex items-center justify-center bg-secondary/80">
               <div className="text-center text-white">
                 <Zap className="h-8 w-8 mx-auto mb-2 animate-pulse" />
                 <p>Initializing WebGL...</p>
@@ -665,7 +665,7 @@ export function Spectrogram3D({ analysis, fileName, audioData, className }: Spec
         </div>
 
         {/* Info */}
-        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-4 text-sm text-muted-foreground">
           <p>
             Spettrografica 3D con accelerazione WebGL. Visualizza frequenze nel tempo con rappresentazione tridimensionale.
             {audioData ? ' Basata su dati audio reali.' : ' Simulazione basata su analisi audio.'}

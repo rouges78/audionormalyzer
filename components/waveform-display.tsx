@@ -170,7 +170,7 @@ export function WaveformDisplay({ analysis, fileName, audioData, className }: Wa
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading flex items-center gap-2 text-base">
-            <BarChart3 className="h-4 w-4 text-purple-800" />
+            <BarChart3 className="h-4 w-4 text-[color:var(--primary-ink)]" />
             Waveform - {fileName}
           </CardTitle>
           <Button
@@ -190,7 +190,7 @@ export function WaveformDisplay({ analysis, fileName, audioData, className }: Wa
       <CardContent>
         <div className="space-y-4">
           {/* Canvas Waveform */}
-          <div className="relative bg-gray-50 dark:bg-gray-800/50 rounded-lg overflow-hidden">
+          <div className="relative bg-muted rounded-lg overflow-hidden">
             <canvas
               ref={canvasRef}
               className="w-full"
@@ -200,43 +200,43 @@ export function WaveformDisplay({ analysis, fileName, audioData, className }: Wa
 
           {/* Waveform Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-              <div className="font-medium text-gray-900 dark:text-white">
+            <div className="text-center p-2 bg-muted rounded">
+              <div className="font-medium text-foreground">
                 {analysis.peakLevel.toFixed(1)} dB
               </div>
-              <div className="text-gray-500 dark:text-gray-400">Peak</div>
+              <div className="text-muted-foreground">Peak</div>
             </div>
             
-            <div className="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-              <div className="font-medium text-gray-900 dark:text-white">
+            <div className="text-center p-2 bg-muted rounded">
+              <div className="font-medium text-foreground">
                 {analysis.rmsLevel.toFixed(1)} dB
               </div>
-              <div className="text-gray-500 dark:text-gray-400">RMS</div>
+              <div className="text-muted-foreground">RMS</div>
             </div>
             
-            <div className="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-              <div className="font-medium text-gray-900 dark:text-white">
+            <div className="text-center p-2 bg-muted rounded">
+              <div className="font-medium text-foreground">
                 {analysis.lufsIntegrated.toFixed(1)} LUFS
               </div>
-              <div className="text-gray-500 dark:text-gray-400">Loudness</div>
+              <div className="text-muted-foreground">Loudness</div>
             </div>
             
-            <div className="text-center p-2 bg-gray-50 dark:bg-gray-800/50 rounded">
-              <div className="font-medium text-gray-900 dark:text-white">
+            <div className="text-center p-2 bg-muted rounded">
+              <div className="font-medium text-foreground">
                 {Math.abs(analysis.peakLevel - analysis.rmsLevel).toFixed(1)} dB
               </div>
-              <div className="text-gray-500 dark:text-gray-400">Dynamic Range</div>
+              <div className="text-muted-foreground">Dynamic Range</div>
             </div>
           </div>
 
           {/* Clipping Warning */}
           {analysis.hasClipping && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+            <div className="p-3 bg-[color:var(--tint-danger)] border border-[color:var(--danger)] rounded-lg">
+              <div className="flex items-center gap-2 text-[color:var(--danger)]">
                 <BarChart3 className="h-4 w-4" />
                 <span className="font-medium">Clipping Rilevato</span>
               </div>
-              <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+              <p className="text-sm text-[color:var(--danger)] mt-1">
                 Il segnale audio supera 0 dB, causando distorsione. Si consiglia la normalizzazione.
               </p>
             </div>

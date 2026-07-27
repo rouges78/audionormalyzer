@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </Button>
             
             {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
-              <details className="mt-4 p-3 bg-gray-100 rounded text-xs">
+              <details className="mt-4 p-3 bg-muted rounded text-xs">
                 <summary className="cursor-pointer font-medium">
                   Error Details (Development)
                 </summary>

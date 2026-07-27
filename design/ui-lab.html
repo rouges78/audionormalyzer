@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio Normalizer · Soft UI Lab</title>
+<style>
+/* ============================================================
+   AUDIO NORMALIZER — SOFT UI (NEUMORPHISM) DESIGN SYSTEM
+   File autonomo di valutazione. Nessuna dipendenza esterna.
+
+   PORTABILITÀ: il blocco "TOKEN" e il blocco "PRIMITIVE"
+   sono progettati per essere copiati dentro app/globals.css
+   (o styles/neumorphic.css) senza modifiche. Le utility .nu-*
+   diventano poi @apply-abili o mappate in tailwind.config.js
+   sotto theme.extend.boxShadow.
+   ============================================================ */
+
+/* ---------- TOKEN ---------- */
+:root {
+  --r-sm: 10px;  --r-md: 16px;  --r-lg: 24px;  --r-xl: 32px;  --r-full: 999px;
+  --accent:    #ff3b52;
+  --accent-2:  #ff9a3c;
+  --accent-ink:#ffffff;
+  --ok:        #22c55e;
+  --warn:      #f5a524;
+  --danger:    #ff3b52;
+  --dur: .22s;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"] {
+  --bg:        #e6e9ef;
+  --surface:   #e6e9ef;
+  --surface-2: #eef0f5;
+  --ink:       #2b3044;
+  --ink-2:     #5b6178;
+  --muted:     #868da4;
+  --contrast:  #2b3044;   /* superfici scure su fondo chiaro */
+  --contrast-ink: #eef0f5;
+  --sh-dark:   rgba(160,169,190,.58);
+  --sh-light:  rgba(255,255,255,.95);
+  --hairline:  rgba(43,48,68,.07);
+}
+[data-theme="dark"] {
+  --bg:        #23273a;
+  --surface:   #23273a;
+  --surface-2: #282d43;
+  --ink:       #e9ecf5;
+  --ink-2:     #b6bcd0;
+  --muted:     #8b92ab;
+  --contrast:  #171a28;
+  --contrast-ink: #e9ecf5;
+  --sh-dark:   rgba(12,14,22,.72);
+  --sh-light:  rgba(60,67,95,.55);
+  --hairline:  rgba(255,255,255,.06);
+}
+
+/* ---------- PRIMITIVE: la scala di elevazione ----------
+   Tutto il linguaggio visivo nasce da 2 ombre speculari.
+   extruded = sporge dal fondo · inset = affonda nel fondo   */
+.nu-xs { box-shadow:  2px  2px  4px var(--sh-dark), -2px  -2px  4px var(--sh-light); }
+.nu-sm { box-shadow:  4px  4px  8px var(--sh-dark), -4px  -4px  8px var(--sh-light); }
+.nu    { box-shadow:  6px  6px 13px var(--sh-dark), -6px  -6px 13px var(--sh-light); }
+.nu-lg { box-shadow: 11px 11px 22px var(--sh-dark), -11px -11px 22px var(--sh-light); }
+.nu-in    { box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light); }
+.nu-in-sm { box-shadow: inset 2px 2px 5px var(--sh-dark), inset -2px -2px 5px var(--sh-light); }
+.nu-flat  { box-shadow: none; }
+
+/* ---------- BASE ---------- */
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 40px 32px 80px;
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+h1,h2,h3 { margin: 0; font-weight: 650; letter-spacing: -.015em; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+.muted { color: var(--muted); }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+
+/* ---------- LAYOUT ---------- */
+.topbar { display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:14px; flex-wrap:wrap; }
+.grid { display:grid; gap:26px; }
+.g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+@media (max-width: 900px){ .g2,.g3 { grid-template-columns: 1fr; } }
+
+section.block { margin-top: 40px; }
+.sec-head { display:flex; align-items:baseline; gap:12px; margin: 0 0 16px 4px; }
+.sec-head h2 { font-size: 15px; text-transform: uppercase; letter-spacing:.09em; color: var(--ink-2); }
+.sec-head span { font-size: 13px; color: var(--muted); }
+
+.card {
+  background: var(--surface); border-radius: var(--r-lg); padding: 24px;
+  transition: box-shadow var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.card-title { font-size:13px; font-weight:650; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin-bottom:18px; }
+.row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.col { display:flex; flex-direction:column; gap:16px; }
+.spread { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+
+/* ---------- BOTTONI ---------- */
+.btn {
+  appearance:none; border:0; cursor:pointer; font:inherit; font-weight:600;
+  background: var(--surface); color: var(--ink);
+  border-radius: var(--r-md); padding: 13px 22px;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  box-shadow: 6px 6px 13px var(--sh-dark), -6px -6px 13px var(--sh-light);
+  transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.btn:hover { box-shadow: 8px 8px 17px var(--sh-dark), -8px -8px 17px var(--sh-light); }
+.btn:active, .btn[aria-pressed="true"] {
+  box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light);
+  color: var(--accent);
+}
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent), #ff5f52); color: var(--accent-ink);
+  box-shadow: 6px 6px 14px rgba(255,59,82,.32), -5px -5px 12px var(--sh-light);
+}
+.btn-accent:hover { box-shadow: 8px 8px 20px rgba(255,59,82,.42), -6px -6px 14px var(--sh-light); }
+.btn-accent:active { box-shadow: inset 3px 3px 8px rgba(150,20,35,.5), inset -2px -2px 6px rgba(255,255,255,.22); }
+.btn-dark { background: var(--contrast); color: var(--contrast-ink); }
+.btn-dark:active { color: var(--accent); box-shadow: inset 4px 4px 9px rgba(0,0,0,.5), inset -3px -3px 8px rgba(255,255,255,.07); }
+.btn-wide { width:100%; justify-content:space-between; padding:18px 24px; color:var(--muted); font-weight:600; }
+.btn-sq {
+  width:56px; height:56px; padding:0; border-radius: var(--r-md);
+  background: var(--contrast); color: var(--contrast-ink);
+}
+.btn-sq:active { color: var(--accent); box-shadow: inset 4px 4px 9px rgba(0,0,0,.5), inset -3px -3px 8px rgba(255,255,255,.07); }
+.btn-round { width:62px; height:62px; padding:0; border-radius:var(--r-full); background:var(--contrast); color:var(--contrast-ink); }
+.btn-round.lg { width:78px; height:78px; }
+.btn-round:active { color: var(--accent); box-shadow: inset 5px 5px 11px rgba(0,0,0,.55), inset -4px -4px 9px rgba(255,255,255,.07); }
+.btn-ghost { background: var(--surface); color: var(--ink-2); box-shadow:none; }
+.btn-ghost:hover { box-shadow: 4px 4px 8px var(--sh-dark), -4px -4px 8px var(--sh-light); }
+.icon { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.icon.fill { fill:currentColor; stroke:none; }
+
+/* ---------- SWITCH ---------- */
+.switch-shell { background: var(--contrast); border-radius: var(--r-lg); padding: 18px; display:inline-flex; flex-direction:column; gap:14px;
+  box-shadow: 8px 8px 18px var(--sh-dark), -8px -8px 18px var(--sh-light); }
+.switch { position:relative; width:104px; height:46px; border-radius:var(--r-full); cursor:pointer; border:0; padding:0;
+  background: rgba(0,0,0,.28); box-shadow: inset 3px 3px 7px rgba(0,0,0,.6), inset -2px -2px 6px rgba(255,255,255,.06); }
+.switch .knob { position:absolute; top:5px; left:5px; width:36px; height:36px; border-radius:var(--r-full);
+  background:#f2f4f8; box-shadow: 2px 2px 6px rgba(0,0,0,.45);
+  transition: left var(--dur) var(--ease), background var(--dur) var(--ease); }
+.switch[aria-checked="true"] .knob { left:63px; background: linear-gradient(135deg,var(--accent),#ff6a4d); box-shadow:0 0 14px rgba(255,59,82,.6), 2px 2px 6px rgba(0,0,0,.45); }
+.switch:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+
+/* ---------- SLIDER ORIZZONTALE ---------- */
+.slider { position:relative; width:100%; }
+.slider input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:22px; background:transparent; margin:0; cursor:pointer; }
+.slider .track { position:absolute; inset:0; top:50%; transform:translateY(-50%); height:14px; border-radius:var(--r-full);
+  background: var(--contrast); box-shadow: inset 3px 3px 6px rgba(0,0,0,.45), inset -2px -2px 5px rgba(255,255,255,.08); pointer-events:none; }
+.slider .fill { position:absolute; left:0; top:50%; transform:translateY(-50%); height:14px; border-radius:var(--r-full);
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)); pointer-events:none; transition: width .06s linear; }
+.slider input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:24px; height:24px; border-radius:var(--r-full);
+  background:#f4f6fa; box-shadow: 2px 2px 6px rgba(0,0,0,.4), -1px -1px 4px rgba(255,255,255,.5); border:0; }
+.slider input[type=range]::-moz-range-thumb{ width:24px; height:24px; border:0; border-radius:var(--r-full); background:#f4f6fa; box-shadow:2px 2px 6px rgba(0,0,0,.4); }
+.slider input[type=range]:focus-visible{ outline:2px solid var(--accent); outline-offset:6px; border-radius:var(--r-full); }
+
+/* ---------- SLIDER VERTICALE (fader) ---------- */
+.fader { width:66px; height:210px; border-radius:var(--r-xl); background:var(--surface); position:relative;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 7px 7px 15px var(--sh-dark), -7px -7px 15px var(--sh-light); }
+.fader .rail { position:absolute; top:22px; bottom:46px; width:5px; border-radius:var(--r-full); background:var(--hairline);
+  box-shadow: inset 1px 1px 3px var(--sh-dark); }
+.fader .rail .on { position:absolute; bottom:0; left:0; right:0; border-radius:var(--r-full); background:linear-gradient(180deg,var(--accent-2),var(--accent)); }
+.fader .dot { position:absolute; width:22px; height:22px; border-radius:var(--r-full); background:var(--accent);
+  box-shadow: 0 0 12px rgba(255,59,82,.5), 2px 2px 5px var(--sh-dark); transition: bottom .1s linear; }
+.fader input[type=range]{ -webkit-appearance:none; appearance:none; position:absolute; top:22px; bottom:46px; width:150px;
+  transform: rotate(-90deg); transform-origin:center; background:transparent; margin:0; cursor:pointer; height:26px; opacity:0; }
+/* l'input è invisibile: il focus da tastiera va mostrato sul guscio, altrimenti i fader non sono navigabili */
+.fader:has(input:focus-visible) { outline:2px solid var(--accent); outline-offset:4px; border-radius:var(--r-xl); }
+.fader .cap { position:absolute; bottom:14px; font-size:11px; font-weight:700; letter-spacing:.04em; color:var(--muted); }
+
+/* ---------- SELECT ---------- */
+.sel { position:relative; }
+.sel-btn { width:100%; text-align:left; justify-content:space-between; }
+.sel-menu { position:absolute; z-index:20; left:0; right:0; top:calc(100% + 12px); padding:10px; border-radius:var(--r-md);
+  background: var(--contrast); box-shadow: 8px 8px 20px var(--sh-dark), -6px -6px 16px var(--sh-light);
+  display:none; }
+.sel.open .sel-menu { display:block; }
+.sel-opt { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left;
+  padding:11px 15px; border-radius:var(--r-sm); border:0; background:transparent; color:var(--contrast-ink);
+  font:inherit; font-weight:550; cursor:pointer; }
+.sel-opt:hover { background: rgba(255,255,255,.07); }
+.sel-opt[aria-selected="true"] { background: linear-gradient(135deg,var(--accent),#ff5f52); color:#fff; box-shadow:0 4px 12px rgba(255,59,82,.35); }
+.sel-opt small { opacity:.62; font-weight:500; }
+
+/* ---------- STEPPER WIZARD ---------- */
+.stepper { display:flex; align-items:center; gap:0; }
+.step { display:flex; flex-direction:column; align-items:center; gap:9px; flex:0 0 auto; }
+.step .bubble { width:48px; height:48px; border-radius:var(--r-full); display:grid; place-items:center;
+  background:var(--surface); color:var(--muted); font-weight:700; font-size:14px;
+  box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light); transition: all var(--dur) var(--ease); }
+.step .lbl { font-size:12px; font-weight:600; color:var(--muted); white-space:nowrap; }
+.step[data-state="done"] .bubble { background:linear-gradient(135deg,var(--accent),#ff5f52); color:#fff; box-shadow:4px 4px 12px rgba(255,59,82,.35), -4px -4px 10px var(--sh-light); }
+.step[data-state="done"] .lbl { color: var(--ink-2); }
+.step[data-state="active"] .bubble { color:var(--accent); box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light); }
+.step[data-state="active"] .lbl { color: var(--accent); }
+.step-line { flex:1 1 auto; height:5px; margin:0 10px 26px; border-radius:var(--r-full); background:var(--surface);
+  box-shadow: inset 2px 2px 4px var(--sh-dark), inset -2px -2px 4px var(--sh-light); position:relative; overflow:hidden; }
+.step-line .on { position:absolute; inset:0; right:auto; background:linear-gradient(90deg,var(--accent),var(--accent-2)); }
+
+/* ---------- DROPZONE ---------- */
+.dropzone { border-radius:var(--r-lg); padding:44px 24px; text-align:center; background:var(--surface);
+  box-shadow: inset 5px 5px 12px var(--sh-dark), inset -5px -5px 12px var(--sh-light);
+  transition: box-shadow var(--dur) var(--ease); }
+.dropzone .ring { width:76px; height:76px; margin:0 auto 16px; border-radius:var(--r-full); display:grid; place-items:center;
+  color:var(--accent); background:var(--surface); box-shadow: 6px 6px 13px var(--sh-dark), -6px -6px 13px var(--sh-light); }
+.dropzone.hot { box-shadow: inset 5px 5px 12px rgba(255,59,82,.28), inset -5px -5px 12px var(--sh-light); }
+
+/* ---------- FILE CARD ---------- */
+.file { display:flex; align-items:center; gap:16px; padding:15px 18px; border-radius:var(--r-md); background:var(--surface);
+  box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light); }
+.file .thumb { width:46px; height:46px; border-radius:var(--r-sm); flex:0 0 auto; display:grid; place-items:center;
+  background:var(--contrast); color:var(--accent); box-shadow: inset 2px 2px 5px rgba(0,0,0,.4); }
+.file .meta { min-width:0; flex:1; }
+.file .name { font-weight:620; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.file .sub { font-size:12px; color:var(--muted); }
+
+/* ---------- WAVEFORM ---------- */
+.wave { display:flex; align-items:center; gap:2.5px; height:64px; padding:0 4px; }
+.wave i { flex:1; border-radius:var(--r-full); background:var(--muted); opacity:.5; display:block; transition:background .2s,opacity .2s; }
+.wave i.on { background:linear-gradient(180deg,var(--accent),var(--accent-2)); opacity:1; }
+.wave i.clip { background:var(--danger); opacity:1; }
+
+/* ---------- BADGE / PILL ---------- */
+.badge { display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:var(--r-full);
+  font-size:12px; font-weight:650; letter-spacing:.02em; background:var(--surface); color:var(--ink-2);
+  box-shadow: 3px 3px 7px var(--sh-dark), -3px -3px 7px var(--sh-light); }
+.badge .dot { width:8px; height:8px; border-radius:var(--r-full); background:currentColor; }
+.badge.ok { color:var(--ok); } .badge.warn { color:var(--warn); } .badge.err { color:var(--danger); }
+.badge.muted { color:var(--muted); }
+.badge.solid { background:linear-gradient(135deg,var(--accent),#ff5f52); color:#fff; box-shadow:3px 3px 10px rgba(255,59,82,.35); }
+
+/* ---------- GAUGE / RING ---------- */
+.gauge { width:210px; height:210px; border-radius:var(--r-full); background:var(--surface); position:relative; display:grid; place-items:center;
+  box-shadow: 9px 9px 20px var(--sh-dark), -9px -9px 20px var(--sh-light); }
+.gauge.inverted { background: var(--contrast); box-shadow: 9px 9px 20px var(--sh-dark), -9px -9px 20px var(--sh-light); }
+.gauge svg { position:absolute; inset:0; width:100%; height:100%; transform: rotate(-90deg); }
+.gauge .val { position:relative; text-align:center; }
+.gauge .val b { display:block; font-size:30px; font-weight:700; letter-spacing:-.02em; }
+.gauge .val span { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.gauge.inverted .val b { color: var(--contrast-ink); }
+
+/* ---------- TABS SEGMENTED ---------- */
+.seg { display:inline-flex; padding:6px; border-radius:var(--r-full); background:var(--surface);
+  box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light); }
+.seg button { border:0; background:transparent; font:inherit; font-weight:620; font-size:13px; color:var(--muted);
+  padding:9px 20px; border-radius:var(--r-full); cursor:pointer; transition: all var(--dur) var(--ease); }
+.seg button[aria-selected="true"] { background:var(--surface); color:var(--accent);
+  box-shadow: 4px 4px 9px var(--sh-dark), -4px -4px 9px var(--sh-light); }
+
+/* ---------- PROGRESS BAR ---------- */
+.bar { height:14px; border-radius:var(--r-full); background:var(--surface); overflow:hidden;
+  box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light); }
+.bar .on { height:100%; border-radius:var(--r-full); background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition: width .3s var(--ease); }
+
+/* ---------- SWATCH ---------- */
+.sw { display:flex; flex-direction:column; gap:8px; align-items:center; }
+.sw .chip { width:100%; height:56px; border-radius:var(--r-md); }
+.sw code { font-size:11px; color:var(--muted); }
+
+/* ---------- NOTA ---------- */
+.note { border-radius:var(--r-md); padding:16px 20px; background:var(--surface); font-size:13.5px; line-height:1.6; color:var(--ink-2);
+  box-shadow: inset 3px 3px 7px var(--sh-dark), inset -3px -3px 7px var(--sh-light); }
+.note b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= HEADER ================= -->
+  <div class="topbar">
+    <div>
+      <h1 style="font-size:26px">Audio Normalizer · <span style="color:var(--accent)">Soft UI</span></h1>
+      <div class="muted" style="font-size:13.5px;margin-top:5px">Prototipo di valutazione · 27 luglio 2026 · componenti applicati a contenuti reali dell'app</div>
+    </div>
+    <div class="row">
+      <div class="seg" role="tablist" id="themeSeg">
+        <button role="tab" aria-selected="true"  data-theme-set="light">☀ Chiaro</button>
+        <button role="tab" aria-selected="false" data-theme-set="dark">☾ Scuro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= WIZARD ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Wizard</h2><span>i 5 step di normalization-wizard.tsx</span></div>
+    <div class="card nu">
+      <div class="stepper" id="stepper">
+        <div class="step" data-state="done"><div class="bubble">✓</div><div class="lbl">Carica</div></div>
+        <div class="step-line"><div class="on" style="width:100%"></div></div>
+        <div class="step" data-state="done"><div class="bubble">✓</div><div class="lbl">Configura</div></div>
+        <div class="step-line"><div class="on" style="width:100%"></div></div>
+        <div class="step" data-state="active"><div class="bubble">3</div><div class="lbl">Anteprima</div></div>
+        <div class="step-line"><div class="on" style="width:0%"></div></div>
+        <div class="step" data-state="todo"><div class="bubble">4</div><div class="lbl">Processa</div></div>
+        <div class="step-line"><div class="on" style="width:0%"></div></div>
+        <div class="step" data-state="todo"><div class="bubble">5</div><div class="lbl">Scarica</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= UPLOAD + FILE ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Step 1 · Carica</h2><span>dropzone, lista file, stati</span></div>
+    <div class="grid g2">
+      <div class="card nu">
+        <div class="card-title">Dropzone</div>
+        <div class="dropzone" id="dz">
+          <div class="ring">
+            <svg class="icon" style="width:28px;height:28px" viewBox="0 0 24 24"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          </div>
+          <div style="font-weight:650;font-size:15px">Trascina qui i tuoi MP3 o WAV</div>
+          <div class="muted" style="font-size:13px;margin-top:5px">oppure <span style="color:var(--accent);font-weight:600;cursor:pointer">sfoglia il computer</span> · max 500 MB per file</div>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <span class="badge">MP3</span><span class="badge">WAV</span><span class="badge">FLAC</span>
+          <span class="badge">M4A</span><span class="badge muted">+ 3 altri</span>
+        </div>
+      </div>
+
+      <div class="card nu">
+        <div class="card-title">Coda di elaborazione</div>
+        <div class="col" style="gap:12px">
+          <div class="file">
+            <div class="thumb"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+            <div class="meta"><div class="name">01 — Intro Session.wav</div><div class="sub">48 kHz · 24 bit · 42,1 MB</div></div>
+            <span class="badge ok"><i class="dot"></i>Fatto</span>
+          </div>
+          <div class="file">
+            <div class="thumb"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+            <div class="meta">
+              <div class="name">02 — Midnight Drive.mp3</div>
+              <div class="bar" style="margin-top:7px"><div class="on" style="width:64%"></div></div>
+            </div>
+            <span class="badge warn"><i class="dot"></i>64%</span>
+          </div>
+          <div class="file">
+            <div class="thumb"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+            <div class="meta"><div class="name">03 — Broken Codec.m4a</div><div class="sub" style="color:var(--danger)">Formato non decodificabile dal browser</div></div>
+            <span class="badge err"><i class="dot"></i>Errore</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONFIGURA ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Step 2 · Configura</h2><span>preset, target, fader</span></div>
+    <div class="grid g3">
+      <div class="card nu">
+        <div class="card-title">Preset piattaforma</div>
+        <div class="sel" id="presetSel">
+          <button class="btn sel-btn" id="presetBtn">
+            <span>Spotify · −14 LUFS</span>
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="sel-menu" role="listbox">
+            <button class="sel-opt" role="option" aria-selected="true">Spotify <small>−14 LUFS</small></button>
+            <button class="sel-opt" role="option" aria-selected="false">YouTube <small>−14 LUFS</small></button>
+            <button class="sel-opt" role="option" aria-selected="false">Apple Music <small>−16 LUFS</small></button>
+            <button class="sel-opt" role="option" aria-selected="false">Broadcast EBU <small>−23 LUFS</small></button>
+            <button class="sel-opt" role="option" aria-selected="false">Personalizzato <small>manuale</small></button>
+          </div>
+        </div>
+
+        <div style="margin-top:26px">
+          <div class="spread" style="margin-bottom:10px"><span style="font-size:13px;font-weight:600">Target loudness</span><span class="mono" style="font-weight:700;color:var(--accent)" id="lufsOut">−14.0 LUFS</span></div>
+          <div class="slider"><div class="track"></div><div class="fill" id="lufsFill"></div>
+            <input type="range" min="-30" max="-6" step="0.5" value="-14" id="lufsRange" aria-label="Target loudness">
+          </div>
+        </div>
+        <div style="margin-top:22px">
+          <div class="spread" style="margin-bottom:10px"><span style="font-size:13px;font-weight:600">True peak ceiling</span><span class="mono" style="font-weight:700;color:var(--accent)" id="tpOut">−1.0 dBTP</span></div>
+          <div class="slider"><div class="track"></div><div class="fill" id="tpFill"></div>
+            <input type="range" min="-6" max="0" step="0.1" value="-1" id="tpRange" aria-label="True peak ceiling">
+          </div>
+        </div>
+      </div>
+
+      <div class="card nu">
+        <div class="card-title">Controlli fini</div>
+        <div class="row" style="justify-content:space-around;align-items:flex-end">
+          <div class="fader" data-fader data-val="62"><div class="rail"><div class="on"></div></div><div class="dot"></div><div class="cap">GAIN</div><input type="range" min="0" max="100" value="62" aria-label="Gain"></div>
+          <div class="fader" data-fader data-val="35"><div class="rail"><div class="on"></div></div><div class="dot"></div><div class="cap">LRA</div><input type="range" min="0" max="100" value="35" aria-label="Loudness range"></div>
+          <div class="fader" data-fader data-val="80"><div class="rail"><div class="on"></div></div><div class="dot"></div><div class="cap">COMP</div><input type="range" min="0" max="100" value="80" aria-label="Compressione"></div>
+        </div>
+      </div>
+
+      <div class="card nu">
+        <div class="card-title">Opzioni</div>
+        <div class="col">
+          <div class="spread"><div><div style="font-weight:620;font-size:14px">Preserva metadati ID3</div><div class="muted" style="font-size:12px">titolo, artista, copertina</div></div>
+            <button class="switch" role="switch" aria-checked="true"><span class="knob"></span></button></div>
+          <div class="spread"><div><div style="font-weight:620;font-size:14px">Normalizza per album</div><div class="muted" style="font-size:12px">guadagno relativo condiviso</div></div>
+            <button class="switch" role="switch" aria-checked="false"><span class="knob"></span></button></div>
+          <div class="spread"><div><div style="font-weight:620;font-size:14px">Non sovrascrivere originali</div><div class="muted" style="font-size:12px">scrive in /normalized</div></div>
+            <button class="switch" role="switch" aria-checked="true"><span class="knob"></span></button></div>
+          <div class="spread"><div><div style="font-weight:620;font-size:14px">Due passate</div><div class="muted" style="font-size:12px">più preciso, più lento</div></div>
+            <button class="switch" role="switch" aria-checked="false"><span class="knob"></span></button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ANTEPRIMA ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Step 3 · Anteprima A/B</h2><span>transport, waveform, misure</span></div>
+    <div class="grid" style="grid-template-columns: 1.35fr 1fr">
+      <div class="card nu">
+        <div class="spread" style="margin-bottom:18px">
+          <div><div style="font-weight:650;font-size:15px">02 — Midnight Drive.mp3</div><div class="muted" style="font-size:12.5px">3:42 · confronto originale / normalizzato</div></div>
+          <div class="seg" id="abSeg" role="tablist" aria-label="Confronto A/B"><button role="tab" aria-selected="true">Originale</button><button role="tab" aria-selected="false">Normalizzato</button></div>
+        </div>
+
+        <div class="wave" id="wave"></div>
+
+        <div class="row" style="justify-content:center;gap:16px;margin-top:22px">
+          <button class="btn btn-round nu" aria-label="Indietro veloce"><svg class="icon fill" viewBox="0 0 24 24"><path d="M11 12L20 6v12zM2 12l9-6v12z"/></svg></button>
+          <button class="btn btn-round nu" aria-label="Traccia precedente"><svg class="icon fill" viewBox="0 0 24 24"><path d="M6 6h2.5v12H6zM20 6v12l-9-6z"/></svg></button>
+          <button class="btn btn-round lg nu" id="playBtn" aria-label="Riproduci"><svg class="icon fill" style="width:26px;height:26px" viewBox="0 0 24 24"><path d="M7 5v14l11-7z"/></svg></button>
+          <button class="btn btn-round nu" aria-label="Traccia successiva"><svg class="icon fill" viewBox="0 0 24 24"><path d="M15.5 6H18v12h-2.5zM4 6l9 6-9 6z"/></svg></button>
+          <button class="btn btn-round nu" aria-label="Avanti veloce"><svg class="icon fill" viewBox="0 0 24 24"><path d="M13 12L4 18V6zM22 12l-9 6V6z"/></svg></button>
+        </div>
+
+        <div class="row" style="justify-content:center;gap:10px;margin-top:20px">
+          <button class="btn btn-sq nu" aria-label="Loop"><svg class="icon" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></button>
+          <button class="btn btn-sq nu" aria-label="Aggiungi"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="btn btn-sq nu" aria-label="Avanti"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="btn btn-sq nu" aria-label="Indietro"><svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+          <button class="btn btn-sq nu" aria-label="Preferito" style="color:var(--accent)"><svg class="icon fill" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg></button>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card nu">
+          <div class="card-title">Misure</div>
+          <div class="row" style="justify-content:space-around">
+            <div class="gauge" style="width:180px;height:180px">
+              <svg viewBox="0 0 100 100">
+                <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a3c"/><stop offset="1" stop-color="#ff3b52"/></linearGradient></defs>
+                <circle cx="50" cy="50" r="41" fill="none" stroke="var(--hairline)" stroke-width="7"/>
+                <circle cx="50" cy="50" r="41" fill="none" stroke="url(#gA)" stroke-width="7" stroke-linecap="round"
+                        stroke-dasharray="257.6" stroke-dashoffset="72" />
+              </svg>
+              <div class="val"><b class="mono">−9.4</b><span>LUFS attuale</span></div>
+            </div>
+          </div>
+          <div class="row" style="justify-content:space-between;margin-top:18px">
+            <span class="badge"><i class="dot" style="background:var(--accent)"></i>Guadagno −4.6 dB</span>
+            <span class="badge warn"><i class="dot"></i>3 clip rilevati</span>
+          </div>
+        </div>
+
+        <div class="card nu">
+          <div class="card-title">Confronto</div>
+          <div class="col" style="gap:14px">
+            <div><div class="spread" style="font-size:13px;margin-bottom:7px"><span class="muted">Originale</span><span class="mono" style="font-weight:700">−9.4 LUFS</span></div><div class="bar"><div class="on" style="width:82%"></div></div></div>
+            <div><div class="spread" style="font-size:13px;margin-bottom:7px"><span class="muted">Normalizzato</span><span class="mono" style="font-weight:700;color:var(--accent)">−14.0 LUFS</span></div><div class="bar"><div class="on" style="width:54%"></div></div></div>
+            <div><div class="spread" style="font-size:13px;margin-bottom:7px"><span class="muted">True peak</span><span class="mono" style="font-weight:700">−1.0 dBTP</span></div><div class="bar"><div class="on" style="width:93%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROCESSA / SCARICA ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Step 4–5 · Processa e scarica</h2><span>ring di avanzamento, azioni</span></div>
+    <div class="grid g3">
+      <div class="card nu" style="display:grid;place-items:center">
+        <div class="gauge inverted" id="ringWrap">
+          <svg viewBox="0 0 100 100">
+            <defs><linearGradient id="gB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a3c"/><stop offset="1" stop-color="#ff3b52"/></linearGradient></defs>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="9"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gB)" stroke-width="9" stroke-linecap="round"
+                    stroke-dasharray="251.3" stroke-dashoffset="62" id="ring"/>
+          </svg>
+          <div class="val"><b class="mono" id="ringVal">75%</b><span>elaborazione</span></div>
+        </div>
+      </div>
+
+      <div class="card nu">
+        <div class="card-title">Azioni</div>
+        <div class="col" style="gap:14px">
+          <button class="btn btn-wide nu"><span>Scarica tutti (3 file)</span>
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 4v12M8 12l4 4 4-4"/><path d="M4 20h16"/></svg></button>
+          <button class="btn btn-wide nu"><span>Carica altri file</span>
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 20h16"/></svg></button>
+          <button class="btn btn-accent" style="padding:16px">Avvia normalizzazione</button>
+          <button class="btn btn-dark nu" style="padding:16px">Annulla elaborazione</button>
+        </div>
+      </div>
+
+      <div class="card nu">
+        <div class="card-title">Riepilogo</div>
+        <div class="col" style="gap:13px">
+          <div class="spread"><span class="muted" style="font-size:13.5px">File processati</span><span class="mono" style="font-weight:700">2 / 3</span></div>
+          <div class="spread"><span class="muted" style="font-size:13.5px">Guadagno medio</span><span class="mono" style="font-weight:700">−4.6 dB</span></div>
+          <div class="spread"><span class="muted" style="font-size:13.5px">Tempo trascorso</span><span class="mono" style="font-weight:700">00:47</span></div>
+          <div class="spread"><span class="muted" style="font-size:13.5px">Motore</span><span class="badge solid">WASM</span></div>
+          <div class="spread"><span class="muted" style="font-size:13.5px">Conformità EBU R128</span><span class="badge ok"><i class="dot"></i>Passata</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TOKEN ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Fondamenta</h2><span>token e scala di elevazione — l'unica cosa da portare nel progetto</span></div>
+    <div class="grid g2">
+      <div class="card nu">
+        <div class="card-title">Palette</div>
+        <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:14px">
+          <div class="sw"><div class="chip nu-sm" style="background:var(--surface)"></div><code>surface</code></div>
+          <div class="sw"><div class="chip nu-sm" style="background:var(--contrast)"></div><code>contrast</code></div>
+          <div class="sw"><div class="chip nu-sm" style="background:var(--accent)"></div><code>accent</code></div>
+          <div class="sw"><div class="chip nu-sm" style="background:var(--accent-2)"></div><code>accent-2</code></div>
+          <div class="sw"><div class="chip nu-sm" style="background:linear-gradient(135deg,var(--accent-2),var(--accent))"></div><code>gradient</code></div>
+        </div>
+        <div class="note" style="margin-top:20px">
+          Il tema si regge su <b>un solo colore di superficie</b> identico allo sfondo. La forma nasce dalle ombre,
+          non dal riempimento — per questo funziona in chiaro e in scuro cambiando solo 5 variabili.
+        </div>
+      </div>
+
+      <div class="card nu">
+        <div class="card-title">Scala di elevazione</div>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:18px">
+          <div class="sw"><div class="chip nu-sm"></div><code>.nu-sm</code></div>
+          <div class="sw"><div class="chip nu"></div><code>.nu</code></div>
+          <div class="sw"><div class="chip nu-lg"></div><code>.nu-lg</code></div>
+          <div class="sw"><div class="chip nu-in"></div><code>.nu-in</code></div>
+          <div class="sw"><div class="chip nu-in-sm"></div><code>.nu-in-sm</code></div>
+          <div class="sw"><div class="chip nu-flat" style="background:var(--surface-2)"></div><code>.nu-flat</code></div>
+        </div>
+        <div class="note" style="margin-top:20px">
+          <b>Regola d'oro:</b> extruded = premibile · inset = premuto, oppure contenitore di qualcos'altro
+          (track dello slider, dropzone, progress). Non annidare mai due extruded consecutivi: la gerarchia si perde.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= AVVERTENZA ================= -->
+  <section class="block">
+    <div class="sec-head"><h2>Da sapere prima di adottarlo</h2><span>onestà tecnica</span></div>
+    <div class="card nu">
+      <div class="col" style="gap:14px">
+        <div class="note"><b>Contrasto.</b> Il neumorfismo puro fallisce WCAG AA sui bordi: un pulsante definito solo da ombre
+        ha contrasto ~1.3:1 contro lo sfondo, sotto il minimo di 3:1 per i controlli. Qui l'ho mitigato tenendo il
+        <b>testo</b> sempre ad alto contrasto e usando l'accento rosso o le superfici scure per ogni azione primaria — ma
+        i controlli "solo ombra" (i quadrati icona chiari) restano un compromesso. Va deciso consapevolmente.</div>
+        <div class="note"><b>Costo di rendering.</b> Due box-shadow grandi per elemento sono costose se applicate a centinaia di nodi.
+        Sulla lista file e sulle visualizzazioni audio (waveform, spettrogramma, vettorscopio) conviene usare <code>.nu-sm</code>
+        o nessuna ombra, altrimenti lo scroll scatta.</div>
+        <div class="note"><b>Conflitto attuale nel repo.</b> Esistono <code>app/globals.css</code> (Tailwind v3) e
+        <code>styles/globals.css</code> (sintassi v4 + token shadcn in oklch), e <code>tailwind.config.js</code> ha
+        <code>theme.extend</code> vuoto. Prima di portare questi token va scelto <b>un solo</b> file sorgente, altrimenti
+        i 50 componenti in <code>components/ui</code> continueranno a leggere token che non esistono.</div>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:44px" class="muted">
+    <span style="font-size:12.5px">Audio Normalizer · prototipo UI · nessuna dipendenza esterna · tutti i valori mostrati sono di esempio</span>
+  </div>
+</div>
+
+<script>
+/* ---------- tema ---------- */
+document.getElementById('themeSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-theme-set]'); if (!b) return;
+  document.documentElement.dataset.theme = b.dataset.themeSet;
+  [...b.parentNode.children].forEach(x => x.setAttribute('aria-selected', x === b));
+});
+
+/* ---------- switch ---------- */
+document.querySelectorAll('.switch').forEach(s =>
+  s.addEventListener('click', () => s.setAttribute('aria-checked', s.getAttribute('aria-checked') !== 'true')));
+
+/* ---------- segmented ---------- */
+document.querySelectorAll('.seg:not(#themeSeg)').forEach(seg =>
+  seg.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    [...seg.children].forEach(x => x.setAttribute('aria-selected', x === b));
+  }));
+
+/* ---------- slider orizzontali ---------- */
+function bindRange(id, fillId, outId, fmt) {
+  const r = document.getElementById(id), f = document.getElementById(fillId), o = document.getElementById(outId);
+  const upd = () => {
+    const p = (r.value - r.min) / (r.max - r.min) * 100;
+    f.style.width = p + '%';
+    o.textContent = fmt(r.value);
+  };
+  r.addEventListener('input', upd); upd();
+}
+bindRange('lufsRange', 'lufsFill', 'lufsOut', v => '−' + Math.abs(v).toFixed(1) + ' LUFS');
+bindRange('tpRange',  'tpFill',  'tpOut',  v => (v == 0 ? '0.0' : '−' + Math.abs(v).toFixed(1)) + ' dBTP');
+
+/* ---------- fader verticali ---------- */
+document.querySelectorAll('[data-fader]').forEach(f => {
+  const inp = f.querySelector('input'), dot = f.querySelector('.dot'), on = f.querySelector('.rail .on'), rail = f.querySelector('.rail');
+  const upd = () => {
+    const p = inp.value / 100;
+    const h = rail.offsetHeight;
+    dot.style.bottom = (46 + p * (h - 22)) + 'px';
+    on.style.height = (p * 100) + '%';
+  };
+  inp.addEventListener('input', upd);
+  requestAnimationFrame(upd);
+});
+
+/* ---------- select ---------- */
+const sel = document.getElementById('presetSel');
+document.getElementById('presetBtn').addEventListener('click', e => { e.stopPropagation(); sel.classList.toggle('open'); });
+sel.querySelectorAll('.sel-opt').forEach(o => o.addEventListener('click', () => {
+  sel.querySelectorAll('.sel-opt').forEach(x => x.setAttribute('aria-selected', x === o));
+  document.querySelector('#presetBtn span').textContent = o.childNodes[0].textContent.trim() + ' · ' + o.querySelector('small').textContent;
+  sel.classList.remove('open');
+}));
+document.addEventListener('click', () => sel.classList.remove('open'));
+
+/* ---------- waveform ---------- */
+const wave = document.getElementById('wave');
+const N = 96, played = 0.42;
+for (let i = 0; i < N; i++) {
+  const t = i / N;
+  const a = (Math.sin(t * 22) * .3 + Math.sin(t * 7.5) * .4 + Math.sin(t * 41) * .18 + .55);
+  const h = Math.max(8, Math.min(100, a * 78 + Math.random() * 18));
+  const b = document.createElement('i');
+  b.style.height = h + '%';
+  if (t < played) b.classList.add('on');
+  if (h > 92) b.classList.add('clip');
+  wave.appendChild(b);
+}
+
+/* ---------- play/pause ---------- */
+const playBtn = document.getElementById('playBtn');
+let playing = false;
+const ICON_PLAY  = '<svg class="icon fill" style="width:26px;height:26px" viewBox="0 0 24 24"><path d="M7 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg class="icon fill" style="width:26px;height:26px" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
+playBtn.addEventListener('click', () => {
+  playing = !playing;
+  playBtn.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+  playBtn.setAttribute('aria-pressed', playing);
+});
+
+/* ---------- ring animato ---------- */
+const ring = document.getElementById('ring'), ringVal = document.getElementById('ringVal');
+const C = 251.3; let p = 0;
+setInterval(() => {
+  p = (p + 1) % 101;
+  ring.style.strokeDashoffset = C * (1 - p / 100);
+  ringVal.textContent = p + '%';
+}, 90);
+
+/* ---------- dropzone ---------- */
+const dz = document.getElementById('dz');
+['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('hot'); }));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('hot'); }));
+</script>
+</body>
+</html>

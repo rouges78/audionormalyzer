@@ -214,7 +214,7 @@ export function HistogramVisualization({ analysis, fileName, audioData, classNam
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading flex items-center gap-2 text-base">
-            <BarChart3 className="h-4 w-4 text-purple-800" />
+            <BarChart3 className="h-4 w-4 text-[color:var(--primary-ink)]" />
             Histogram Analysis - {fileName}
           </CardTitle>
           <Badge variant="secondary">{settings.bins} bins</Badge>
@@ -279,7 +279,7 @@ export function HistogramVisualization({ analysis, fileName, audioData, classNam
           </div>
         </div>
 
-        <div className="relative h-64 bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden">
+        <div className="relative h-64 bg-gradient-to-br from-secondary to-black rounded-lg overflow-hidden">
           <canvas
             ref={canvasRef}
             className="w-full h-full cursor-crosshair"
@@ -287,7 +287,7 @@ export function HistogramVisualization({ analysis, fileName, audioData, classNam
           />
           
           {!histogramData && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50">
+            <div className="absolute inset-0 flex items-center justify-center bg-secondary/80">
               <div className="text-center text-white">
                 <Activity className="h-8 w-8 mx-auto mb-2 animate-pulse" />
                 <p>Generating histogram...</p>
@@ -296,7 +296,7 @@ export function HistogramVisualization({ analysis, fileName, audioData, classNam
           )}
         </div>
 
-        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-4 text-sm text-muted-foreground">
           <p>
             Histogram analysis mostra la distribuzione di valori audio. 
             {audioData ? ' Basato su dati audio reali.' : ' Simulazione basata su analisi.'}

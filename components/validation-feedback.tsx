@@ -29,7 +29,7 @@ export const ValidationFeedback: React.FC<ValidationFeedbackProps> = ({
   if (error) {
     return (
       <div className={cn('mt-1', className)}>
-        <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+        <div className="flex items-center gap-1 text-sm text-[color:var(--danger)]">
           <AlertCircle className="h-3 w-3 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -42,7 +42,7 @@ export const ValidationFeedback: React.FC<ValidationFeedbackProps> = ({
   if (isValid && isDirty && showSuccess) {
     return (
       <div className={cn('mt-1', className)}>
-        <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+        <div className="flex items-center gap-1 text-sm text-[color:var(--success)]">
           <CheckCircle className="h-3 w-3 flex-shrink-0" />
           <span>Valid</span>
         </div>
@@ -77,14 +77,14 @@ export const FieldValidation: React.FC<FieldValidationProps> = ({
 }) => {
   return (
     <div className={cn('space-y-2', className)}>
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label className="text-sm font-medium text-muted-foreground">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className="text-[color:var(--danger)] ml-1">*</span>}
       </label>
       
       <div className={cn(
         'relative',
-        error && 'ring-1 ring-red-500 rounded-md'
+        error && 'ring-1 ring-[color:var(--danger)] rounded-md'
       )}>
         {children}
       </div>
@@ -96,7 +96,7 @@ export const FieldValidation: React.FC<FieldValidationProps> = ({
         showSuccess={true}
       >
         {helpText && !error && (
-          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Info className="h-3 w-3 flex-shrink-0" />
             <span>{helpText}</span>
           </div>
@@ -164,7 +164,7 @@ export const FileValidation: React.FC<FileValidationProps> = ({
   
   if (errors.length === 0) {
     return (
-      <div className={cn('flex items-center gap-1 text-xs text-green-600 dark:text-green-400', className)}>
+      <div className={cn('flex items-center gap-1 text-xs text-[color:var(--success)]', className)}>
         <CheckCircle className="h-3 w-3" />
         <span>Valid audio file</span>
       </div>
@@ -174,7 +174,7 @@ export const FileValidation: React.FC<FileValidationProps> = ({
   return (
     <div className={cn('space-y-1', className)}>
       {errors.map((error, index) => (
-        <div key={index} className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+        <div key={index} className="flex items-center gap-1 text-xs text-[color:var(--danger)]">
           <AlertCircle className="h-3 w-3 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -205,12 +205,12 @@ export const AudioParameterValidation: React.FC<AudioParameterValidationProps> =
   return (
     <div className={cn('text-xs', className)}>
       {isValid ? (
-        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+        <div className="flex items-center gap-1 text-[color:var(--success)]">
           <CheckCircle className="h-3 w-3" />
           <span>{label}: {value}{unit} (valid range: {min} to {max}{unit})</span>
         </div>
       ) : (
-        <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
+        <div className="flex items-center gap-1 text-[color:var(--danger)]">
           <AlertCircle className="h-3 w-3" />
           <span>{label}: {value}{unit} is outside valid range ({min} to {max}{unit})</span>
         </div>
