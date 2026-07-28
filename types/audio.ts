@@ -1,5 +1,20 @@
 // Core audio processing interfaces based on design document
 
+/**
+ * Provenienza dei valori di un'AudioAnalysis. Serve a non spacciare mai una
+ * stima per una misura: la UI deve poter dire all'utente quanto fidarsi.
+ *
+ *  - 'measured'  → tutto misurato davvero (richiede un ffmpeg reale che
+ *                  esegua il filtro `ebur128`; vedi core-04).
+ *  - 'partial'   → contenitore reale (durata, sample rate, canali, formato,
+ *                  letti con `music-metadata`) ma loudness NON misurata.
+ *  - 'estimated' → nessun valore reale: fallback deterministico ricavato dal
+ *                  file. Utile solo per far girare la UI, non per decidere.
+ *
+ * Opzionale per retrocompatibilità: se assente, tratta il dato come 'estimated'.
+ */
+export type AnalysisSource = 'measured' | 'partial' | 'estimated'
+
 export interface AudioAnalysis {
   duration: number // secondi
   sampleRate: number // Hz
@@ -20,6 +35,18 @@ export interface AudioAnalysis {
    * dall'anteprima basata sul gain.
    */
   loudnessRange?: number
+  /**
+   * Quanto di questa analisi è misurato davvero. Vedi {@link AnalysisSource}.
+   * Assente = da trattare come 'estimated'.
+   */
+  source?: AnalysisSource
+  /** Bitrate in bit/s, quando il contenitore lo dichiara. */
+  bitrate?: number
+}
+
+/** True se l'analisi contiene valori di loudness realmente misurati. */
+export function hasMeasuredLoudness(a: Pick<AudioAnalysis, 'source'>): boolean {
+  return a.source === 'measured'
 }
 
 /**

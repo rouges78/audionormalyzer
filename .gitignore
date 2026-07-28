@@ -34,3 +34,4 @@ logs/*.log
 
 # Build output desktop (Electron)
 /dist/
+output/downloads/

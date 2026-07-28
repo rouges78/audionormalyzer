@@ -233,6 +233,12 @@ export function NormalizationWizard() {
   const targetMax = method === "peak" ? 0 : -6
   const targetUnit = method === "peak" ? "dBFS" : "LUFS"
 
+  // Quanti file hanno valori di loudness NON realmente misurati.
+  // `source` assente = analisi vecchia, da trattare come non misurata.
+  const unmeasuredCount = readyFiles.filter(
+    f => f.analysis?.source !== "measured"
+  ).length
+
   // ======================================================================
   return (
     <div className="space-y-6">
@@ -242,6 +248,22 @@ export function NormalizationWizard() {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* I valori di loudness non sono ancora misurati davvero (serve ffmpeg
+          con il filtro ebur128, task core-04). Finché è così l'utente deve
+          saperlo: mostrare numeri senza avviso equivale a mentirgli. */}
+      {unmeasuredCount > 0 && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <b>Valori di loudness non misurati.</b> Durata, sample rate, canali e
+            formato sono letti dal file e sono corretti; LUFS, picco e true peak
+            sono invece stime provvisorie, non misure EBU R128.
+            {" "}Usali per prendere confidenza con il flusso, non per decisioni
+            di mastering.
+          </AlertDescription>
         </Alert>
       )}
 

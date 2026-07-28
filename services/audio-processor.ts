@@ -49,39 +49,109 @@ export class AudioProcessorImpl implements AudioProcessor {
     try {
       // Verify file exists
       await fs.access(filePath)
-      
-      // Get file stats for realistic data generation
+
       const stats = await fs.stat(filePath)
       const ext = path.extname(filePath).toLowerCase()
-      
-      // Generate deterministic but realistic analysis data based on file
+
+      // 1) Dati di contenitore: REALI, letti dall'header del file.
+      const container = await this.readContainerInfo(filePath)
+
+      // 2) Loudness: NON misurabile senza un ffmpeg reale che esegua il
+      //    filtro `ebur128`. Finché core-04 non è pronto restituiamo valori
+      //    di ripiego DICHIARATI come tali via `source`, invece di spacciarli
+      //    per misure. La UI deve avvisare l'utente quando source !== 'measured'.
       const fileHash = this.generateFileHash(filePath, stats.size)
-      
-      // Use hash to generate consistent values for the same file
-      const duration = 120 + (fileHash % 300) // 2-7 minutes
-      const sampleRate = [44100, 48000, 96000][fileHash % 3]
-      const channels = fileHash % 10 < 8 ? 2 : 1 // 80% stereo, 20% mono
-      
-      // Generate realistic audio levels
-      const peakLevel = -1 - (fileHash % 20) // -1 to -20 dB
-      const rmsLevel = peakLevel - 6 - (fileHash % 12) // 6-18 dB below peak
-      const lufsIntegrated = -23 + ((fileHash % 40) - 20) // -43 to -3 LUFS
-      const truePeak = peakLevel + 0.1 + ((fileHash % 10) / 10) // Slightly above peak
-      const hasClipping = fileHash % 10 < 2 // 20% chance of clipping
-      
+      const loudness = this.placeholderLoudness(fileHash)
+
+      if (container) {
+        return {
+          duration: container.duration,
+          sampleRate: container.sampleRate,
+          channels: container.channels,
+          format: container.format || ext.substring(1).toUpperCase(),
+          bitrate: container.bitrate,
+          ...loudness,
+          source: 'partial',
+        }
+      }
+
+      // Fallback: nemmeno il contenitore è leggibile (file corrotto, formato
+      // non riconosciuto, o ambiente di test senza file reale).
       return {
-        duration,
-        sampleRate,
-        channels,
-        peakLevel,
-        rmsLevel,
-        lufsIntegrated,
-        truePeak,
-        hasClipping,
-        format: ext.substring(1).toUpperCase()
+        duration: 120 + (fileHash % 300),
+        sampleRate: [44100, 48000, 96000][fileHash % 3],
+        channels: fileHash % 10 < 8 ? 2 : 1,
+        format: ext.substring(1).toUpperCase(),
+        ...loudness,
+        source: 'estimated',
       }
     } catch (error) {
       throw new Error(`Audio analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Legge i dati reali del contenitore audio (durata, sample rate, canali,
+   * formato, bitrate) tramite `music-metadata`, che analizza l'header del file
+   * senza bisogno di ffmpeg.
+   *
+   * Restituisce `null` — senza sollevare — se il file non è interpretabile:
+   * chi chiama decide come degradare.
+   */
+  private async readContainerInfo(filePath: string): Promise<{
+    duration: number
+    sampleRate: number
+    channels: number
+    format?: string
+    bitrate?: number
+  } | null> {
+    try {
+      const { parseFile } = await import('music-metadata')
+      const meta = await parseFile(filePath, { duration: true })
+      const info = meta.format
+
+      // Senza questi tre il dato non è utilizzabile: meglio dichiararlo assente
+      // che restituire zeri che poi finiscono nei calcoli di guadagno.
+      if (!info?.duration || !info.sampleRate || !info.numberOfChannels) {
+        return null
+      }
+
+      return {
+        duration: info.duration,
+        sampleRate: info.sampleRate,
+        channels: info.numberOfChannels,
+        format: info.container?.toUpperCase(),
+        bitrate: info.bitrate,
+      }
+    } catch {
+      // music-metadata assente, file illeggibile o formato non supportato.
+      return null
+    }
+  }
+
+  /**
+   * Valori di loudness di ripiego, deterministici rispetto al file.
+   *
+   * NON sono misure. Esistono solo perché l'interfaccia possa funzionare prima
+   * che l'engine nativo sia pronto (core-04); vanno sempre accompagnati da
+   * `source: 'partial' | 'estimated'`. Da eliminare quando ffmpeg misurerà
+   * davvero via `ebur128`.
+   */
+  private placeholderLoudness(fileHash: number): {
+    peakLevel: number
+    rmsLevel: number
+    lufsIntegrated: number
+    truePeak: number
+    hasClipping: boolean
+  } {
+    const peakLevel = -1 - (fileHash % 20) // -1 .. -20 dBFS
+    return {
+      peakLevel,
+      rmsLevel: peakLevel - 6 - (fileHash % 12),
+      lufsIntegrated: -23 + ((fileHash % 40) - 20), // -43 .. -3 LUFS
+      // il true peak sta appena sopra il picco campionato, ma mai sopra 0 dBTP
+      truePeak: Math.min(0, peakLevel + 0.1 + ((fileHash % 10) / 10)),
+      hasClipping: fileHash % 10 < 2,
     }
   }
 
