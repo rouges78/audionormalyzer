@@ -35,3 +35,6 @@ logs/*.log
 # Build output desktop (Electron)
 /dist/
 output/downloads/
+
+# Backup bundle Git (locali, mai versionati)
+_backup/
