@@ -32,6 +32,10 @@ output/audio/*
 !output/audio/.gitkeep
 logs/*.log
 
+# Artefatti generati dalla suite di test
+temp/test-downloads/
+temp/test-*/
+
 # Build output desktop (Electron)
 /dist/
 output/downloads/
