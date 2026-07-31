@@ -1,9 +1,10 @@
 import { 
   AlbumProcessor, 
   AudioFile, 
-  AlbumOptions, 
-  ProcessingResult, 
-  AlbumLoudnessData, 
+  AlbumOptions,
+  ProcessingResult,
+  AlbumProcessingResult,
+  AlbumLoudnessData,
   ProcessingReport,
   AudioAnalysis,
   NormalizationOptions
@@ -29,7 +30,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
    * @param options Opzioni di processing per l'album
    * @returns Promise<ProcessingResult> Risultato del processing dell'album
    */
-  async processAlbum(files: AudioFile[], options: AlbumOptions): Promise<ProcessingResult> {
+  async processAlbum(files: AudioFile[], options: AlbumOptions): Promise<AlbumProcessingResult> {
     const startTime = Date.now()
     
     try {
@@ -95,9 +96,10 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         finalLoudness: avgFinalLoudness,
         gainApplied: avgGain,
         processingTime,
-        error: successfulResults.length === 0 ? 'Nessun file processato con successo' : undefined
+        error: successfulResults.length === 0 ? 'Nessun file processato con successo' : undefined,
+        fileResults: results
       }
-      
+
     } catch (error) {
       const processingTime = Date.now() - startTime
       return {
@@ -107,7 +109,8 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         finalLoudness: 0,
         gainApplied: 0,
         processingTime,
-        error: error instanceof Error ? error.message : 'Errore sconosciuto nel processing dell\'album'
+        error: error instanceof Error ? error.message : 'Errore sconosciuto nel processing dell\'album',
+        fileResults: []
       }
     }
   }

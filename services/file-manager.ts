@@ -231,6 +231,34 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
+   * Costruisce il percorso di uscita per un singolo file normalizzato,
+   * assicurandosi che la directory di output esista.
+   *
+   * La rotta /api/normalize chiamava questo metodo da sempre, ma non esisteva:
+   * il bug era mascherato perché il fileManager vi era tipizzato `any` e i test
+   * lo sostituiscono con un mock. In produzione sarebbe esploso con
+   * "fileManager.createOutputPath is not a function".
+   *
+   * @param fileName Nome del file desiderato (viene sanificato)
+   * @returns Percorso assoluto del file di uscita
+   */
+  async createOutputPath(fileName: string): Promise<string> {
+    if (!fileName || fileName.trim() === '') {
+      throw new Error('Nome file richiesto')
+    }
+
+    await fs.mkdir(this.outputDir, { recursive: true })
+
+    const extension = this.getFileExtension(fileName)
+    const baseName = this.sanitizeFileName(
+      extension ? fileName.slice(0, -extension.length) : fileName
+    )
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+
+    return path.join(this.outputDir, `${baseName}_${timestamp}${extension}`)
+  }
+
+  /**
    * Preserva i metadati da un file sorgente a uno di destinazione
    * @param sourcePath Percorso del file sorgente
    * @param targetPath Percorso del file di destinazione

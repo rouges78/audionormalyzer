@@ -78,6 +78,10 @@ export interface AudioProcessor {
   analyzeAudio(filePath: string): Promise<AudioAnalysis>
   normalizeAudio(filePath: string, options: NormalizationOptions): Promise<string>
   validateFormat(filePath: string): Promise<boolean>
+  validateNormalizationOptions(options: NormalizationOptions): {
+    isValid: boolean
+    errors: string[]
+  }
 }
 
 export interface UploadResult {
@@ -94,11 +98,30 @@ export interface ValidationResult {
   error?: string
 }
 
+/** Informazioni su un file temporaneo caricato, restituite da getTempFileInfo. */
+export interface TempFileInfo {
+  path: string
+  size: number
+  created: Date
+  /**
+   * Nome originale del file, quando è noto.
+   * Opzionale: su disco i temporanei sono salvati con il solo fileId, quindi
+   * chi legge questo campo deve prevedere un fallback.
+   */
+  originalName?: string
+}
+
 export interface FileManager {
   uploadFiles(files: File[]): Promise<UploadResult[]>
   validateAudioFile(file: File): Promise<ValidationResult>
   createOutputDirectory(albumName: string): Promise<string>
+  createOutputPath(fileName: string): Promise<string>
   preserveMetadata(sourcePath: string, targetPath: string): Promise<void>
+  getTempFileInfo(fileId: string): Promise<TempFileInfo | null>
+  cleanupFiles(filePaths: string[]): Promise<void>
+  cleanupOldTempFiles(maxAgeHours?: number): Promise<void>
+  fileSupportsMetadata(filePath: string): boolean
+  extractFileMetadata(filePath: string): Promise<any | null>
 }
 
 export interface AlbumOptions {
@@ -117,6 +140,18 @@ export interface ProcessingResult {
   gainApplied: number
   processingTime: number
   error?: string
+}
+
+/**
+ * Esito del processing di un album.
+ *
+ * I campi ereditati da ProcessingResult descrivono l'album nel suo insieme
+ * (loudness media, guadagno medio, tempo totale); `fileResults` conserva
+ * l'esito traccia per traccia, che prima veniva calcolato e poi scartato —
+ * la rotta /api/normalize lo cercava e trovava `undefined`.
+ */
+export interface AlbumProcessingResult extends ProcessingResult {
+  fileResults: ProcessingResult[]
 }
 
 export interface AlbumLoudnessData {
@@ -138,7 +173,7 @@ export interface ProcessingReport {
 }
 
 export interface AlbumProcessor {
-  processAlbum(files: AudioFile[], options: AlbumOptions): Promise<ProcessingResult>
+  processAlbum(files: AudioFile[], options: AlbumOptions): Promise<AlbumProcessingResult>
   calculateAlbumLoudness(files: AudioFile[]): Promise<AlbumLoudnessData>
   generateProcessingReport(results: ProcessingResult[]): ProcessingReport
 }

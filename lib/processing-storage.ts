@@ -3,6 +3,8 @@
  * In production, this should be replaced with a proper database
  */
 
+import { scheduleBackgroundCleanup } from './background-cleanup'
+
 export interface ProcessingResult {
   fileId: string
   fileName: string
@@ -16,6 +18,19 @@ export interface ProcessingResult {
   error?: string
 }
 
+/**
+ * Statistiche di riepilogo esposte dalla rotta GET /api/process/[id]
+ * quando l'elaborazione è conclusa.
+ */
+export interface ProcessingSummary {
+  totalSuccessful: number
+  totalFailed: number
+  averageGainApplied: number
+  averageProcessingTime: number
+  totalOutputSize: number
+  outputFiles: string[]
+}
+
 export interface ProcessingData {
   id: string
   status: 'processing' | 'completed' | 'error'
@@ -26,11 +41,19 @@ export interface ProcessingData {
   successfulFiles: number
   failedFiles: number
   results: ProcessingResult[]
+  /** Timestamp in millisecondi (Date.now()), non un oggetto Date. */
   startTime: number
+  /** Timestamp in millisecondi (Date.now()), non un oggetto Date. */
   endTime?: number
   processingTime?: number
   error?: string
   outputDirectory?: string
+  /** Modalità album: le tracce sono normalizzate come un insieme unico. */
+  albumMode?: boolean
+  /** In modalità album, conserva le differenze dinamiche fra le tracce. */
+  maintainRelativeLoudness?: boolean
+  /** 'preserve' oppure un formato di uscita specifico. */
+  outputFormat?: string
 }
 
 class ProcessingStorageClass {
@@ -61,6 +84,16 @@ class ProcessingStorageClass {
 
   get(id: string): ProcessingData | null {
     return this.storage.get(id) || null
+  }
+
+  /**
+   * Scrive (o sovrascrive) l'intero record di un'elaborazione.
+   * Le rotte API mutano l'oggetto ottenuto da get() e lo risalvano qui:
+   * a differenza di update(), che fonde un Partial, set() rimpiazza tutto.
+   */
+  set(id: string, data: ProcessingData): ProcessingData {
+    this.storage.set(id, data)
+    return data
   }
 
   update(id: string, updates: Partial<ProcessingData>): ProcessingData | null {
@@ -181,9 +214,5 @@ class ProcessingStorageClass {
 
 export const ProcessingStorage = new ProcessingStorageClass()
 
-// Auto-cleanup every hour
-if (typeof window === 'undefined') { // Server-side only
-  setInterval(() => {
-    ProcessingStorage.cleanup()
-  }, 60 * 60 * 1000) // 1 hour
-}
+// Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
+scheduleBackgroundCleanup(() => ProcessingStorage.cleanup(), 60 * 60 * 1000)

@@ -4,6 +4,7 @@
 import { EventEmitter } from 'events'
 import { pluginManager, PluginAPI } from './plugin-system'
 import { moduleLoader } from './module-loader'
+import { scheduleBackgroundCleanup } from './background-cleanup'
 
 // Extension interfaces
 export interface APIExtension {
@@ -547,7 +548,8 @@ export class APIExtensionManager extends EventEmitter {
 
   private setupRateLimiters(): void {
     // Cleanup old rate limiters periodically
-    setInterval(() => {
+    // (non registrato in test, non blocca l'uscita del processo)
+    scheduleBackgroundCleanup(() => {
       const now = Date.now()
       for (const [key, limiter] of this.rateLimiters.entries()) {
         if (now - limiter.lastReset > limiter.window * 2) {

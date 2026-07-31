@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createFileManager } from '@/services/file-manager'
 import { createAlbumProcessor } from '@/services/album-processor'
 import { resolveAudioEngine } from '@/lib/engines'
-import type { NormalizationResult } from '@/types/audio'
+import type { AudioFile, NormalizationResult, TempFileInfo } from '@/types/audio'
+import { basename, extname } from 'path'
 import { ProcessingStorage, ProcessingResult } from '@/lib/processing-storage'
 import { withErrorHandling, serverErrorHandler, ErrorTypes } from '@/lib/server-error-handler'
 import { v4 as uuidv4 } from 'uuid'
@@ -65,8 +66,16 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const processId = uuidv4()
   const fileManager = createFileManager()
 
-  // Initialize processing result
-  const processingData = ProcessingStorage.create(processId, method, targetLevel, fileIds.length)
+  // Initialize processing result.
+  // create() copre i campi comuni; albumMode, maintainRelativeLoudness e
+  // outputFormat vanno scritti a parte, altrimenti processAlbumAsync e la rotta
+  // GET /api/process/[id] li leggono e trovano undefined.
+  ProcessingStorage.create(processId, method, targetLevel, fileIds.length)
+  const processingData = ProcessingStorage.update(processId, {
+    albumMode,
+    maintainRelativeLoudness,
+    outputFormat,
+  })!
 
   await serverErrorHandler.logInfo('Normalization initialized', {
     processId,
@@ -145,14 +154,17 @@ async function processFilesAsync(
 
     for (const fileId of fileIds) {
       const fileStartTime = Date.now();
-      
+
+      // Dichiarato fuori dal try: il blocco catch lo usa per il nome del file.
+      let fileInfo: TempFileInfo | null = null;
+
       try {
         await serverErrorHandler.logInfo(`Processing file ${fileId}`, { processId, fileId });
 
         // Get file info with timeout
-        const fileInfo = await Promise.race([
+        fileInfo = await Promise.race([
           fileManager.getTempFileInfo(fileId),
-          new Promise((_, reject) => 
+          new Promise<never>((_, reject) =>
             setTimeout(() => reject(ErrorTypes.TIMEOUT_ERROR('file info retrieval', 30000)), 30000)
           )
         ]);
@@ -215,7 +227,7 @@ async function processFilesAsync(
 
         processingData.results.push({
           fileId,
-          fileName: fileInfo.originalName || `file-${fileId}`,
+          fileName: fileInfo?.originalName || `file-${fileId}`,
           success: false,
           error: fileError instanceof Error ? fileError.message : 'Errore di normalizzazione'
         });
@@ -228,9 +240,9 @@ async function processFilesAsync(
 
     // Mark as completed
     processingData.status = 'completed';
-    processingData.endTime = new Date();
-    processingData.processingTime = processingData.endTime.getTime() - processingData.startTime.getTime();
-    
+    processingData.endTime = Date.now();
+    processingData.processingTime = processingData.endTime - processingData.startTime;
+
     // Final storage update
     ProcessingStorage.set(processId, processingData);
 
@@ -247,7 +259,7 @@ async function processFilesAsync(
     
     processingData.status = 'error';
     processingData.error = error instanceof Error ? error.message : 'Errore di processing';
-    processingData.endTime = new Date();
+    processingData.endTime = Date.now();
     ProcessingStorage.set(processId, processingData);
 
     // Cleanup temp files on error
@@ -274,12 +286,23 @@ async function processAlbumAsync(
   try {
     const albumProcessor = createAlbumProcessor()
 
-    // Get all file infos
-    const fileInfos = []
+    // Get all file infos.
+    // getTempFileInfo non restituisce il nome originale (i temporanei su disco
+    // sono salvati con il solo fileId), quindi lo deriviamo dal percorso.
+    const fileInfos: AudioFile[] = []
     for (const fileId of fileIds) {
       const fileInfo = await fileManager.getTempFileInfo(fileId)
       if (fileInfo) {
-        fileInfos.push({ id: fileId, ...fileInfo })
+        const name = fileInfo.originalName || basename(fileInfo.path)
+        fileInfos.push({
+          id: fileId,
+          name,
+          originalPath: fileInfo.path,
+          tempPath: fileInfo.path,
+          size: fileInfo.size,
+          format: extname(name).replace('.', '').toLowerCase(),
+          status: 'ready',
+        })
       }
     }
 
@@ -294,16 +317,21 @@ async function processAlbumAsync(
     const albumOptions = {
       normalizationMethod: processingData.method,
       targetLevel: processingData.targetLevel,
-      maintainRelativeLoudness: processingData.maintainRelativeLoudness,
-      outputFormat: processingData.outputFormat
+      maintainRelativeLoudness: processingData.maintainRelativeLoudness ?? true,
+      outputFormat: processingData.outputFormat ?? 'preserve'
     }
 
-    const albumResults = await albumProcessor.processAlbum(fileInfos, albumOptions)
+    const albumResult = await albumProcessor.processAlbum(fileInfos, albumOptions)
 
-    // Update results
-    processingData.results = albumResults.map(result => ({
+    // Update results — fileResults contiene l'esito traccia per traccia,
+    // mentre albumResult descrive l'album nel suo insieme.
+    // Il ProcessingResult dell'album non porta il nome del file: lo recuperiamo
+    // dai fileInfos raccolti sopra.
+    const nameByFileId = new Map<string, string>(fileInfos.map(info => [info.id, info.name]))
+
+    processingData.results = albumResult.fileResults.map(result => ({
       fileId: result.fileId,
-      fileName: result.fileName,
+      fileName: nameByFileId.get(result.fileId) || `file-${result.fileId}`,
       success: result.success,
       outputPath: result.outputPath,
       originalLoudness: result.originalLoudness,
@@ -315,16 +343,16 @@ async function processAlbumAsync(
 
     processingData.processedFiles = fileInfos.length
     processingData.status = 'completed'
-    processingData.endTime = new Date()
-    processingData.processingTime = processingData.endTime.getTime() - processingData.startTime.getTime()
-    
+    processingData.endTime = Date.now()
+    processingData.processingTime = processingData.endTime - processingData.startTime
+
     ProcessingStorage.set(processId, processingData)
 
   } catch (error) {
     console.error('Errore nel processing album:', error)
     processingData.status = 'error'
     processingData.error = error instanceof Error ? error.message : 'Errore di processing album'
-    processingData.endTime = new Date()
+    processingData.endTime = Date.now()
     ProcessingStorage.set(processId, processingData)
   }
 }

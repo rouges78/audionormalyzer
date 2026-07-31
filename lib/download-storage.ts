@@ -3,6 +3,8 @@
  * In production, this should be replaced with a proper database
  */
 
+import { scheduleBackgroundCleanup } from './background-cleanup'
+
 export interface DownloadFile {
   id: string
   originalName: string
@@ -213,9 +215,5 @@ class DownloadStorageClass {
 
 export const DownloadStorage = new DownloadStorageClass()
 
-// Auto-cleanup every hour
-if (typeof window === 'undefined') { // Server-side only
-  setInterval(() => {
-    DownloadStorage.cleanup()
-  }, 60 * 60 * 1000) // 1 hour
-}
+// Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
+scheduleBackgroundCleanup(() => DownloadStorage.cleanup(), 60 * 60 * 1000)

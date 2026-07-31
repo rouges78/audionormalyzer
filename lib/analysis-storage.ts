@@ -3,6 +3,8 @@
  * In production, this should be replaced with a proper database
  */
 
+import { scheduleBackgroundCleanup } from './background-cleanup'
+
 export interface AnalysisResult {
   fileId: string
   fileName: string
@@ -139,9 +141,5 @@ class AnalysisStorageClass {
 
 export const AnalysisStorage = new AnalysisStorageClass()
 
-// Auto-cleanup every hour
-if (typeof window === 'undefined') { // Server-side only
-  setInterval(() => {
-    AnalysisStorage.cleanup()
-  }, 60 * 60 * 1000) // 1 hour
-}
+// Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
+scheduleBackgroundCleanup(() => AnalysisStorage.cleanup(), 60 * 60 * 1000)

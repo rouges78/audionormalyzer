@@ -32,7 +32,9 @@ export function useAudioUpload(): UseAudioUploadReturn {
   const { handleError, retryOperation } = useErrorHandling()
   
   // Validation rules for file uploads
-  const { validateField } = useValidation({}, {
+  // Il tipo dei campi va dedotto dai valori iniziali: passando `{}` la chiave
+  // 'files' non esisteva e validateField la rifiutava come `never`.
+  const { validateField } = useValidation<{ files: File[] }>({ files: [] }, {
     files: [
       validationRules.required('Please select at least one file'),
       validationRules.fileSize(100 * 1024 * 1024, 'File size must be less than 100MB'), // 100MB limit

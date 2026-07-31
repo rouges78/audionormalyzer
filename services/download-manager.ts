@@ -5,6 +5,7 @@ import { createWriteStream, createReadStream } from 'fs'
 import { pipeline } from 'stream/promises'
 import archiver from 'archiver'
 import { createFileOutputManager, DownloadPreparation } from './file-output-manager'
+import { scheduleBackgroundCleanup } from '@/lib/background-cleanup'
 
 /**
  * Interface for download management operations
@@ -612,10 +613,8 @@ export class DownloadManagerImpl implements DownloadManager {
    * Start cleanup scheduler for expired downloads
    */
   private startCleanupScheduler(): void {
-    // Run cleanup every hour
-    setInterval(async () => {
-      await this.cleanupExpiredDownloads()
-    }, 60 * 60 * 1000)
+    // Run cleanup every hour (non registrato in test, non blocca l'uscita)
+    scheduleBackgroundCleanup(() => this.cleanupExpiredDownloads(), 60 * 60 * 1000)
   }
 
   /**

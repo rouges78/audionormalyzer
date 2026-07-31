@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ProcessingStorage } from '@/lib/processing-storage'
+import type { ProcessingData, ProcessingSummary } from '@/lib/processing-storage'
 
 /**
  * GET /api/process/[id]
@@ -41,7 +42,25 @@ export async function GET(
       ? Math.round((processingData.processedFiles / processingData.totalFiles) * 100)
       : 0
 
-    const response = {
+    const response: {
+      success: true
+      data: {
+        id: string
+        status: ProcessingData['status']
+        progress: number
+        method: ProcessingData['method']
+        targetLevel: number
+        albumMode?: boolean
+        totalFiles: number
+        processedFiles: number
+        startTime: number
+        endTime?: number
+        processingTime?: number
+        results: ProcessingData['results']
+        error?: string
+        summary?: ProcessingSummary
+      }
+    } = {
       success: true,
       data: {
         id: processingData.id,
@@ -131,7 +150,7 @@ export async function DELETE(
     if (processingData.status === 'processing') {
       processingData.status = 'error'
       processingData.error = 'Processo cancellato dall\'utente'
-      processingData.endTime = new Date()
+      processingData.endTime = Date.now()
       ProcessingStorage.set(id, processingData)
 
       return NextResponse.json({
