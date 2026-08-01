@@ -57,6 +57,18 @@ class AnalysisStorageClass {
     return this.storage.get(id) || null
   }
 
+  /**
+   * Scrive (o sovrascrive) l'intero record di un'analisi.
+   * Contropartita di ProcessingStorage.set(), aggiunta in v2.0: mancava solo
+   * qui, e i test che preparavano uno stato di analisi fallivano con
+   * "AnalysisStorage.set is not a function". A differenza di update(), che
+   * fonde un Partial, set() rimpiazza il record per intero.
+   */
+  set(id: string, data: AnalysisData): AnalysisData {
+    this.storage.set(id, data)
+    return data
+  }
+
   update(id: string, updates: Partial<AnalysisData>): AnalysisData | null {
     const existing = this.storage.get(id)
     if (!existing) return null
@@ -97,6 +109,16 @@ class AnalysisStorageClass {
     return existing
   }
 
+  /** Esiste un record con questo id? */
+  has(id: string): boolean {
+    return this.storage.has(id)
+  }
+
+  /** Numero di analisi attualmente in memoria. */
+  size(): number {
+    return this.storage.size
+  }
+
   delete(id: string): boolean {
     return this.storage.delete(id)
   }
@@ -106,14 +128,22 @@ class AnalysisStorageClass {
   }
 
   // Cleanup old entries (older than 24 hours)
-  cleanup(): void {
+  /**
+   * Rimuove le analisi più vecchie della finestra di ritenzione.
+   * @returns Numero di record rimossi (vedi ProcessingStorage.cleanup()).
+   */
+  cleanup(): number {
     const cutoff = Date.now() - (24 * 60 * 60 * 1000) // 24 hours
-    
+    let removed = 0
+
     for (const [id, data] of this.storage.entries()) {
-      if (data.startTime < cutoff) {
+      if (Number(data.startTime) < cutoff) {
         this.storage.delete(id)
+        removed++
       }
     }
+
+    return removed
   }
 
   // Get all active analyses
@@ -142,4 +172,4 @@ class AnalysisStorageClass {
 export const AnalysisStorage = new AnalysisStorageClass()
 
 // Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
-scheduleBackgroundCleanup(() => AnalysisStorage.cleanup(), 60 * 60 * 1000)
+scheduleBackgroundCleanup(() => { AnalysisStorage.cleanup() }, 60 * 60 * 1000)

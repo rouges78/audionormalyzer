@@ -31,11 +31,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   // Validation
   if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
-    throw ErrorTypes.VALIDATION_ERROR('Array di ID file richiesto', { 
+    throw ErrorTypes.VALIDATION_ERROR('Array di ID file richiesto', {
       fileIds: fileIds || null,
       isArray: Array.isArray(fileIds),
       length: fileIds?.length || 0
-    });
+    }, 'MISSING_FILE_IDS');
   }
 
   // Validate normalization method
@@ -43,7 +43,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw ErrorTypes.VALIDATION_ERROR('Metodo di normalizzazione non valido. Usa "peak" o "loudness"', {
       method,
       validMethods: ['peak', 'loudness']
-    });
+    }, 'INVALID_METHOD');
   }
 
   // Validate target level based on method
@@ -52,7 +52,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       method,
       targetLevel,
       validRange: { min: -60, max: 0 }
-    });
+    }, 'INVALID_TARGET_LEVEL');
   }
 
   if (method === 'loudness' && (targetLevel > -6 || targetLevel < -30)) {
@@ -60,7 +60,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       method,
       targetLevel,
       validRange: { min: -30, max: -6 }
-    });
+    }, 'INVALID_TARGET_LEVEL');
   }
 
   const processId = uuidv4()
@@ -173,8 +173,16 @@ async function processFilesAsync(
           throw ErrorTypes.FILE_NOT_FOUND(fileId);
         }
 
-        // Create output path
-        const outputPath = await fileManager.createOutputPath(fileInfo.originalName || `processed-${fileId}`)
+        // Create output path.
+        // getTempFileInfo() non restituisce `originalName` — non l'ha mai
+        // restituito — quindi il ramo di fallback scattava SEMPRE e produceva
+        // nomi senza estensione (es. "processed-<uuid>_2026-...-586Z"),
+        // rendendo il file di uscita non riconoscibile nonostante
+        // preserveFormat: true. Recuperiamo l'estensione dal file temporaneo.
+        const sourceExtension = extname(fileInfo.path)
+        const outputPath = await fileManager.createOutputPath(
+          fileInfo.originalName || `processed-${fileId}${sourceExtension}`
+        )
         tempPaths.push(outputPath);
 
         // Normalize audio with timeout

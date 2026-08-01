@@ -9,6 +9,23 @@ vi.mock('@/services/audio-processor', () => ({
   })
 }))
 
+// La rotta non chiama più createAudioProcessor: delega a resolveAudioEngine()
+// (arch-07, astrazione AudioEngine). Mockare solo il servizio lasciava passare
+// l'engine vero, che tentava di leggere '/temp/test-file.mp3' — inesistente —
+// e faceva risultare fallito un caso che il test dà per riuscito.
+vi.mock('@/lib/engines', () => ({
+  resolveAudioEngine: vi.fn().mockResolvedValue({
+    name: 'mock',
+    normalize: vi.fn().mockImplementation(async (_input: unknown, options: any) => ({
+      success: true,
+      outputPath: options.outputPath,
+      gainApplied: 2.5,
+      finalLoudness: options.targetLevel,
+      processingTime: 12
+    }))
+  })
+}))
+
 vi.mock('@/services/file-manager', () => ({
   createFileManager: () => ({
     getTempFileInfo: vi.fn().mockImplementation((fileId: string) => {
@@ -77,8 +94,8 @@ describe('Normalize API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('MISSING_FILE_IDS')
-      expect(data.error).toBe('Array di ID file richiesto')
+      expect(data.error.code).toBe('MISSING_FILE_IDS')
+      expect(data.error.message).toBe('Array di ID file richiesto')
     })
 
     it('should return error when fileIds is not an array', async () => {
@@ -94,7 +111,7 @@ describe('Normalize API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('MISSING_FILE_IDS')
+      expect(data.error.code).toBe('MISSING_FILE_IDS')
     })
 
     it('should return error for invalid normalization method', async () => {
@@ -113,8 +130,8 @@ describe('Normalize API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('INVALID_METHOD')
-      expect(data.error).toContain('Metodo di normalizzazione non valido')
+      expect(data.error.code).toBe('INVALID_METHOD')
+      expect(data.error.message).toContain('Metodo di normalizzazione non valido')
     })
 
     it('should return error for invalid peak target level', async () => {
@@ -134,8 +151,8 @@ describe('Normalize API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('INVALID_TARGET_LEVEL')
-      expect(data.error).toContain('Livello target per peak deve essere tra -60dB e 0dB')
+      expect(data.error.code).toBe('INVALID_TARGET_LEVEL')
+      expect(data.error.message).toContain('Livello target per peak deve essere tra -60dB e 0dB')
     })
 
     it('should return error for invalid loudness target level', async () => {
@@ -155,8 +172,8 @@ describe('Normalize API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('INVALID_TARGET_LEVEL')
-      expect(data.error).toContain('Livello target per loudness deve essere tra -30 LUFS e -6 LUFS')
+      expect(data.error.code).toBe('INVALID_TARGET_LEVEL')
+      expect(data.error.message).toContain('Livello target per loudness deve essere tra -30 LUFS e -6 LUFS')
     })
 
     it('should start normalization for valid parameters', async () => {
@@ -315,7 +332,8 @@ describe('Normalize API Integration Tests', () => {
       expect(processingData?.status).toBe('completed')
       expect(processingData?.results).toHaveLength(1)
       expect(processingData?.results[0].success).toBe(false)
-      expect(processingData?.results[0].error).toBe('File non trovato')
+      // Vedi analyze-integration: il messaggio include ora l'id del file.
+      expect(processingData?.results[0].error).toContain('non-existent-file-id')
     })
   })
 })

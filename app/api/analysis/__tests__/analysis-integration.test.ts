@@ -306,7 +306,9 @@ describe('Analysis Results API Integration Tests', () => {
         totalFiles: 1,
         processedFiles: 1,
         results: [],
-        startTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        // La finestra di ritenzione di cleanup() è di 24 ore: con 2 ore questo
+        // record restava e il test si aspettava comunque 1 cancellazione.
+        startTime: Date.now() - 25 * 60 * 60 * 1000,
         error: null
       }
 
@@ -316,7 +318,7 @@ describe('Analysis Results API Integration Tests', () => {
         totalFiles: 1,
         processedFiles: 1,
         results: [],
-        startTime: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+        startTime: Date.now() - 30 * 60 * 1000, // 30 minutes ago
         error: null
       }
 

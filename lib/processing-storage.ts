@@ -151,6 +151,16 @@ class ProcessingStorageClass {
     return existing
   }
 
+  /** Esiste un record con questo id? */
+  has(id: string): boolean {
+    return this.storage.has(id)
+  }
+
+  /** Numero di elaborazioni attualmente in memoria. */
+  size(): number {
+    return this.storage.size
+  }
+
   delete(id: string): boolean {
     return this.storage.delete(id)
   }
@@ -160,14 +170,23 @@ class ProcessingStorageClass {
   }
 
   // Cleanup old entries (older than 24 hours)
-  cleanup(): void {
+  /**
+   * Rimuove le elaborazioni più vecchie della finestra di ritenzione.
+   * @returns Numero di record rimossi (prima non restituiva nulla, quindi il
+   * chiamante non poteva né loggare né verificare l'effetto della pulizia).
+   */
+  cleanup(): number {
     const cutoff = Date.now() - (24 * 60 * 60 * 1000) // 24 hours
-    
+    let removed = 0
+
     for (const [id, data] of this.storage.entries()) {
-      if (data.startTime < cutoff) {
+      if (Number(data.startTime) < cutoff) {
         this.storage.delete(id)
+        removed++
       }
     }
+
+    return removed
   }
 
   // Get all active processing jobs
@@ -184,17 +203,21 @@ class ProcessingStorageClass {
     totalFilesProcessed: number
     totalSuccessful: number
     totalFailed: number
+    /** Istante di avvio dell'elaborazione più vecchia ancora in memoria. */
+    oldestProcessing: number | null
   } {
     const all = Array.from(this.storage.values())
-    
+    const startTimes = all.map(d => Number(d.startTime)).filter(t => !Number.isNaN(t))
+
     return {
       total: all.length,
       processing: all.filter(d => d.status === 'processing').length,
       completed: all.filter(d => d.status === 'completed').length,
       error: all.filter(d => d.status === 'error').length,
       totalFilesProcessed: all.reduce((sum, d) => sum + d.processedFiles, 0),
-      totalSuccessful: all.reduce((sum, d) => sum + d.successfulFiles, 0),
-      totalFailed: all.reduce((sum, d) => sum + d.failedFiles, 0)
+      totalSuccessful: all.reduce((sum, d) => sum + (d.successfulFiles ?? 0), 0),
+      totalFailed: all.reduce((sum, d) => sum + (d.failedFiles ?? 0), 0),
+      oldestProcessing: startTimes.length > 0 ? Math.min(...startTimes) : null
     }
   }
 
@@ -215,4 +238,4 @@ class ProcessingStorageClass {
 export const ProcessingStorage = new ProcessingStorageClass()
 
 // Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
-scheduleBackgroundCleanup(() => ProcessingStorage.cleanup(), 60 * 60 * 1000)
+scheduleBackgroundCleanup(() => { ProcessingStorage.cleanup() }, 60 * 60 * 1000)

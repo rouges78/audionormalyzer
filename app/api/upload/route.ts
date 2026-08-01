@@ -19,16 +19,16 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   // Validation
   if (!files || files.length === 0) {
-    throw ErrorTypes.VALIDATION_ERROR('Nessun file fornito per l\'upload', { filesCount: 0 });
+    throw ErrorTypes.VALIDATION_ERROR('Nessun file fornito per l\'upload', { filesCount: 0 }, 'NO_FILES');
   }
 
   // Validate that all entries are actually File objects
   const invalidFiles = files.filter(file => !(file instanceof File))
   if (invalidFiles.length > 0) {
-    throw ErrorTypes.VALIDATION_ERROR('Alcuni file non sono validi', { 
+    throw ErrorTypes.VALIDATION_ERROR('Alcuni file non sono validi', {
       invalidFilesCount: invalidFiles.length,
-      totalFiles: files.length 
-    });
+      totalFiles: files.length
+    }, 'INVALID_FILES');
   }
 
   // Validate file sizes and formats

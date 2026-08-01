@@ -20,11 +20,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const { fileIds } = body
 
   if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
-    throw ErrorTypes.VALIDATION_ERROR('Array di ID file richiesto', { 
+    throw ErrorTypes.VALIDATION_ERROR('Array di ID file richiesto', {
       fileIds: fileIds || null,
       isArray: Array.isArray(fileIds),
       length: fileIds?.length || 0
-    });
+    }, 'MISSING_FILE_IDS');
   }
 
   const fileManager = createFileManager()

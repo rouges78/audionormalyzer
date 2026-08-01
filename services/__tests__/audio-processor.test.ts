@@ -233,7 +233,10 @@ describe('AudioProcessorImpl', () => {
     beforeEach(() => {
       vi.mocked(fs.access).mockResolvedValue(undefined)
       vi.mocked(fs.readFile).mockResolvedValue(Buffer.from('mock audio data'))
-      
+      // analyzeAudio legge fs.stat per derivare l'hash del file: senza questo
+      // mock stats è undefined e l'analisi esplode su stats.size.
+      vi.mocked(fs.stat).mockResolvedValue({ size: 1024 * 1024 } as any)
+
       // Mock FFmpeg responses
       mockFFmpeg.writeFile.mockResolvedValue(undefined)
       mockFFmpeg.exec.mockResolvedValue(undefined)

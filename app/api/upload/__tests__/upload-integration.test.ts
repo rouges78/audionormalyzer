@@ -40,8 +40,11 @@ describe('Upload API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('NO_FILES')
-      expect(data.error).toBe('Nessun file fornito per l\'upload')
+      // POST /api/upload passa per withErrorHandling, che incapsula l'errore
+      // in { success, error: { message, code, requestId, ... } }. Le rotte
+      // [fileId] e validate/ non lo usano e restano a { error: '...' }.
+      expect(data.error.code).toBe('NO_FILES')
+      expect(data.error.message).toBe('Nessun file fornito per l\'upload')
     })
 
     it('should handle invalid file objects', async () => {
@@ -61,7 +64,7 @@ describe('Upload API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('INVALID_FILES')
+      expect(data.error.code).toBe('INVALID_FILES')
     })
 
     it('should successfully upload valid audio files', async () => {

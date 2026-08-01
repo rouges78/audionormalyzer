@@ -76,9 +76,13 @@ export async function GET(
           sampleRates: [...new Set(analyses.map((a: any) => a.sampleRate))]
         }
         
+        // Si partiva da `analysisData` grezzo, e così il ramo "con riepilogo"
+        // restituiva una forma DIVERSA dall'altro: spariva `progress` (che
+        // esiste solo nell'oggetto `response`) proprio per le analisi
+        // completate, cioè quelle in cui il client se lo aspetta a 100.
         return NextResponse.json({
           success: true,
-          data: { ...analysisData, summary }
+          data: { ...response.data, summary }
         })
       }
     }

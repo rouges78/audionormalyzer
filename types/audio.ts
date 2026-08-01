@@ -152,6 +152,14 @@ export interface ProcessingResult {
  */
 export interface AlbumProcessingResult extends ProcessingResult {
   fileResults: ProcessingResult[]
+  /** Numero di tracce sottoposte a processing (= fileResults.length). */
+  totalFiles: number
+  /** Tracce completate con successo. */
+  successfulFiles: number
+  /** Tracce fallite (totalFiles - successfulFiles). */
+  failedFiles: number
+  /** Messaggi d'errore delle tracce fallite, uno per traccia. */
+  errors: string[]
 }
 
 export interface AlbumLoudnessData {

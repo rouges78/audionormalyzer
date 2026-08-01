@@ -59,8 +59,8 @@ describe('Analyze API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('MISSING_FILE_IDS')
-      expect(data.error).toBe('Array di ID file richiesto')
+      expect(data.error.code).toBe('MISSING_FILE_IDS')
+      expect(data.error.message).toBe('Array di ID file richiesto')
     })
 
     it('should return error when fileIds is not an array', async () => {
@@ -76,7 +76,7 @@ describe('Analyze API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('MISSING_FILE_IDS')
+      expect(data.error.code).toBe('MISSING_FILE_IDS')
     })
 
     it('should return error when fileIds array is empty', async () => {
@@ -92,7 +92,7 @@ describe('Analyze API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      expect(data.code).toBe('MISSING_FILE_IDS')
+      expect(data.error.code).toBe('MISSING_FILE_IDS')
     })
 
     it('should start analysis for valid file IDs', async () => {
@@ -204,7 +204,9 @@ describe('Analyze API Integration Tests', () => {
       expect(analysisData?.status).toBe('completed')
       expect(analysisData?.results).toHaveLength(1)
       expect(analysisData?.results[0].success).toBe(false)
-      expect(analysisData?.results[0].error).toBe('File non trovato')
+      // Il messaggio ora arriva da ErrorTypes.FILE_NOT_FOUND e include l'id del
+      // file ('File not found: <id>'), più utile del vecchio 'File non trovato'.
+      expect(analysisData?.results[0].error).toContain('non-existent-file-id')
     })
   })
 })

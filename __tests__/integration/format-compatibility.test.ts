@@ -1,10 +1,37 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest'
+import { promises as fs } from 'fs'
+import os from 'os'
+import path from 'path'
 import { AudioProcessorImpl } from '../../services/audio-processor'
 import { FileManagerImpl } from '../../services/file-manager'
 
 describe('Audio Format Compatibility Integration Tests', () => {
   let audioProcessor: AudioProcessorImpl
   let fileManager: FileManagerImpl
+
+  // validateFormat NON si limita a guardare l'estensione: verifica che il file
+  // esista, sia leggibile e non sia vuoto. I test usavano percorsi inventati
+  // come '/test/audio.flac' e quindi ricevevano sempre false. Creiamo dei file
+  // veri in una cartella temporanea, così la validazione viene esercitata sul
+  // serio invece di essere aggirata.
+  let fixtureDir: string
+  const fixture = (name: string) => path.join(fixtureDir, name)
+
+  beforeAll(async () => {
+    fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'audionorm-formats-'))
+    const names = [
+      'audio.flac', 'audio.wav', 'audio.mp3', 'audio.aac', 'audio.ogg',
+      '96khz-24bit.flac', '192khz-24bit.wav', 'dsd.flac',
+      'truncated.mp3', 'header-damaged.flac', 'invalid-data.wav'
+    ]
+    await Promise.all(
+      names.map(n => fs.writeFile(fixture(n), Buffer.alloc(2048, 0x11)))
+    )
+  })
+
+  afterAll(async () => {
+    await fs.rm(fixtureDir, { recursive: true, force: true })
+  })
 
   beforeEach(() => {
     audioProcessor = new AudioProcessorImpl()
@@ -92,7 +119,7 @@ describe('Audio Format Compatibility Integration Tests', () => {
 
   describe('Format-Specific Processing', () => {
     it('should handle lossless formats (FLAC, WAV) correctly', async () => {
-      const losslessFormats = ['/test/audio.flac', '/test/audio.wav']
+      const losslessFormats = [fixture('audio.flac'), fixture('audio.wav')]
 
       for (const filePath of losslessFormats) {
         const isValid = await audioProcessor.validateFormat(filePath)
@@ -118,7 +145,7 @@ describe('Audio Format Compatibility Integration Tests', () => {
     })
 
     it('should handle compressed formats (MP3, AAC, OGG) correctly', async () => {
-      const compressedFormats = ['/test/audio.mp3', '/test/audio.aac', '/test/audio.ogg']
+      const compressedFormats = [fixture('audio.mp3'), fixture('audio.aac'), fixture('audio.ogg')]
 
       for (const filePath of compressedFormats) {
         const isValid = await audioProcessor.validateFormat(filePath)
@@ -266,9 +293,9 @@ describe('Audio Format Compatibility Integration Tests', () => {
   describe('Format Conversion and Quality', () => {
     it('should handle high-resolution audio formats', async () => {
       const hiResFormats = [
-        { path: '/hires/96khz-24bit.flac', sampleRate: 96000 },
-        { path: '/hires/192khz-24bit.wav', sampleRate: 192000 },
-        { path: '/hires/dsd.flac', sampleRate: 88200 }
+        { path: fixture('96khz-24bit.flac'), sampleRate: 96000 },
+        { path: fixture('192khz-24bit.wav'), sampleRate: 192000 },
+        { path: fixture('dsd.flac'), sampleRate: 88200 }
       ]
 
       for (const format of hiResFormats) {
@@ -324,20 +351,24 @@ describe('Audio Format Compatibility Integration Tests', () => {
     })
 
     it('should detect and handle corrupted format files', async () => {
+      // Il test precedente mockava analyzeAudio per farlo fallire e poi
+      // verificava il messaggio: non esercitava alcun codice di produzione.
+      // Qui usiamo file veri con contenuto non audio. Il comportamento
+      // documentato in audio-processor.ts è il DEGRADO, non l'eccezione:
+      // quando l'header non è leggibile l'analisi restituisce valori di
+      // ripiego marcati `source: 'estimated'`, così la UI può avvisare
+      // l'utente invece di far esplodere il flusso.
       const corruptedFiles = [
-        '/corrupted/truncated.mp3',
-        '/corrupted/header-damaged.flac',
-        '/corrupted/invalid-data.wav'
+        fixture('truncated.mp3'),
+        fixture('header-damaged.flac'),
+        fixture('invalid-data.wav')
       ]
 
       for (const filePath of corruptedFiles) {
-        // Mock corrupted file detection
-        vi.spyOn(audioProcessor, 'analyzeAudio').mockRejectedValue(
-          new Error('Invalid or corrupted audio data')
-        )
+        const analysis = await audioProcessor.analyzeAudio(filePath)
 
-        await expect(audioProcessor.analyzeAudio(filePath))
-          .rejects.toThrow('Audio analysis failed')
+        expect(analysis.source).toBe('estimated')
+        expect(analysis.duration).toBeGreaterThan(0)
       }
     })
   })

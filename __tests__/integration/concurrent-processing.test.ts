@@ -11,7 +11,8 @@ describe('Concurrent Processing Integration Tests', () => {
   beforeEach(() => {
     processingQueue = new ProcessingQueueImpl()
     audioProcessor = new AudioProcessorImpl()
-    albumProcessor = new AlbumProcessorImpl()
+    // Stessa istanza su cui i test mettono gli spy (vedi album-processor.ts).
+    albumProcessor = new AlbumProcessorImpl(audioProcessor)
   })
 
   describe('Multiple Album Concurrent Processing', () => {

@@ -321,8 +321,18 @@ export function withErrorHandling(
 
 // Common error types
 export const ErrorTypes = {
-  VALIDATION_ERROR: (message: string, context?: Record<string, any>) =>
-    serverErrorHandler.createError(message, 400, 'VALIDATION_ERROR', context),
+  /**
+   * @param code Codice specifico dell'errore di validazione. Prima era sempre
+   * 'VALIDATION_ERROR' per qualunque causa, quindi il client non poteva
+   * distinguere "manca l'elenco dei file" da "metodo non valido" da "livello
+   * target fuori scala" — tutte cose che la UI deve saper segnalare in modo
+   * diverso. Il default resta invariato per i chiamanti che non lo passano.
+   */
+  VALIDATION_ERROR: (
+    message: string,
+    context?: Record<string, any>,
+    code: string = 'VALIDATION_ERROR'
+  ) => serverErrorHandler.createError(message, 400, code, context),
   
   FILE_NOT_FOUND: (filePath: string) =>
     serverErrorHandler.createError(`File not found: ${filePath}`, 404, 'FILE_NOT_FOUND', { filePath }),

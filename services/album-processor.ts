@@ -20,8 +20,14 @@ import path from 'path'
 export class AlbumProcessorImpl implements AlbumProcessor {
   private audioProcessor: AudioProcessorImpl
 
-  constructor() {
-    this.audioProcessor = new AudioProcessorImpl()
+  /**
+   * @param audioProcessor Processore audio da usare. Iniettabile: prima era
+   * costruito qui dentro e non c'era modo di sostituirlo, quindi i test che
+   * mockavano una propria istanza di AudioProcessorImpl non avevano alcun
+   * effetto sull'album processor e finivano per analizzare file inesistenti.
+   */
+  constructor(audioProcessor: AudioProcessorImpl = new AudioProcessorImpl()) {
+    this.audioProcessor = audioProcessor
   }
 
   /**
@@ -97,7 +103,13 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         gainApplied: avgGain,
         processingTime,
         error: successfulResults.length === 0 ? 'Nessun file processato con successo' : undefined,
-        fileResults: results
+        fileResults: results,
+        totalFiles: results.length,
+        successfulFiles: successfulResults.length,
+        failedFiles: results.length - successfulResults.length,
+        errors: results
+          .filter(r => !r.success)
+          .map(r => r.error ?? 'Errore sconosciuto')
       }
 
     } catch (error) {
@@ -110,7 +122,11 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         gainApplied: 0,
         processingTime,
         error: error instanceof Error ? error.message : 'Errore sconosciuto nel processing dell\'album',
-        fileResults: []
+        fileResults: [],
+        totalFiles: files?.length ?? 0,
+        successfulFiles: 0,
+        failedFiles: files?.length ?? 0,
+        errors: [error instanceof Error ? error.message : 'Errore sconosciuto nel processing dell\'album']
       }
     }
   }
