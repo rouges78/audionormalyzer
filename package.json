@@ -7,7 +7,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "eslint .",
     "start": "next start",
     "setup:audio": "node scripts/setup-audio-env.js",
     "test:audio": "node scripts/test-audio-setup.js",
@@ -119,6 +119,7 @@
     "zod": "3.25.67"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",
@@ -127,6 +128,8 @@
     "concurrently": "^8.2.2",
     "electron": "^27.3.11",
     "electron-builder": "^24.13.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "15.2.4",
     "postcss": "^8.5",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.9",
