@@ -1,0 +1,73 @@
+# Gate di qualità su ogni commit.
+#
+# Perché esiste (test-10): build-release.yml esegue già test e build, ma parte
+# solo sui tag v* o a mano. Sui commit normali a main non girava nulla, e infatti
+# maint-09 — il lockfile disallineato che avrebbe fatto fallire `npm ci` — è
+# rimasto invisibile per un giorno intero. Questo workflow è volutamente leggero:
+# niente build desktop, niente Docker, niente immagini da pubblicare. Solo le tre
+# domande che contano prima di un merge: i tipi tornano, i test passano, e le
+# dipendenze sono installabili.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Un push che ne supera un altro sullo stesso ramo annulla la run precedente:
+# non ha senso pagare CI per un commit già sorpassato.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Tipi, test e audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Node 20 LTS. build-release.yml è ancora su 18, che è fuori supporto
+          # da aprile 2025: da allineare quando si tocca quel workflow.
+          node-version: '20'
+          cache: 'npm'
+
+      # `npm ci` invece di `npm install`: rispetta il lockfile alla lettera e
+      # fallisce se diverge da package.json. È esattamente il controllo che
+      # mancava, ed è il motivo per cui maint-09 non era stato notato.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      # I tre gruppi separati, invece di un `vitest run` unico, per leggere
+      # subito nel log quale area si è rotta. I filtri sono prefissi di
+      # percorso, non glob: vedi test-11.
+      - name: Test — servizi
+        run: npm run test:unit
+
+      - name: Test — rotte API
+        run: npm run test:api
+
+      - name: Test — integrazione
+        run: npm run test:integration
+
+      # Informativo, non bloccante (sec-05). Le vulnerabilità residue stanno
+      # tutte nell'albero di electron-builder e richiedono major (maint-10):
+      # renderle bloccanti oggi vorrebbe dire una CI rossa su ogni PR, che dopo
+      # due giorni nessuno guarda più. Il report finisce nel riepilogo della run.
+      - name: Audit dipendenze (informativo)
+        if: always()
+        run: |
+          echo '## npm audit' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          npm audit --audit-level=high >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
