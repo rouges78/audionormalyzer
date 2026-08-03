@@ -10,10 +10,15 @@ const path = require('path');
 console.log('🎵 Audio Normalizer - Comprehensive Test Suite');
 console.log('='.repeat(50));
 
+// NOTA sui pattern: il filtro posizionale di vitest NON è una glob, è una
+// corrispondenza di sottostringa sul percorso del file. Pattern come
+// 'services/__tests__/**\/*.test.ts' non corrispondono a nulla e fanno uscire
+// vitest con codice 1 e zero test eseguiti — su qualunque sistema operativo.
+// Vedi test-11 in ROADMAP.html. Qui usiamo prefissi di percorso.
 const testCategories = [
   {
     name: 'Unit Tests - Core Functionality',
-    pattern: 'services/__tests__/**/*.test.ts',
+    pattern: 'services/__tests__',
     description: 'Test delle funzionalità core (audio processing, file management, etc.)'
   },
   {
@@ -33,7 +38,7 @@ const testCategories = [
   },
   {
     name: 'Integration Tests - API Endpoints',
-    pattern: 'app/api/**/__tests__/**/*.test.ts',
+    pattern: 'app/api',
     description: 'Test di integrazione degli endpoint API'
   },
   {

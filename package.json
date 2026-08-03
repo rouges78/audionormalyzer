@@ -15,9 +15,9 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:unit": "vitest run services/__tests__/**/*.test.ts",
-    "test:integration": "vitest run __tests__/integration/**/*.test.ts",
-    "test:api": "vitest run app/api/**/__tests__/**/*.test.ts",
+    "test:unit": "vitest run services/__tests__",
+    "test:integration": "vitest run __tests__/integration",
+    "test:api": "vitest run app/api",
     "test:comprehensive": "node scripts/run-comprehensive-tests.js",
     "test:watch": "vitest",
     "clean:temp": "rimraf temp/audio/* output/audio/*",
@@ -115,7 +115,6 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
-    "vaul": "^0.9.9",
     "zod": "3.25.67"
   },
   "devDependencies": {
