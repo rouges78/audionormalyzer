@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -63,6 +64,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ErrorBoundary>{children}</ErrorBoundary>
+          {/*
+            Il Toaster va montato una volta sola, qui: useToast() tiene lo stato
+            dei toast in un modulo condiviso, ma senza questo componente nessuno
+            lo legge e i toast prodotti da use-error-handling non compaiono a
+            schermo. È stato il bug qual-15: ogni errore di upload, validazione
+            o analisi veniva registrato e mostrato a nessuno.
+          */}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
