@@ -56,6 +56,13 @@ jobs:
       - name: Test — rotte API
         run: npm run test:api
 
+      # Aggiunto il 03/08: i test sotto lib/ non erano coperti da nessuno dei
+      # tre gruppi storici, quindi 14 test degli engine esistevano ma non li
+      # eseguiva niente — CI compresa. Qui vive anche la conformità EBU R128
+      # su file reali (test-02), che si salta da sola se manca ffmpeg.
+      - name: Test — engine e librerie
+        run: npm run test:lib
+
       - name: Test — integrazione
         run: npm run test:integration
 

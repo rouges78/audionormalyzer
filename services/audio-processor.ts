@@ -1,43 +1,44 @@
 import { AudioProcessor, AudioAnalysis, NormalizationOptions } from '@/types/audio'
 import { promises as fs, constants as fsConstants } from 'fs'
 import path from 'path'
-import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { toBlobURL } from '@ffmpeg/util'
+/**
+ * NOTA (core-05, 03/08): qui c'erano `FFmpeg` da `@ffmpeg/ffmpeg` e
+ * `toBlobURL` da `@ffmpeg/util`, usati per caricare il core WASM da
+ * `unpkg.com` al momento della costruzione del servizio. Sono stati rimossi
+ * perché quel percorso **non ha mai funzionato**: questo file gira lato
+ * server, e ffmpeg.wasm rifiuta esplicitamente Node — `f.load()` termina con
+ * "ffmpeg.wasm does not support nodejs". L'errore veniva inghiottito da un
+ * catch che stampava "using fallback methods", e il fallback era l'analisi
+ * simulata di core-03.
+ *
+ * Il risultato pratico: l'app scaricava a ogni avvio ~30 MB da un CDN per un
+ * modulo che non poteva caricare, e questa era anche la ragione per cui il
+ * desktop non funzionava offline. Il processing server/desktop ora passa dal
+ * NativeEngine (core-04), che usa un ffmpeg vero.
+ */
+import type { FFmpeg as FFmpegInstance } from '@ffmpeg/ffmpeg'
 
 /**
  * AudioProcessor service implementation
  * Provides audio analysis, format validation, and normalization capabilities
  */
 export class AudioProcessorImpl implements AudioProcessor {
-  private ffmpeg: FFmpeg | null = null
+  /**
+   * Istanza di ffmpeg.wasm. Resta `null` per sempre: vedi la nota di core-05 in
+   * testa al file. I due campi sopravvivono perché una ventina di rami più
+   * sotto li interrogano, e quei rami vanno rimossi in un passaggio dedicato
+   * (qual-17) invece che di striscio insieme al motore nuovo.
+   *
+   * Il tipo arriva da un `import type`, che TypeScript cancella in
+   * compilazione: i rami morti restano tipizzati e verificabili, ma la
+   * libreria non finisce nel bundle.
+   */
+  private ffmpeg: FFmpegInstance | null = null
   private isFFmpegLoaded = false
 
   constructor() {
-    // Don't initialize FFmpeg in test environment
-    if (process.env.NODE_ENV !== 'test') {
-      this.initializeFFmpeg()
-    }
-  }
-
-  /**
-   * Initialize FFmpeg instance for audio processing
-   */
-  private async initializeFFmpeg(): Promise<void> {
-    try {
-      this.ffmpeg = new FFmpeg()
-      
-      // Load FFmpeg core
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
-      await this.ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      })
-      
-      this.isFFmpegLoaded = true
-    } catch (error) {
-      console.warn('FFmpeg initialization failed, using fallback methods:', error)
-      this.isFFmpegLoaded = false
-    }
+    // Nessuna inizializzazione: il caricamento del core WASM da CDN è stato
+    // rimosso (core-05). Il processing reale passa dal NativeEngine.
   }
 
   /**
@@ -56,10 +57,15 @@ export class AudioProcessorImpl implements AudioProcessor {
       // 1) Dati di contenitore: REALI, letti dall'header del file.
       const container = await this.readContainerInfo(filePath)
 
-      // 2) Loudness: NON misurabile senza un ffmpeg reale che esegua il
-      //    filtro `ebur128`. Finché core-04 non è pronto restituiamo valori
-      //    di ripiego DICHIARATI come tali via `source`, invece di spacciarli
-      //    per misure. La UI deve avvisare l'utente quando source !== 'measured'.
+      // 2) Loudness: dal 03/08 (core-04) è misurata davvero, quando c'è un
+      //    ffmpeg nativo. L'engine esegue `ebur128` e restituisce LUFS, LRA,
+      //    sample peak e true peak reali, con `source: 'measured'`.
+      const misurata = await this.measureWithNativeEngine(filePath)
+      if (misurata) return misurata
+
+      // 3) Senza ffmpeg restano i valori di ripiego, DICHIARATI come tali via
+      //    `source` invece di essere spacciati per misure. La UI avvisa
+      //    l'utente quando source !== 'measured'.
       const fileHash = this.generateFileHash(filePath, stats.size)
       const loudness = this.placeholderLoudness(fileHash)
 
@@ -87,6 +93,31 @@ export class AudioProcessorImpl implements AudioProcessor {
       }
     } catch (error) {
       throw new Error(`Audio analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Misura la loudness con l'engine nativo, se un ffmpeg è raggiungibile.
+   *
+   * Restituisce `null` — senza sollevare — quando ffmpeg non c'è o il file non
+   * è misurabile: è la condizione che fa degradare l'analisi ai valori di
+   * ripiego dichiarati. Un'eccezione qui farebbe fallire un'analisi che invece
+   * può ancora restituire dati di contenitore validi.
+   */
+  private async measureWithNativeEngine(
+    filePath: string,
+  ): Promise<AudioAnalysis | null> {
+    try {
+      const { createNativeEngine } = await import('@/lib/engines/native-engine')
+      const engine = createNativeEngine()
+      if (!(await engine.isAvailable())) return null
+
+      const analisi = await engine.analyze({ kind: 'path', path: filePath })
+      // L'engine marca 'partial' quando ebur128 non ha prodotto un riepilogo
+      // (file corrotto o vuoto): in quel caso il ripiego resta più informativo.
+      return analisi.source === 'measured' ? analisi : null
+    } catch {
+      return null
     }
   }
 

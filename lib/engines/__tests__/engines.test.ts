@@ -12,6 +12,7 @@ import {
   type AudioEngine,
   type EngineInput,
 } from '@/lib/engines'
+import { parseLoudness } from '@/lib/engines/native-engine'
 
 const sampleAnalysis: AudioAnalysis = {
   duration: 180,
@@ -57,9 +58,15 @@ describe('AudioEngine — factory di selezione', () => {
     expect(createAudioEngine()).toBeInstanceOf(NativeEngine)
   })
 
-  it('resolveAudioEngine lato server ricade sul WASM (nativo non disponibile)', async () => {
+  // Prima di core-04 questo test affermava "ricade SEMPRE sul WASM", perché il
+  // nativo era uno stub che si dichiarava indisponibile. Ora l'esito dipende
+  // dall'ambiente, ed è esattamente il comportamento voluto: la factory deve
+  // preferire il nativo dove c'è ffmpeg e ripiegare sul WASM dove non c'è.
+  // Fissare uno dei due esiti renderebbe il test verde solo su una macchina.
+  it('resolveAudioEngine lato server preferisce il nativo, o ricade sul WASM', async () => {
     const engine = await resolveAudioEngine()
-    expect(engine).toBeInstanceOf(WasmEngine)
+    const ffmpegPresente = await new NativeEngine().isAvailable()
+    expect(engine).toBeInstanceOf(ffmpegPresente ? NativeEngine : WasmEngine)
   })
 })
 
@@ -130,14 +137,94 @@ describe('WebAudioEngine — capabilities e vincoli', () => {
   })
 })
 
-describe('NativeEngine — stub', () => {
-  it('non è disponibile finché non è implementato (core-04)', async () => {
-    expect(await new NativeEngine().isAvailable()).toBe(false)
+describe('NativeEngine — contratto', () => {
+  it('dichiara di misurare LUFS, LRA e true peak', () => {
+    const c = new NativeEngine().capabilities
+    expect(c.measuresLufs).toBe(true)
+    expect(c.measuresLoudnessRange).toBe(true)
+    expect(c.truePeakLimiting).toBe(true)
+    expect(c.previewOnly).toBe(false)
+    expect(c.runtime).toBe('server')
   })
 
-  it('i metodi sollevano un errore esplicito', async () => {
+  it('accetta solo percorsi file', async () => {
     const engine = new NativeEngine()
-    await expect(engine.analyze({ kind: 'path', path: '/x' })).rejects.toThrow(/core-04/)
+    await expect(
+      engine.analyze({ kind: 'buffer', data: new ArrayBuffer(8) }),
+    ).rejects.toThrow(/non supporta input di tipo "buffer"/)
+  })
+
+  // La disponibilità dipende dall'ambiente: qui verifichiamo solo che sia una
+  // risposta e non un'eccezione. Un ffmpeg assente è una condizione prevista,
+  // non un errore: è ciò che permette alla factory di ripiegare sul WASM.
+  it('risponde sulla disponibilità senza sollevare', async () => {
+    expect(typeof (await new NativeEngine().isAvailable())).toBe('boolean')
+  })
+
+  it('normalize riporta il fallimento invece di sollevare, se il file non esiste', async () => {
+    const engine = new NativeEngine()
+    const res = await engine.normalize(
+      { kind: 'path', path: '/percorso/che/non/esiste.wav' },
+      { method: 'loudness', targetLevel: -16, preserveFormat: true, outputPath: '/tmp/x.wav' },
+    )
+    expect(res.success).toBe(false)
+    expect(res.error).toBeTruthy()
+  })
+})
+
+describe('NativeEngine — parsing dell\'output di ffmpeg', () => {
+  // Il riepilogo di ebur128 usa la stessa identica chiave "Peak:" in due
+  // sezioni diverse. Questo campione lo riproduce: è il caso che rompe
+  // qualunque parsing fatto cercando "Peak:" senza guardare la sezione.
+  const SUMMARY = `
+[Parsed_ebur128_0 @ 0x55] Summary:
+
+  Integrated loudness:
+    I:         -27.8 LUFS
+    Threshold: -37.8 LUFS
+
+  Loudness range:
+    LRA:         3.4 LU
+    Threshold: -47.8 LUFS
+    LRA low:   -29.1 LUFS
+    LRA high:  -25.7 LUFS
+
+  Sample peak:
+    Peak:      -24.1 dBFS
+
+  True peak:
+    Peak:      -23.6 dBFS
+[Parsed_volumedetect_1 @ 0x66] mean_volume: -27.1 dB
+[Parsed_volumedetect_1 @ 0x66] max_volume: -24.1 dB
+`
+
+  it('distingue il sample peak dal true peak', () => {
+    const m = parseLoudness(SUMMARY)
+    expect(m.samplePeak).toBe(-24.1)
+    expect(m.truePeak).toBe(-23.6)
+  })
+
+  it('estrae loudness integrata, LRA e RMS', () => {
+    const m = parseLoudness(SUMMARY)
+    expect(m.lufsIntegrated).toBe(-27.8)
+    expect(m.loudnessRange).toBe(3.4)
+    expect(m.rmsLevel).toBe(-27.1)
+  })
+
+  it('tratta -inf come misura assente invece di restituire -Infinity', () => {
+    const m = parseLoudness(`
+  Integrated loudness:
+    I:          -inf LUFS
+
+  Sample peak:
+    Peak:       -inf dBFS
+`)
+    expect(m.lufsIntegrated).toBeUndefined()
+    expect(m.samplePeak).toBeUndefined()
+  })
+
+  it('non inventa valori quando ffmpeg non ha prodotto un riepilogo', () => {
+    expect(parseLoudness('Invalid data found when processing input')).toEqual({})
   })
 })
 
