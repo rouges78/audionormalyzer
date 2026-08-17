@@ -24,6 +24,11 @@ describe('Error Handling', () => {
   let albumProcessor: AlbumProcessorImpl
 
   beforeEach(() => {
+    // clearAllMocks azzera lo storico delle chiamate, ma conserva le
+    // implementazioni impostate dai test precedenti. In particolare il test
+    // sulla creazione della directory lascia mkdir in mockRejectedValue e
+    // faceva fallire il successivo processing album solo nella suite completa.
+    vi.mocked(fs.mkdir).mockReset().mockResolvedValue(undefined)
     audioProcessor = new AudioProcessorImpl()
     fileManager = new FileManagerImpl()
     // Inietta LA STESSA istanza su cui i test mettono gli spy: prima
