@@ -4,7 +4,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 
 /**
- * Interfaccia per i metadati audio estratti
+ * Interface for the extracted audio metadata
  */
 export interface AudioMetadata {
   title?: string
@@ -33,7 +33,7 @@ export interface AudioMetadata {
 }
 
 /**
- * Interfaccia per le opzioni di preservazione metadati
+ * Interface for the metadata preservation options
  */
 export interface MetadataPreservationOptions {
   preserveArtwork?: boolean
@@ -43,20 +43,20 @@ export interface MetadataPreservationOptions {
 }
 
 /**
- * MetadataManager service per gestire estrazione e preservazione metadati
+ * MetadataManager service to handle metadata extraction and preservation
  */
 export class MetadataManager {
   /**
-   * Estrae metadati da un file audio
-   * @param filePath Percorso del file audio
-   * @returns Promise<AudioMetadata> Metadati estratti
+   * Extracts metadata from an audio file
+   * @param filePath Path of the audio file
+   * @returns Promise<AudioMetadata> Extracted metadata
    */
   async extractMetadata(filePath: string): Promise<AudioMetadata> {
     try {
-      // Verifica che il file esista
+      // Check that the file exists
       await fs.access(filePath)
 
-      // Usa music-metadata per estrarre metadati completi
+      // Use music-metadata to extract complete metadata
       const metadata = await parseFile(filePath)
 
       return this.convertToAudioMetadata(metadata)
@@ -66,10 +66,10 @@ export class MetadataManager {
   }
 
   /**
-   * Preserva metadati da un file sorgente a uno di destinazione
-   * @param sourcePath Percorso del file sorgente
-   * @param targetPath Percorso del file di destinazione
-   * @param options Opzioni di preservazione
+   * Preserves metadata from a source file to a destination one
+   * @param sourcePath Path of the source file
+   * @param targetPath Path of the destination file
+   * @param options Preservation options
    */
   async preserveMetadata(
     sourcePath: string,
@@ -77,10 +77,10 @@ export class MetadataManager {
     options: MetadataPreservationOptions = {}
   ): Promise<void> {
     try {
-      // Estrai metadati dal file sorgente
+      // Extract metadata from the source file
       const sourceMetadata = await this.extractMetadata(sourcePath)
 
-      // Applica metadati al file di destinazione
+      // Apply metadata to the destination file
       await this.applyMetadata(targetPath, sourceMetadata, options)
     } catch (error) {
       throw new Error(`Errore nella preservazione metadati: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`)
@@ -88,10 +88,10 @@ export class MetadataManager {
   }
 
   /**
-   * Applica metadati a un file audio
-   * @param filePath Percorso del file di destinazione
-   * @param metadata Metadati da applicare
-   * @param options Opzioni di applicazione
+   * Applies metadata to an audio file
+   * @param filePath Path of the destination file
+   * @param metadata Metadata to apply
+   * @param options Apply options
    */
   async applyMetadata(
     filePath: string,
@@ -101,7 +101,7 @@ export class MetadataManager {
     try {
       const fileExtension = path.extname(filePath).toLowerCase()
 
-      // Determina il metodo di scrittura in base al formato
+      // Determine the write method based on the format
       switch (fileExtension) {
         case '.mp3':
           await this.applyID3Metadata(filePath, metadata, options)
@@ -115,11 +115,11 @@ export class MetadataManager {
           await this.applyMP4Metadata(filePath, metadata, options)
           break
         case '.wav':
-          // WAV supporta metadati limitati, usa ID3v2 se possibile
+          // WAV supports limited metadata, use ID3v2 if possible
           await this.applyWAVMetadata(filePath, metadata, options)
           break
         default:
-          console.warn(`Formato ${fileExtension} non supportato per scrittura metadati`)
+          console.warn(`Format ${fileExtension} not supported for metadata writing`)
       }
     } catch (error) {
       throw new Error(`Errore nell'applicazione metadati: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`)
@@ -127,10 +127,10 @@ export class MetadataManager {
   }
 
   /**
-   * Confronta metadati tra due file
-   * @param filePath1 Primo file
-   * @param filePath2 Secondo file
-   * @returns Oggetto con le differenze
+   * Compares metadata between two files
+   * @param filePath1 First file
+   * @param filePath2 Second file
+   * @returns Object with the differences
    */
   async compareMetadata(filePath1: string, filePath2: string): Promise<{
     differences: string[]
@@ -142,7 +142,7 @@ export class MetadataManager {
 
       const differences: string[] = []
 
-      // Confronta campi principali
+      // Compare the main fields
       const fieldsToCompare = ['title', 'artist', 'album', 'year', 'genre', 'albumartist']
 
       for (const field of fieldsToCompare) {
@@ -164,28 +164,28 @@ export class MetadataManager {
   }
 
   /**
-   * Pulisce metadati da un file (rimuove tutti i tag)
-   * @param filePath Percorso del file
+   * Cleans metadata from a file (removes all tags)
+   * @param filePath File path
    */
   async clearMetadata(filePath: string): Promise<void> {
     try {
       const fileExtension = path.extname(filePath).toLowerCase()
 
       if (fileExtension === '.mp3') {
-        // Rimuovi tutti i tag ID3
+        // Remove all ID3 tags
         const success = NodeID3.removeTags(filePath)
         if (!success) {
           throw new Error('Impossibile rimuovere tag ID3')
         }
       } else {
-        console.warn(`Rimozione metadati non implementata per formato ${fileExtension}`)
+        console.warn(`Metadata removal not implemented for format ${fileExtension}`)
       }
     } catch (error) {
       throw new Error(`Errore nella rimozione metadati: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`)
     }
   }
 
-  // Metodi privati per gestione formati specifici
+  // Private methods for handling specific formats
 
   private async applyID3Metadata(
     filePath: string,
@@ -194,7 +194,7 @@ export class MetadataManager {
   ): Promise<void> {
     const tags: any = {}
 
-    // Mappa metadati comuni a tag ID3
+    // Map common metadata to ID3 tags
     if (metadata.title) tags.title = metadata.title
     if (metadata.artist) tags.artist = metadata.artist
     if (metadata.album) tags.album = metadata.album
@@ -208,7 +208,7 @@ export class MetadataManager {
       text: metadata.comment[0]
     }
 
-    // Aggiungi artwork se richiesto
+    // Add artwork if requested
     if (options.preserveArtwork && metadata.picture && metadata.picture.length > 0) {
       const artwork = metadata.picture[0]
       tags.image = {
@@ -222,7 +222,7 @@ export class MetadataManager {
       }
     }
 
-    // Scrivi tag al file
+    // Write tags to the file
     const success = NodeID3.write(tags, filePath)
     if (!success) {
       throw new Error('Impossibile scrivere tag ID3')
@@ -234,9 +234,9 @@ export class MetadataManager {
     metadata: AudioMetadata,
     options: MetadataPreservationOptions
   ): Promise<void> {
-    // Per FLAC/OGG, dovremmo usare una libreria specifica come node-flac
-    // Per ora, implementazione placeholder
-    console.warn('Scrittura metadati Vorbis non ancora implementata completamente')
+    // For FLAC/OGG, we should use a specific library such as node-flac
+    // For now, placeholder implementation
+    console.warn('Vorbis metadata writing not fully implemented yet')
   }
 
   private async applyMP4Metadata(
@@ -244,9 +244,9 @@ export class MetadataManager {
     metadata: AudioMetadata,
     options: MetadataPreservationOptions
   ): Promise<void> {
-    // Per MP4/M4A, dovremmo usare una libreria specifica
-    // Per ora, implementazione placeholder
-    console.warn('Scrittura metadati MP4 non ancora implementata completamente')
+    // For MP4/M4A, we should use a specific library
+    // For now, placeholder implementation
+    console.warn('MP4 metadata writing not fully implemented yet')
   }
 
   private async applyWAVMetadata(
@@ -254,9 +254,9 @@ export class MetadataManager {
     metadata: AudioMetadata,
     options: MetadataPreservationOptions
   ): Promise<void> {
-    // WAV ha supporto limitato per metadati
+    // WAV has limited metadata support
     // Alcuni player supportano ID3v2 in WAV
-    console.warn('Scrittura metadati WAV limitata')
+    console.warn('WAV metadata writing is limited')
   }
 
   private convertToAudioMetadata(metadata: IAudioMetadata): AudioMetadata {
@@ -289,9 +289,9 @@ export class MetadataManager {
   }
 
   /**
-   * Valida se un file supporta metadati
-   * @param filePath Percorso del file
-   * @returns boolean True se il formato supporta metadati
+   * Checks whether a file supports metadata
+   * @param filePath File path
+   * @returns boolean True if the format supports metadata
    */
   supportsMetadata(filePath: string): boolean {
     const supportedExtensions = ['.mp3', '.flac', '.ogg', '.m4a', '.aac', '.wav']
@@ -300,9 +300,9 @@ export class MetadataManager {
   }
 
   /**
-   * Ottiene informazioni sui metadati supportati per un formato
-   * @param filePath Percorso del file
-   * @returns Oggetto con informazioni sui metadati supportati
+   * Gets info about the metadata supported for a format
+   * @param filePath File path
+   * @returns Object with info about the supported metadata
    */
   getMetadataSupport(filePath: string): {
     format: string
@@ -328,7 +328,7 @@ export class MetadataManager {
           supportsBasicTags: true,
           supportsArtwork: true,
           supportsCustomTags: true,
-          readOnly: true // Non ancora implementata scrittura
+          readOnly: true // Writing not implemented yet
         }
       case '.ogg':
         return {
@@ -368,7 +368,7 @@ export class MetadataManager {
 }
 
 /**
- * Factory function per creare istanza MetadataManager
+ * Factory function to create a MetadataManager instance
  */
 export function createMetadataManager(): MetadataManager {
   return new MetadataManager()

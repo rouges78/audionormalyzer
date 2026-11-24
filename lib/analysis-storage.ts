@@ -58,11 +58,11 @@ class AnalysisStorageClass {
   }
 
   /**
-   * Scrive (o sovrascrive) l'intero record di un'analisi.
-   * Contropartita di ProcessingStorage.set(), aggiunta in v2.0: mancava solo
-   * qui, e i test che preparavano uno stato di analisi fallivano con
-   * "AnalysisStorage.set is not a function". A differenza di update(), che
-   * fonde un Partial, set() rimpiazza il record per intero.
+   * Writes (or overwrites) the whole record of an analysis.
+   * Counterpart of ProcessingStorage.set(), added in v2.0: it was missing only
+   * here, and the tests that prepared an analysis state failed with
+   * "AnalysisStorage.set is not a function". Unlike update(), which
+   * merges a Partial, set() replaces the record entirely.
    */
   set(id: string, data: AnalysisData): AnalysisData {
     this.storage.set(id, data)
@@ -109,12 +109,12 @@ class AnalysisStorageClass {
     return existing
   }
 
-  /** Esiste un record con questo id? */
+  /** Is there a record with this id? */
   has(id: string): boolean {
     return this.storage.has(id)
   }
 
-  /** Numero di analisi attualmente in memoria. */
+  /** Number of analyses currently in memory. */
   size(): number {
     return this.storage.size
   }
@@ -129,8 +129,8 @@ class AnalysisStorageClass {
 
   // Cleanup old entries (older than 24 hours)
   /**
-   * Rimuove le analisi più vecchie della finestra di ritenzione.
-   * @returns Numero di record rimossi (vedi ProcessingStorage.cleanup()).
+   * Removes analyses older than the retention window.
+   * @returns Number of records removed (see ProcessingStorage.cleanup()).
    */
   cleanup(): number {
     const cutoff = Date.now() - (24 * 60 * 60 * 1000) // 24 hours
@@ -171,5 +171,5 @@ class AnalysisStorageClass {
 
 export const AnalysisStorage = new AnalysisStorageClass()
 
-// Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
+// Automatic cleanup every hour (not registered in tests, does not block exit).
 scheduleBackgroundCleanup(() => { AnalysisStorage.cleanup() }, 60 * 60 * 1000)

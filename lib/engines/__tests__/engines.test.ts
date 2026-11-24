@@ -35,7 +35,7 @@ function fakeProcessor(overrides: Partial<AudioProcessor> = {}): AudioProcessor 
   }
 }
 
-describe('AudioEngine — factory di selezione', () => {
+describe('AudioEngine — selection factory', () => {
   const originalEnv = process.env.AUDIO_ENGINE
 
   afterEach(() => {
@@ -43,35 +43,35 @@ describe('AudioEngine — factory di selezione', () => {
     else process.env.AUDIO_ENGINE = originalEnv
   })
 
-  it('lato server (no window) sceglie il WasmEngine', () => {
+  it('server side (no window) picks the WasmEngine', () => {
     expect(createAudioEngine()).toBeInstanceOf(WasmEngine)
   })
 
-  it('rispetta l\'override esplicito via opzione kind', () => {
+  it('honors the explicit override via the kind option', () => {
     expect(createAudioEngine({ kind: 'web-audio' })).toBeInstanceOf(WebAudioEngine)
     expect(createAudioEngine({ kind: 'native' })).toBeInstanceOf(NativeEngine)
     expect(createAudioEngine({ kind: 'wasm' })).toBeInstanceOf(WasmEngine)
   })
 
-  it('rispetta l\'override via variabile d\'ambiente AUDIO_ENGINE', () => {
+  it('honors the override via the AUDIO_ENGINE environment variable', () => {
     process.env.AUDIO_ENGINE = 'native'
     expect(createAudioEngine()).toBeInstanceOf(NativeEngine)
   })
 
-  // Prima di core-04 questo test affermava "ricade SEMPRE sul WASM", perché il
-  // nativo era uno stub che si dichiarava indisponibile. Ora l'esito dipende
-  // dall'ambiente, ed è esattamente il comportamento voluto: la factory deve
-  // preferire il nativo dove c'è ffmpeg e ripiegare sul WASM dove non c'è.
-  // Fissare uno dei due esiti renderebbe il test verde solo su una macchina.
-  it('resolveAudioEngine lato server preferisce il nativo, o ricade sul WASM', async () => {
+  // Before core-04 this test asserted "ALWAYS falls back to WASM", because the
+  // native one was a stub that declared itself unavailable. Now the outcome depends
+  // on the environment, and that is exactly the intended behavior: the factory must
+  // prefer native where ffmpeg exists and fall back to WASM where it does not.
+  // Pinning either outcome would make the test green on one machine only.
+  it('resolveAudioEngine server side prefers native, or falls back to WASM', async () => {
     const engine = await resolveAudioEngine()
     const ffmpegPresente = await new NativeEngine().isAvailable()
     expect(engine).toBeInstanceOf(ffmpegPresente ? NativeEngine : WasmEngine)
   })
 })
 
-describe('WasmEngine — delega ad AudioProcessor', () => {
-  it('analyze delega a processor.analyzeAudio con il path', async () => {
+describe('WasmEngine — delegates to AudioProcessor', () => {
+  it('analyze delegates to processor.analyzeAudio with the path', async () => {
     const proc = fakeProcessor()
     const engine = new WasmEngine(proc)
     const result = await engine.analyze({ kind: 'path', path: '/in/song.wav' })
@@ -79,7 +79,7 @@ describe('WasmEngine — delega ad AudioProcessor', () => {
     expect(result).toEqual(sampleAnalysis)
   })
 
-  it('normalize restituisce un NormalizationResult ricco con gain calcolato', async () => {
+  it('normalize returns a rich NormalizationResult with computed gain', async () => {
     const proc = fakeProcessor()
     const engine = new WasmEngine(proc)
     const result = await engine.normalize(
@@ -93,7 +93,7 @@ describe('WasmEngine — delega ad AudioProcessor', () => {
     expect(typeof result.processingTime).toBe('number')
   })
 
-  it('normalize cattura gli errori e restituisce success:false', async () => {
+  it('normalize catches errors and returns success:false', async () => {
     const proc = fakeProcessor({
       normalizeAudio: vi.fn().mockRejectedValue(new Error('boom')),
     })
@@ -106,7 +106,7 @@ describe('WasmEngine — delega ad AudioProcessor', () => {
     expect(result.error).toContain('boom')
   })
 
-  it('rifiuta input non supportati (solo path)', async () => {
+  it('rejects unsupported inputs (path only)', async () => {
     const engine = new WasmEngine(fakeProcessor())
     await expect(
       engine.analyze({ kind: 'file', file: {} as File }),
@@ -114,19 +114,19 @@ describe('WasmEngine — delega ad AudioProcessor', () => {
   })
 })
 
-describe('WebAudioEngine — capabilities e vincoli', () => {
-  it('non è disponibile in ambiente node (senza window)', () => {
+describe('WebAudioEngine — capabilities and constraints', () => {
+  it('is not available in a node environment (without window)', () => {
     expect(new WebAudioEngine().isAvailable()).toBe(false)
   })
 
-  it('dichiara di essere solo anteprima e di non misurare LUFS', () => {
+  it('declares it is preview-only and does not measure LUFS', () => {
     const caps = new WebAudioEngine().capabilities
     expect(caps.previewOnly).toBe(true)
     expect(caps.measuresLufs).toBe(false)
     expect(caps.accepts).toEqual(['file', 'buffer'])
   })
 
-  it('rifiuta la normalizzazione loudness (LUFS non misurabile)', async () => {
+  it('rejects loudness normalization (LUFS not measurable)', async () => {
     const engine = new WebAudioEngine()
     await expect(
       engine.normalize(
@@ -137,8 +137,8 @@ describe('WebAudioEngine — capabilities e vincoli', () => {
   })
 })
 
-describe('NativeEngine — contratto', () => {
-  it('dichiara di misurare LUFS, LRA e true peak', () => {
+describe('NativeEngine — contract', () => {
+  it('declares it measures LUFS, LRA and true peak', () => {
     const c = new NativeEngine().capabilities
     expect(c.measuresLufs).toBe(true)
     expect(c.measuresLoudnessRange).toBe(true)
@@ -147,21 +147,21 @@ describe('NativeEngine — contratto', () => {
     expect(c.runtime).toBe('server')
   })
 
-  it('accetta solo percorsi file', async () => {
+  it('accepts only file paths', async () => {
     const engine = new NativeEngine()
     await expect(
       engine.analyze({ kind: 'buffer', data: new ArrayBuffer(8) }),
     ).rejects.toThrow(/non supporta input di tipo "buffer"/)
   })
 
-  // La disponibilità dipende dall'ambiente: qui verifichiamo solo che sia una
-  // risposta e non un'eccezione. Un ffmpeg assente è una condizione prevista,
-  // non un errore: è ciò che permette alla factory di ripiegare sul WASM.
-  it('risponde sulla disponibilità senza sollevare', async () => {
+  // Availability depends on the environment: here we only check that it is an
+  // answer and not an exception. A missing ffmpeg is an expected condition,
+  // not an error: it is what lets the factory fall back to WASM.
+  it('answers about availability without throwing', async () => {
     expect(typeof (await new NativeEngine().isAvailable())).toBe('boolean')
   })
 
-  it('normalize riporta il fallimento invece di sollevare, se il file non esiste', async () => {
+  it('normalize reports the failure instead of throwing if the file does not exist', async () => {
     const engine = new NativeEngine()
     const res = await engine.normalize(
       { kind: 'path', path: '/percorso/che/non/esiste.wav' },
@@ -172,10 +172,10 @@ describe('NativeEngine — contratto', () => {
   })
 })
 
-describe('NativeEngine — parsing dell\'output di ffmpeg', () => {
-  // Il riepilogo di ebur128 usa la stessa identica chiave "Peak:" in due
-  // sezioni diverse. Questo campione lo riproduce: è il caso che rompe
-  // qualunque parsing fatto cercando "Peak:" senza guardare la sezione.
+describe('NativeEngine — parsing ffmpeg output', () => {
+  // The ebur128 summary uses the exact same "Peak:" key in two
+  // different sections. This sample reproduces it: it is the case that breaks
+  // any parsing done by searching for "Peak:" without looking at the section.
   const SUMMARY = `
 [Parsed_ebur128_0 @ 0x55] Summary:
 
@@ -198,20 +198,20 @@ describe('NativeEngine — parsing dell\'output di ffmpeg', () => {
 [Parsed_volumedetect_1 @ 0x66] max_volume: -24.1 dB
 `
 
-  it('distingue il sample peak dal true peak', () => {
+  it('tells the sample peak apart from the true peak', () => {
     const m = parseLoudness(SUMMARY)
     expect(m.samplePeak).toBe(-24.1)
     expect(m.truePeak).toBe(-23.6)
   })
 
-  it('estrae loudness integrata, LRA e RMS', () => {
+  it('extracts integrated loudness, LRA and RMS', () => {
     const m = parseLoudness(SUMMARY)
     expect(m.lufsIntegrated).toBe(-27.8)
     expect(m.loudnessRange).toBe(3.4)
     expect(m.rmsLevel).toBe(-27.1)
   })
 
-  it('tratta -inf come misura assente invece di restituire -Infinity', () => {
+  it('treats -inf as a missing measurement instead of returning -Infinity', () => {
     const m = parseLoudness(`
   Integrated loudness:
     I:          -inf LUFS
@@ -223,13 +223,13 @@ describe('NativeEngine — parsing dell\'output di ffmpeg', () => {
     expect(m.samplePeak).toBeUndefined()
   })
 
-  it('non inventa valori quando ffmpeg non ha prodotto un riepilogo', () => {
+  it('does not invent values when ffmpeg produced no summary', () => {
     expect(parseLoudness('Invalid data found when processing input')).toEqual({})
   })
 })
 
-describe('assertAccepts — helper del contratto', () => {
-  it('passa quando l\'input è accettato', () => {
+describe('assertAccepts — contract helper', () => {
+  it('passes when the input is accepted', () => {
     const engine: AudioEngine = new WasmEngine(fakeProcessor())
     const input: EngineInput = { kind: 'path', path: '/ok' }
     expect(() => assertAccepts(engine, input)).not.toThrow()

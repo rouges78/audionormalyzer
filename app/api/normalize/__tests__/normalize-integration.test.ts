@@ -9,10 +9,10 @@ vi.mock('@/services/audio-processor', () => ({
   })
 }))
 
-// La rotta non chiama più createAudioProcessor: delega a resolveAudioEngine()
-// (arch-07, astrazione AudioEngine). Mockare solo il servizio lasciava passare
-// l'engine vero, che tentava di leggere '/temp/test-file.mp3' — inesistente —
-// e faceva risultare fallito un caso che il test dà per riuscito.
+// The route no longer calls createAudioProcessor: it delegates to resolveAudioEngine()
+// (arch-07, AudioEngine abstraction). Mocking only the service let the real
+// engine through, which tried to read '/temp/test-file.mp3' — nonexistent —
+// and made a case the test expects to succeed come out as failed.
 vi.mock('@/lib/engines', () => ({
   resolveAudioEngine: vi.fn().mockResolvedValue({
     name: 'mock',
@@ -332,7 +332,7 @@ describe('Normalize API Integration Tests', () => {
       expect(processingData?.status).toBe('completed')
       expect(processingData?.results).toHaveLength(1)
       expect(processingData?.results[0].success).toBe(false)
-      // Vedi analyze-integration: il messaggio include ora l'id del file.
+      // See analyze-integration: the message now includes the file id.
       expect(processingData?.results[0].error).toContain('non-existent-file-id')
     })
   })

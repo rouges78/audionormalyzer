@@ -8,10 +8,10 @@ describe('Complete Workflow Integration Tests', () => {
   const outputDir = path.join(process.cwd(), 'output', 'audio')
 
   /**
-   * Attende che una rotta di stato riporti 'completed'.
-   * Prima si usava un setTimeout fisso (200/300 ms): l'elaborazione è
-   * asincrona, quindi il test era una corsa contro il tempo e falliva con
-   * "expected 'processing' to be 'completed'" appena la macchina era lenta.
+   * Waits until a status route reports 'completed'.
+   * A fixed setTimeout (200/300 ms) was used before: processing is
+   * asynchronous, so the test was a race against time and failed with
+   * "expected 'processing' to be 'completed'" as soon as the machine was slow.
    */
   const waitForCompletion = async (
     read: () => Promise<{ status: string; body: any }>,
@@ -153,17 +153,17 @@ describe('Complete Workflow Integration Tests', () => {
       expect(processing.body.data.status).toBe('completed')
 
       // Step 6: Prepare the download.
-      // La rotta invocata prima ('app/api/download/route') non è mai esistita:
-      // l'endpoint reale è /api/download/prepare e accetta filePaths[] +
-      // downloadType, restituendo downloadId al primo livello della risposta.
+      // The route invoked before ('app/api/download/route') never existed:
+      // the real endpoint is /api/download/prepare and accepts filePaths[] +
+      // downloadType, returning downloadId at the top level of the response.
       const { POST: downloadPOST } = await import('../../app/api/download/prepare/route')
 
-      // Sotto NODE_ENV=test applyNormalization non scrive davvero il file
-      // (vedi audio-processor.ts): il percorso di uscita esiste come stringa
-      // ma non su disco, e prepare/ lo rifiuterebbe con 400. Scarichiamo
-      // quindi i soli percorsi realmente presenti, con fallback sul file
-      // caricato — quello che conta qui è che la rotta di download accetti la
-      // richiesta e restituisca un downloadId.
+      // Under NODE_ENV=test applyNormalization does not really write the file
+      // (see audio-processor.ts): the output path exists as a string
+      // but not on disk, and prepare/ would reject it with 400. So we download
+      // only the paths that really exist, falling back to the uploaded
+      // file — what matters here is that the download route accepts the
+      // request and returns a downloadId.
       const candidatePaths: string[] = (processing.body.data.results ?? [])
         .map((r: any) => r.outputPath)
         .filter(Boolean)
@@ -174,7 +174,7 @@ describe('Complete Workflow Integration Tests', () => {
           await fs.access(candidate)
           existingPaths.push(candidate)
         } catch {
-          // percorso non materializzato: ignorato
+          // path not materialized: ignored
         }
       }
 
@@ -261,9 +261,9 @@ describe('Complete Workflow Integration Tests', () => {
       expect(normalizeData.data.totalFiles).toBe(3)
 
       // Step 4: Download as album (batch).
-      // Come nel test single file: la rotta è /api/download/prepare, accetta
-      // filePaths[] e per il batch pretende anche albumName. Usiamo i file
-      // caricati, che esistono davvero su disco.
+      // As in the single file test: the route is /api/download/prepare, it accepts
+      // filePaths[] and for the batch also requires albumName. We use the uploaded
+      // files, which really exist on disk.
       const { POST: downloadPOST } = await import('../../app/api/download/prepare/route')
 
       const downloadRequest = new NextRequest('http://localhost:3000/api/download/prepare', {
@@ -309,11 +309,11 @@ describe('Complete Workflow Integration Tests', () => {
       const uploadResponse = await uploadPOST(uploadRequest)
       const uploadData = await uploadResponse.json()
 
-      // La rotta rifiuta l'intero lotto appena trova un'estensione non
-      // supportata, e lo fa con 415 Unsupported Media Type / UNSUPPORTED_FORMAT
-      // (vedi ErrorTypes in lib/server-error-handler.ts). Il test pretendeva
-      // 400/INVALID_FILES, che è il comportamento di una versione precedente:
-      // 415 è semanticamente più corretto per un formato non accettato.
+      // The route rejects the whole batch as soon as it finds an unsupported
+      // extension, and does so with 415 Unsupported Media Type / UNSUPPORTED_FORMAT
+      // (see ErrorTypes in lib/server-error-handler.ts). The test required
+      // 400/INVALID_FILES, which is the behavior of an earlier version:
+      // 415 is semantically more correct for a format that is not accepted.
       expect(uploadResponse.status).toBe(415)
       expect(uploadData.success).toBe(false)
       expect(uploadData.error?.code ?? uploadData.code).toBe('UNSUPPORTED_FORMAT')

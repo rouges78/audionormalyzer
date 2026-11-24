@@ -1,5 +1,5 @@
 // Plugin Architecture Integration Example
-// Esempio di integrazione completa dell'architettura plugin
+// Example of a complete integration of the plugin architecture
 
 import { pluginManager, PluginBuilder } from '@/lib/plugin-system'
 import { moduleLoader } from '@/lib/module-loader'

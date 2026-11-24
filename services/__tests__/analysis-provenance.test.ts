@@ -1,10 +1,10 @@
 /**
- * Test sulla PROVENIENZA dei dati di analisi (task core-03).
+ * Tests on the PROVENANCE of analysis data (task core-03).
  *
- * Il punto non è "che numeri escono", ma che l'app non spacci mai una stima
- * per una misura: ogni AudioAnalysis deve dichiarare, tramite `source`, quanto
- * di sé è reale. Questi test falliranno di proposito il giorno in cui qualcuno
- * reintrodurrà valori inventati marcandoli come misurati.
+ * The point is not "which numbers come out", but that the app never passes off an estimate
+ * as a measurement: every AudioAnalysis must declare, via `source`, how much
+ * of itself is real. These tests will fail on purpose the day someone
+ * reintroduces invented values marking them as measured.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -22,13 +22,13 @@ vi.mock('fs', () => ({
 
 const FILE = '/test/track.mp3'
 
-/** Carica il servizio dopo aver impostato i mock del modulo music-metadata. */
+/** Loads the service after setting up the mocks of the music-metadata module. */
 async function loadProcessor() {
   const { AudioProcessorImpl } = await import('@/services/audio-processor')
   return new AudioProcessorImpl()
 }
 
-describe('provenienza dell\'analisi audio', () => {
+describe('audio analysis provenance', () => {
   beforeEach(() => {
     vi.resetModules()
     vi.mocked(fs.access).mockResolvedValue(undefined)
@@ -40,7 +40,7 @@ describe('provenienza dell\'analisi audio', () => {
     vi.restoreAllMocks()
   })
 
-  it('usa i dati REALI del contenitore quando il file è leggibile', async () => {
+  it('uses the REAL container data when the file is readable', async () => {
     vi.doMock('music-metadata', () => ({
       parseFile: vi.fn().mockResolvedValue({
         format: {
@@ -56,19 +56,19 @@ describe('provenienza dell\'analisi audio', () => {
     const processor = await loadProcessor()
     const a = await processor.analyzeAudio(FILE)
 
-    // Questi valori vengono dal file, non da un hash del nome
+    // These values come from the file, not from a hash of the name
     expect(a.duration).toBe(253.44)
     expect(a.sampleRate).toBe(48000)
     expect(a.channels).toBe(1)
     expect(a.format).toBe('MPEG')
     expect(a.bitrate).toBe(320000)
 
-    // ...ma la loudness NON è misurata, e deve dirlo
+    // ...but the loudness is NOT measured, and it must say so
     expect(a.source).toBe('partial')
     expect(hasMeasuredLoudness(a)).toBe(false)
   })
 
-  it('ripiega su "estimated" se il contenitore non è interpretabile', async () => {
+  it('falls back to "estimated" if the container cannot be interpreted', async () => {
     vi.doMock('music-metadata', () => ({
       parseFile: vi.fn().mockRejectedValue(new Error('formato non riconosciuto')),
     }))
@@ -78,14 +78,14 @@ describe('provenienza dell\'analisi audio', () => {
 
     expect(a.source).toBe('estimated')
     expect(hasMeasuredLoudness(a)).toBe(false)
-    // deve comunque restituire una struttura utilizzabile dalla UI
+    // it must still return a structure the UI can use
     expect(a.duration).toBeGreaterThan(0)
     expect(a.sampleRate).toBeGreaterThan(0)
     expect(a.channels).toBeGreaterThanOrEqual(1)
   })
 
-  it('tratta come non interpretabile un contenitore con campi mancanti', async () => {
-    // durata assente: restituire 0 falserebbe ogni calcolo di guadagno a valle
+  it('treats a container with missing fields as not interpretable', async () => {
+    // missing duration: returning 0 would skew every downstream gain calculation
     vi.doMock('music-metadata', () => ({
       parseFile: vi.fn().mockResolvedValue({
         format: { sampleRate: 44100, numberOfChannels: 2 },
@@ -99,7 +99,7 @@ describe('provenienza dell\'analisi audio', () => {
     expect(a.duration).toBeGreaterThan(0)
   })
 
-  it('non dichiara MAI "measured" finché non c\'è una misura vera', async () => {
+  it('NEVER declares "measured" until there is a real measurement', async () => {
     vi.doMock('music-metadata', () => ({
       parseFile: vi.fn().mockResolvedValue({
         format: { duration: 100, sampleRate: 44100, numberOfChannels: 2, container: 'wav' },
@@ -109,12 +109,12 @@ describe('provenienza dell\'analisi audio', () => {
     const processor = await loadProcessor()
     const a = await processor.analyzeAudio(FILE)
 
-    // Guardia sul task core-04: quando l'engine nativo misurerà davvero via
-    // ebur128, questo test andrà aggiornato DELIBERATAMENTE, non per caso.
+    // Guard on task core-04: when the native engine really measures via
+    // ebur128, this test must be updated DELIBERATELY, not by accident.
     expect(a.source).not.toBe('measured')
   })
 
-  it('mantiene il true peak entro 0 dBTP', async () => {
+  it('keeps the true peak within 0 dBTP', async () => {
     vi.doMock('music-metadata', () => ({
       parseFile: vi.fn().mockResolvedValue({
         format: { duration: 100, sampleRate: 44100, numberOfChannels: 2, container: 'wav' },
@@ -128,7 +128,7 @@ describe('provenienza dell\'analisi audio', () => {
     expect(a.rmsLevel).toBeLessThan(a.peakLevel)
   })
 
-  it('propaga un errore chiaro se il file non esiste', async () => {
+  it('propagates a clear error if the file does not exist', async () => {
     vi.mocked(fs.access).mockRejectedValue(new Error('ENOENT'))
     const processor = await loadProcessor()
     await expect(processor.analyzeAudio(FILE)).rejects.toThrow('Audio analysis failed')

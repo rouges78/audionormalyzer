@@ -24,15 +24,15 @@ describe('Error Handling', () => {
   let albumProcessor: AlbumProcessorImpl
 
   beforeEach(() => {
-    // clearAllMocks azzera lo storico delle chiamate, ma conserva le
-    // implementazioni impostate dai test precedenti. In particolare il test
-    // sulla creazione della directory lascia mkdir in mockRejectedValue e
-    // faceva fallire il successivo processing album solo nella suite completa.
+    // clearAllMocks resets the call history, but keeps the
+    // implementations set by previous tests. In particular the test
+    // on directory creation leaves mkdir in mockRejectedValue and
+    // made the following album processing fail only in the full suite.
     vi.mocked(fs.mkdir).mockReset().mockResolvedValue(undefined)
     audioProcessor = new AudioProcessorImpl()
     fileManager = new FileManagerImpl()
-    // Inietta LA STESSA istanza su cui i test mettono gli spy: prima
-    // AlbumProcessorImpl ne costruiva una propria e i mock non avevano effetto.
+    // Injects THE SAME instance the tests put their spies on: before,
+    // AlbumProcessorImpl built its own and the mocks had no effect.
     albumProcessor = new AlbumProcessorImpl(audioProcessor)
     vi.clearAllMocks()
   })
@@ -57,11 +57,11 @@ describe('Error Handling', () => {
       vi.mocked(fs.stat).mockResolvedValue({ size: 1024 } as any)
       vi.mocked(fs.readFile).mockResolvedValue(Buffer.from('invalid audio data'))
 
-      // Il test precedente mockava FFmpeg e pretendeva un'eccezione, ma
-      // analyzeAudio non usa più FFmpeg: quando l'header non è leggibile
-      // DEGRADA di proposito a valori di ripiego marcati `source: 'estimated'`
-      // (vedi il commento in audio-processor.ts), così la UI può avvisare
-      // l'utente invece di interrompere il flusso.
+      // The previous test mocked FFmpeg and required an exception, but
+      // analyzeAudio no longer uses FFmpeg: when the header is unreadable
+      // it DEGRADES on purpose to fallback values marked `source: 'estimated'`
+      // (see the comment in audio-processor.ts), so the UI can warn
+      // the user instead of interrupting the flow.
       const analysis = await audioProcessor.analyzeAudio('/corrupted/file.mp3')
 
       expect(analysis.source).toBe('estimated')
@@ -82,12 +82,12 @@ describe('Error Handling', () => {
         outputPath: '/output/test.mp3'
       }
 
-      // Il test originale mockava fs.writeFile in errore, ma applyNormalization
-      // esce subito quando NODE_ENV === 'test' o FFmpeg non è caricato: il ramo
-      // di scrittura non è raggiungibile da un test unitario e la promise si
-      // risolveva sempre. Verifichiamo invece un errore di I/O che il codice
-      // incontra davvero — l'accesso al file sorgente — e il fatto che venga
-      // incapsulato nel messaggio 'Audio normalization failed'.
+      // The original test mocked fs.writeFile to fail, but applyNormalization
+      // returns immediately when NODE_ENV === 'test' or FFmpeg is not loaded: the
+      // write branch is not reachable from a unit test and the promise always
+      // resolved. Instead we check an I/O error the code really
+      // encounters — access to the source file — and that it gets
+      // wrapped in the 'Audio normalization failed' message.
       vi.mocked(fs.access).mockRejectedValue(new Error('ENOENT: no such file'))
 
       await expect(audioProcessor.normalizeAudio('/test/file.mp3', options))
@@ -108,10 +108,10 @@ describe('Error Handling', () => {
     it('should handle stat failures during analysis', async () => {
       vi.mocked(fs.access).mockResolvedValue(undefined)
 
-      // Il test precedente faceva fallire fs.readFile per simulare un timeout,
-      // ma analyzeAudio non chiama più readFile: legge l'header tramite
-      // music-metadata e in caso di problema degrada. L'errore che il metodo
-      // propaga davvero è quello di fs.stat, che serve a calcolare l'hash.
+      // The previous test made fs.readFile fail to simulate a timeout,
+      // but analyzeAudio no longer calls readFile: it reads the header via
+      // music-metadata and degrades on problems. The error the method
+      // really propagates is the fs.stat one, needed to compute the hash.
       vi.mocked(fs.stat).mockRejectedValue(new Error('Processing timeout'))
 
       await expect(audioProcessor.analyzeAudio('/test/file.mp3'))
@@ -252,10 +252,10 @@ describe('Error Handling', () => {
       }
 
       // Mock audio processor to succeed for first file, fail for second
-      // I mock "once" incatenati non bastavano: processAlbumFile richiama
-      // analyzeAudio anche sul file PRODOTTO, per verificare l'esito, quindi
-      // la terza chiamata cadeva sul mock di default (undefined) e faceva
-      // fallire pure la traccia buona. Distinguiamo per percorso.
+      // Chained "once" mocks were not enough: processAlbumFile also calls
+      // analyzeAudio on the PRODUCED file, to check the outcome, so
+      // the third call fell on the default mock (undefined) and made
+      // the good track fail too. We distinguish by path.
       vi.spyOn(audioProcessor, 'analyzeAudio').mockImplementation(async (filePath: string) => {
         if (filePath.includes('nonexistent')) {
           throw new Error('File not found')
@@ -307,11 +307,11 @@ describe('Error Handling', () => {
 
       const result = await albumProcessor.processAlbum(mockFiles, options)
       
-      // processAlbum gestisce l'errore e ritorna un risultato di fallimento.
-      // Quando NESSUN file supera l'analisi, però, il flusso non arriva al
-      // conteggio per traccia: calculateAlbumLoudness non trova dati e solleva
-      // per prima, quindi il messaggio è il suo — più informativo del generico
-      // 'Nessun file processato con successo' che il test pretendeva.
+      // processAlbum handles the error and returns a failure result.
+      // When NO file passes analysis, however, the flow does not reach the
+      // per-track count: calculateAlbumLoudness finds no data and throws
+      // first, so the message is its own — more informative than the generic
+      // 'Nessun file processato con successo' the test required.
       expect(result.success).toBe(false)
       expect(result.error).toContain('Calcolo loudness album fallito')
       expect(result.failedFiles).toBe(1)
@@ -336,14 +336,14 @@ describe('Error Handling', () => {
         arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(1000))
       }
 
-      // Il FileManager non ha retry automatico built-in
-      // Questo test dovrebbe verificare che i retry vengano gestiti al livello appropriato
+      // The FileManager has no built-in automatic retry
+      // This test should check that retries are handled at the appropriate level
       try {
         await fileManager.uploadFiles([mockFile as unknown as File])
-        // Se arriva qui significa che i primi 2 tentativi sono falliti ma il test non ha retry
-        expect(attemptCount).toBe(1) // Solo un tentativo per questo test
+        // If it gets here the first 2 attempts failed but the test has no retry
+        expect(attemptCount).toBe(1) // Only one attempt for this test
       } catch (error) {
-        // È normale che fallisca al primo tentativo
+        // It is normal for it to fail on the first attempt
         expect(attemptCount).toBe(1)
         expect(error).toBeInstanceOf(Error)
       }

@@ -5,16 +5,16 @@ import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 
 /**
- * Interruttore chiaro/scuro in stile Soft UI.
- * Il segmento attivo è "affondato" (nu-in), quello inattivo è a filo:
- * è la stessa grammatica usata da tabs e slider.
+ * Soft UI style light/dark switch.
+ * The active segment is "sunken" (nu-in), the inactive one is flush:
+ * it is the same grammar used by tabs and slider.
  */
 export function ThemeToggle() {
   const { theme, setTheme, systemTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
-  // next-themes conosce il tema solo dopo l'idratazione: prima di allora
-  // qualunque icona renderizzata sarebbe quella sbagliata a metà delle volte.
+  // next-themes only knows the theme after hydration: before that
+  // any rendered icon would be the wrong one half of the time.
   React.useEffect(() => setMounted(true), [])
 
   const current = theme === "system" ? systemTheme : theme

@@ -32,8 +32,8 @@ export function useAudioUpload(): UseAudioUploadReturn {
   const { handleError, retryOperation } = useErrorHandling()
   
   // Validation rules for file uploads
-  // Il tipo dei campi va dedotto dai valori iniziali: passando `{}` la chiave
-  // 'files' non esisteva e validateField la rifiutava come `never`.
+  // The field types must be inferred from the initial values: passing `{}` the
+  // 'files' key did not exist and validateField rejected it as `never`.
   const { validateField } = useValidation<{ files: File[] }>({ files: [] }, {
     files: [
       validationRules.required('Please select at least one file'),

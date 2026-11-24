@@ -21,7 +21,7 @@ describe('AlbumProcessor', () => {
   })
 
   describe('calculateAlbumLoudness', () => {
-    it('dovrebbe calcolare correttamente la loudness media dell\'album', async () => {
+    it('should correctly compute the album average loudness', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -70,7 +70,7 @@ describe('AlbumProcessor', () => {
       expect(result.files[1]).toEqual({ id: '2', loudness: -14.5 })
     })
 
-    it('dovrebbe gestire file senza analisi', async () => {
+    it('should handle files without analysis', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -79,7 +79,7 @@ describe('AlbumProcessor', () => {
           size: 1000,
           format: 'MP3',
           status: 'uploaded'
-          // Nessuna analisi
+          // No analysis
         }
       ]
 
@@ -87,7 +87,7 @@ describe('AlbumProcessor', () => {
         .rejects.toThrow('Nessun file valido per calcolo loudness album')
     })
 
-    it('dovrebbe ignorare file in stato di errore', async () => {
+    it('should ignore files in error state', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -130,13 +130,13 @@ describe('AlbumProcessor', () => {
 
       const result = await albumProcessor.calculateAlbumLoudness(mockFiles)
 
-      expect(result.averageLoudness).toBe(-14.5) // Solo il secondo file
+      expect(result.averageLoudness).toBe(-14.5) // Only the second file
       expect(result.files).toHaveLength(1)
     })
   })
 
   describe('processAlbum', () => {
-    it('dovrebbe processare con successo un album completo', async () => {
+    it('should successfully process a complete album', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -165,7 +165,7 @@ describe('AlbumProcessor', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock delle chiamate al AudioProcessor
+      // Mock the AudioProcessor calls
       mockAudioProcessor.normalizeAudio.mockResolvedValue('/output/track1_normalized.mp3')
       mockAudioProcessor.analyzeAudio.mockResolvedValue({
         duration: 180,
@@ -187,7 +187,7 @@ describe('AlbumProcessor', () => {
       expect(mockAudioProcessor.normalizeAudio).toHaveBeenCalledTimes(1)
     })
 
-    it('dovrebbe gestire errori durante il processing di singoli file', async () => {
+    it('should handle errors while processing individual files', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -216,7 +216,7 @@ describe('AlbumProcessor', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock errore durante normalizzazione
+      // Mock error during normalization
       mockAudioProcessor.normalizeAudio.mockRejectedValue(new Error('Errore processing'))
 
       const result = await albumProcessor.processAlbum(mockFiles, options)
@@ -225,7 +225,7 @@ describe('AlbumProcessor', () => {
       expect(result.error).toContain('Nessun file processato con successo')
     })
 
-    it('dovrebbe mantenere loudness relativa quando richiesto', async () => {
+    it('should maintain relative loudness when requested', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -240,7 +240,7 @@ describe('AlbumProcessor', () => {
             channels: 2,
             peakLevel: -3.2,
             rmsLevel: -18.5,
-            lufsIntegrated: -18.0, // Più quiet della media
+            lufsIntegrated: -18.0, // Quieter than the average
             truePeak: -2.1,
             hasClipping: false
           }
@@ -258,7 +258,7 @@ describe('AlbumProcessor', () => {
             channels: 2,
             peakLevel: -2.8,
             rmsLevel: -17.2,
-            lufsIntegrated: -14.0, // Più loud della media
+            lufsIntegrated: -14.0, // Louder than the average
             truePeak: -1.8,
             hasClipping: false
           }
@@ -289,13 +289,13 @@ describe('AlbumProcessor', () => {
       expect(result.success).toBe(true)
       expect(mockAudioProcessor.normalizeAudio).toHaveBeenCalledTimes(2)
       
-      // Verifica che i target level siano stati calcolati mantenendo posizioni relative
+      // Check that the target levels were computed keeping relative positions
       const calls = mockAudioProcessor.normalizeAudio.mock.calls
-      expect(calls[0][1].targetLevel).toBeLessThan(-16.0) // Track1 dovrebbe rimanere più quiet
-      expect(calls[1][1].targetLevel).toBeGreaterThan(-16.0) // Track2 dovrebbe rimanere più loud
+      expect(calls[0][1].targetLevel).toBeLessThan(-16.0) // Track1 should stay quieter
+      expect(calls[1][1].targetLevel).toBeGreaterThan(-16.0) // Track2 should stay louder
     })
 
-    it('dovrebbe analizzare file non ancora analizzati', async () => {
+    it('should analyze files not yet analyzed', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -304,7 +304,7 @@ describe('AlbumProcessor', () => {
           size: 1000,
           format: 'MP3',
           status: 'uploaded'
-          // Nessuna analisi
+          // No analysis
         }
       ]
 
@@ -341,7 +341,7 @@ describe('AlbumProcessor', () => {
   })
 
   describe('generateProcessingReport', () => {
-    it('dovrebbe generare un report completo', () => {
+    it('should generate a complete report', () => {
       const mockResults = [
         {
           fileId: '1',
@@ -382,7 +382,7 @@ describe('AlbumProcessor', () => {
       expect(report.results).toEqual(mockResults)
     })
 
-    it('dovrebbe gestire report senza file processati con successo', () => {
+    it('should handle reports with no successfully processed files', () => {
       const mockResults = [
         {
           fileId: '1',
@@ -405,7 +405,7 @@ describe('AlbumProcessor', () => {
   })
 
   describe('validateAlbumOptions', () => {
-    it('dovrebbe validare opzioni corrette', () => {
+    it('should validate correct options', () => {
       const validOptions: AlbumOptions = {
         normalizationMethod: 'loudness',
         targetLevel: -16.0,
@@ -419,7 +419,7 @@ describe('AlbumProcessor', () => {
       expect(result.errors).toHaveLength(0)
     })
 
-    it('dovrebbe rilevare metodo di normalizzazione non valido', () => {
+    it('should detect an invalid normalization method', () => {
       const invalidOptions = {
         normalizationMethod: 'invalid' as any,
         targetLevel: -16.0,
@@ -433,10 +433,10 @@ describe('AlbumProcessor', () => {
       expect(result.errors).toContain('Metodo di normalizzazione non valido. Deve essere "peak" o "loudness"')
     })
 
-    it('dovrebbe rilevare target level non valido per peak', () => {
+    it('should detect an invalid target level for peak', () => {
       const invalidOptions: AlbumOptions = {
         normalizationMethod: 'peak',
-        targetLevel: 5.0, // Troppo alto
+        targetLevel: 5.0, // Too high
         maintainRelativeLoudness: false,
         outputFormat: 'wav'
       }
@@ -447,10 +447,10 @@ describe('AlbumProcessor', () => {
       expect(result.errors).toContain('Target level per peak deve essere <= 0 dB')
     })
 
-    it('dovrebbe rilevare target level non valido per loudness', () => {
+    it('should detect an invalid target level for loudness', () => {
       const invalidOptions: AlbumOptions = {
         normalizationMethod: 'loudness',
-        targetLevel: -5.0, // Troppo alto
+        targetLevel: -5.0, // Too high
         maintainRelativeLoudness: false,
         outputFormat: 'flac'
       }
@@ -461,7 +461,7 @@ describe('AlbumProcessor', () => {
       expect(result.errors).toContain('Target level per loudness deve essere <= -6 LUFS')
     })
 
-    it('dovrebbe rilevare formato output non valido', () => {
+    it('should detect an invalid output format', () => {
       const invalidOptions: AlbumOptions = {
         normalizationMethod: 'loudness',
         targetLevel: -16.0,
@@ -477,7 +477,7 @@ describe('AlbumProcessor', () => {
   })
 
   describe('calculateConsistencyStats', () => {
-    it('dovrebbe calcolare statistiche di consistenza per album uniforme', () => {
+    it('should compute consistency statistics for a uniform album', () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -519,13 +519,13 @@ describe('AlbumProcessor', () => {
 
       const stats = albumProcessor.calculateConsistencyStats(mockFiles)
 
-      expect(stats.loudnessConsistency).toBeGreaterThan(0.9) // Molto consistente
-      expect(stats.dynamicRangeVariation).toBeLessThan(1.0) // Poca variazione
+      expect(stats.loudnessConsistency).toBeGreaterThan(0.9) // Very consistent
+      expect(stats.dynamicRangeVariation).toBeLessThan(1.0) // Little variation
       expect(stats.recommendedMethod).toBe('loudness')
       expect(stats.notes).toContain('Album già abbastanza consistente in loudness')
     })
 
-    it('dovrebbe raccomandare peak normalization per album con dynamic range variabile', () => {
+    it('should recommend peak normalization for an album with variable dynamic range', () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -538,7 +538,7 @@ describe('AlbumProcessor', () => {
             duration: 180,
             sampleRate: 44100,
             channels: 2,
-            peakLevel: -1.0, // Alto dynamic range
+            peakLevel: -1.0, // High dynamic range
             rmsLevel: -20.0,
             lufsIntegrated: -16.0,
             truePeak: -0.5,
@@ -556,7 +556,7 @@ describe('AlbumProcessor', () => {
             duration: 200,
             sampleRate: 44100,
             channels: 2,
-            peakLevel: -6.0, // Basso dynamic range
+            peakLevel: -6.0, // Low dynamic range
             rmsLevel: -18.0,
             lufsIntegrated: -16.1,
             truePeak: -5.5,
@@ -572,7 +572,7 @@ describe('AlbumProcessor', () => {
       expect(stats.notes).toContain('Raccomandato peak normalization per preservare dynamic range')
     })
 
-    it('dovrebbe rilevare file con clipping', () => {
+    it('should detect files with clipping', () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -589,7 +589,7 @@ describe('AlbumProcessor', () => {
             rmsLevel: -18.0,
             lufsIntegrated: -16.0,
             truePeak: -2.1,
-            hasClipping: true // Clipping rilevato
+            hasClipping: true // Clipping detected
           }
         }
       ]
@@ -599,7 +599,7 @@ describe('AlbumProcessor', () => {
       expect(stats.notes).toContain('1 file con clipping rilevato')
     })
 
-    it('dovrebbe gestire album senza file validi', () => {
+    it('should handle albums without valid files', () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',

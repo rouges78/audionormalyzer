@@ -1,43 +1,43 @@
 # Audio Normalizer - Antivirus Build Solution
-# PowerShell script per risolvere problemi antivirus durante build
+# PowerShell script to fix antivirus problems during the build
 
-Write-Host "🛡️ Audio Normalizer - Soluzione Antivirus Build" -ForegroundColor Cyan
+Write-Host "🛡️ Audio Normalizer - Antivirus Build Fix" -ForegroundColor Cyan
 Write-Host ""
 
-# Funzione per verificare se si sta eseguendo come amministratore
+# Function to check whether we are running as administrator
 function Test-Administrator {
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
-# Funzione per disabilitare temporaneamente Windows Defender
+# Function to temporarily disable Windows Defender
 function Disable-WindowsDefender {
     try {
-        Write-Host "🛑 Disabilitazione temporanea Windows Defender..." -ForegroundColor Yellow
+        Write-Host "🛑 Temporarily disabling Windows Defender..." -ForegroundColor Yellow
         Set-MpPreference -DisableRealtimeMonitoring $true -ErrorAction SilentlyContinue
-        Write-Host "✅ Windows Defender disabilitato temporaneamente" -ForegroundColor Green
+        Write-Host "✅ Windows Defender temporarily disabled" -ForegroundColor Green
         return $true
     } catch {
-        Write-Host "⚠️ Impossibile disabilitare Windows Defender: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "⚠️ Unable to disable Windows Defender: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 }
 
-# Funzione per riabilitare Windows Defender
+# Function to re-enable Windows Defender
 function Enable-WindowsDefender {
     try {
-        Write-Host "🛡️ Riabilitazione Windows Defender..." -ForegroundColor Yellow
+        Write-Host "🛡️ Re-enabling Windows Defender..." -ForegroundColor Yellow
         Set-MpPreference -DisableRealtimeMonitoring $false -ErrorAction SilentlyContinue
-        Write-Host "✅ Windows Defender riabilitato" -ForegroundColor Green
+        Write-Host "✅ Windows Defender re-enabled" -ForegroundColor Green
     } catch {
-        Write-Host "⚠️ Errore riabilitazione Windows Defender: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "⚠️ Error re-enabling Windows Defender: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 
-# Funzione per killare processi che potrebbero bloccare file
+# Function to kill processes that could lock files
 function Stop-BlockingProcesses {
-    Write-Host "🛑 Chiusura processi che potrebbero bloccare file..." -ForegroundColor Yellow
+    Write-Host "🛑 Closing processes that could lock files..." -ForegroundColor Yellow
     
     $processesToKill = @("electron", "Audio Normalizer", "node", "npm")
     
@@ -45,124 +45,124 @@ function Stop-BlockingProcesses {
         try {
             Get-Process -Name $process -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
         } catch {
-            # Processo non trovato, ok
+            # Process not found, ok
         }
     }
     
-    Write-Host "✅ Processi chiusi" -ForegroundColor Green
+    Write-Host "✅ Processes closed" -ForegroundColor Green
 }
 
-# Funzione per pulire directory dist
+# Function to clean the dist directory
 function Clear-DistDirectory {
-    Write-Host "🗑️ Pulizia directory dist..." -ForegroundColor Yellow
+    Write-Host "🗑️ Cleaning dist directory..." -ForegroundColor Yellow
     
     if (Test-Path "dist") {
         try {
             Remove-Item -Path "dist" -Recurse -Force -ErrorAction Stop
-            Write-Host "✅ Directory dist eliminata" -ForegroundColor Green
+            Write-Host "✅ dist directory deleted" -ForegroundColor Green
         } catch {
-            Write-Host "⚠️ Errore eliminazione dist: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "⚠️ Error deleting dist: $($_.Exception.Message)" -ForegroundColor Red
             
-            # Tentativo con metodi alternativi
+            # Attempt with alternative methods
             try {
                 cmd /c "rmdir /s /q dist" 2>$null
                 if (-not (Test-Path "dist")) {
-                    Write-Host "✅ Directory dist eliminata con cmd" -ForegroundColor Green
+                    Write-Host "✅ dist directory deleted with cmd" -ForegroundColor Green
                 }
             } catch {
-                Write-Host "❌ Impossibile eliminare directory dist" -ForegroundColor Red
+                Write-Host "❌ Unable to delete dist directory" -ForegroundColor Red
             }
         }
     }
 }
 
-# Funzione per aggiungere esclusioni antivirus
+# Function to add antivirus exclusions
 function Add-AntivirusExclusion {
     param([string]$Path)
     
     try {
-        Write-Host "🛡️ Aggiunta esclusione antivirus per: $Path" -ForegroundColor Yellow
+        Write-Host "🛡️ Adding antivirus exclusion for: $Path" -ForegroundColor Yellow
         Add-MpPreference -ExclusionPath $Path -ErrorAction SilentlyContinue
-        Write-Host "✅ Esclusione aggiunta" -ForegroundColor Green
+        Write-Host "✅ Exclusion added" -ForegroundColor Green
     } catch {
-        Write-Host "⚠️ Impossibile aggiungere esclusione: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "⚠️ Unable to add exclusion: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 
-# Script principale
+# Main script
 try {
-    Write-Host "🔍 Verifica privilegi amministratore..." -ForegroundColor Yellow
+    Write-Host "🔍 Checking administrator privileges..." -ForegroundColor Yellow
     
     if (-not (Test-Administrator)) {
-        Write-Host "⚠️ ATTENZIONE: Non stai eseguendo come Amministratore!" -ForegroundColor Red
-        Write-Host "📋 Per migliori risultati, esegui PowerShell come Amministratore" -ForegroundColor Yellow
+        Write-Host "⚠️ WARNING: You are not running as Administrator!" -ForegroundColor Red
+        Write-Host "📋 For best results, run PowerShell as Administrator" -ForegroundColor Yellow
         Write-Host ""
-        $continue = Read-Host "Continuare comunque? (y/N)"
+        $continue = Read-Host "Continue anyway? (y/N)"
         if ($continue -ne "y" -and $continue -ne "Y") {
-            Write-Host "❌ Build annullato" -ForegroundColor Red
+            Write-Host "❌ Build cancelled" -ForegroundColor Red
             exit 1
         }
     } else {
-        Write-Host "✅ Eseguendo come Amministratore" -ForegroundColor Green
+        Write-Host "✅ Running as Administrator" -ForegroundColor Green
     }
     
-    # Ottieni directory corrente
+    # Get the current directory
     $currentDir = Get-Location
     $distDir = Join-Path $currentDir "dist"
     
-    # Aggiungi esclusioni antivirus
+    # Add antivirus exclusions
     if (Test-Administrator) {
         Add-AntivirusExclusion -Path $currentDir
         Add-AntivirusExclusion -Path $distDir
     }
     
-    # Disabilita Windows Defender temporaneamente
+    # Temporarily disable Windows Defender
     $defenderDisabled = $false
     if (Test-Administrator) {
         $defenderDisabled = Disable-WindowsDefender
     }
     
-    # Chiudi processi bloccanti
+    # Close blocking processes
     Stop-BlockingProcesses
     
-    # Attendi un po'
-    Write-Host "⏳ Attesa 3 secondi per rilascio file..." -ForegroundColor Yellow
+    # Wait a bit
+    Write-Host "⏳ Waiting 3 seconds for files to be released..." -ForegroundColor Yellow
     Start-Sleep -Seconds 3
     
-    # Pulisci directory dist
+    # Clean the dist directory
     Clear-DistDirectory
     
-    # Attendi ancora
-    Write-Host "⏳ Attesa finale 2 secondi..." -ForegroundColor Yellow
+    # Wait some more
+    Write-Host "⏳ Final 2-second wait..." -ForegroundColor Yellow
     Start-Sleep -Seconds 2
     
-    # Esegui build
-    Write-Host "🔨 Avvio build Electron..." -ForegroundColor Cyan
+    # Run the build
+    Write-Host "🔨 Starting Electron build..." -ForegroundColor Cyan
     Write-Host ""
     
-    # Prova build con npx
+    # Try the build with npx
     $buildSuccess = $false
     try {
         & npx electron-builder --win --x64 --publish=never
         $buildSuccess = $true
     } catch {
-        Write-Host "❌ Build con npx fallito: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "❌ Build with npx failed: $($_.Exception.Message)" -ForegroundColor Red
     }
     
-    # Se il primo metodo fallisce, prova metodo alternativo
+    # If the first method fails, try an alternative method
     if (-not $buildSuccess) {
-        Write-Host "🔄 Tentativo con metodo alternativo..." -ForegroundColor Yellow
+        Write-Host "🔄 Trying an alternative method..." -ForegroundColor Yellow
         try {
             & npm run build:simple
             $buildSuccess = $true
         } catch {
-            Write-Host "❌ Anche build alternativo fallito: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "❌ Alternative build failed too: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
     
-    # Verifica risultati
+    # Check the results
     Write-Host ""
-    Write-Host "🔍 Verifica file di output..." -ForegroundColor Cyan
+    Write-Host "🔍 Checking output files..." -ForegroundColor Cyan
     
     $exePath = "dist\Audio Normalizer 0.1.0.exe"
     $unpackedPath = "dist\win-unpacked\Audio Normalizer.exe"
@@ -171,54 +171,54 @@ try {
     
     if (Test-Path $exePath) {
         $size = (Get-Item $exePath).Length / 1MB
-        Write-Host "✅ Eseguibile creato: $exePath ($([math]::Round($size, 2)) MB)" -ForegroundColor Green
+        Write-Host "✅ Executable created: $exePath ($([math]::Round($size, 2)) MB)" -ForegroundColor Green
         $hasExecutable = $true
     }
     
     if (Test-Path $unpackedPath) {
         $size = (Get-Item $unpackedPath).Length / 1MB
-        Write-Host "✅ Versione unpacked: $unpackedPath ($([math]::Round($size, 2)) MB)" -ForegroundColor Green
+        Write-Host "✅ Unpacked version: $unpackedPath ($([math]::Round($size, 2)) MB)" -ForegroundColor Green
         $hasExecutable = $true
     }
     
     if ($hasExecutable) {
         Write-Host ""
-        Write-Host "🎉 BUILD COMPLETATO CON SUCCESSO!" -ForegroundColor Green
+        Write-Host "🎉 BUILD COMPLETED SUCCESSFULLY!" -ForegroundColor Green
         Write-Host ""
-        Write-Host "🚀 Per testare l'eseguibile:" -ForegroundColor Cyan
+        Write-Host "🚀 To test the executable:" -ForegroundColor Cyan
         if (Test-Path $exePath) {
             Write-Host "   `"$exePath`"" -ForegroundColor White
         }
         Write-Host ""
-        Write-Host "📋 Funzionalità disponibili:" -ForegroundColor Cyan
-        Write-Host "   • Drag & drop file audio" -ForegroundColor White
-        Write-Host "   • Normalizzazione professionale" -ForegroundColor White
-        Write-Host "   • Supporto formati multipli" -ForegroundColor White
+        Write-Host "📋 Available features:" -ForegroundColor Cyan
+        Write-Host "   • Drag & drop audio files" -ForegroundColor White
+        Write-Host "   • Professional normalization" -ForegroundColor White
+        Write-Host "   • Multiple format support" -ForegroundColor White
         Write-Host "   • Interface user-friendly" -ForegroundColor White
     } else {
         Write-Host ""
-        Write-Host "❌ BUILD FALLITO - Nessun eseguibile creato" -ForegroundColor Red
+        Write-Host "❌ BUILD FAILED - No executable created" -ForegroundColor Red
         Write-Host ""
-        Write-Host "🛠️ Soluzioni aggiuntive:" -ForegroundColor Yellow
-        Write-Host "   1. Disabilita manualmente l'antivirus" -ForegroundColor White
-        Write-Host "   2. Aggiungi questa cartella alle esclusioni:" -ForegroundColor White
+        Write-Host "🛠️ Additional solutions:" -ForegroundColor Yellow
+        Write-Host "   1. Disable the antivirus manually" -ForegroundColor White
+        Write-Host "   2. Add this folder to the exclusions:" -ForegroundColor White
         Write-Host "      $currentDir" -ForegroundColor Gray
-        Write-Host "   3. Riavvia come Amministratore" -ForegroundColor White
-        Write-Host "   4. Chiudi tutte le applicazioni non necessarie" -ForegroundColor White
+        Write-Host "   3. Restart as Administrator" -ForegroundColor White
+        Write-Host "   4. Close all unnecessary applications" -ForegroundColor White
     }
     
 } finally {
-    # Riabilita Windows Defender
+    # Re-enable Windows Defender
     if ($defenderDisabled -and (Test-Administrator)) {
         Write-Host ""
         Enable-WindowsDefender
     }
     
     Write-Host ""
-    Write-Host "🏁 Script completato" -ForegroundColor Cyan
+    Write-Host "🏁 Script completed" -ForegroundColor Cyan
 }
 
-# Pausa per leggere output
+# Pause to read the output
 Write-Host ""
-Write-Host "Premi un tasto per continuare..." -ForegroundColor Gray
+Write-Host "Press any key to continue..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

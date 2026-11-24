@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script per creare l'eseguibile Windows dell'Audio Normalizer
+ * Script to create the Windows executable of Audio Normalizer
  */
 
 const { execSync } = require('child_process');

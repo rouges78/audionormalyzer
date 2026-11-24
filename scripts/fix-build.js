@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script per risolvere i problemi di build di Next.js
+ * Script to fix Next.js build problems
  */
 
 const { execSync } = require('child_process');

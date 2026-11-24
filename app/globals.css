@@ -1,16 +1,16 @@
 /* ============================================================
-   AUDIO NORMALIZER — foglio di stile unico
-   Tailwind v4 (CSS-first). Questo è l'UNICO globals.css:
-   styles/globals.css è stato rimosso perché non era importato
-   da nessuno e usava token che l'app non caricava mai.
+   AUDIO NORMALIZER — single stylesheet
+   Tailwind v4 (CSS-first). This is the ONLY globals.css:
+   styles/globals.css was removed because nothing imported it
+   and it used tokens the app never loaded.
 
-   Struttura:
-     1. Token          — palette Soft UI, chiaro e scuro
-     2. Bridge shadcn  — mappatura @theme per le 50 ui/*
+   Structure:
+     1. Tokens         — Soft UI palette, light and dark
+     2. shadcn bridge  — @theme mapping for the 50 ui/*
      3. Base
-     4. Primitive .nu-* — la scala di elevazione neumorfica
-     5. Override slot   — shadcn diventa Soft UI senza toccarne il TSX
-     6. Classi app      — waveform, meter, upload, file item
+     4. .nu-* primitives — the neumorphic elevation scale
+     5. Slot overrides  — shadcn becomes Soft UI without touching its TSX
+     6. App classes     — waveform, meter, upload, file item
    ============================================================ */
 
 @import 'tailwindcss';
@@ -22,9 +22,9 @@
 :root {
   --radius: 1rem;
 
-  /* Soft UI — tema chiaro.
-     card e background COINCIDONO: nel neumorfismo la forma nasce
-     dalle ombre, non dal riempimento. Non è un errore. */
+  /* Soft UI — light theme.
+     card and background MATCH: in neumorphism the shape comes
+     from the shadows, not from the fill. This is not a mistake. */
   --background:            #e6e9ef;
   --foreground:            #2b3044;
   --card:                  #e6e9ef;
@@ -35,8 +35,8 @@
   --primary-foreground:    #ffffff;
   --secondary:             #2b3044;
   --secondary-foreground:  #eef0f5;
-  --muted:                 #d6dbe6;   /* deve staccare da --background #e6e9ef */
-  --muted-foreground:      #565d73;   /* 4.5:1 su background E su muted */
+  --muted:                 #d6dbe6;   /* must stand out from --background #e6e9ef */
+  --muted-foreground:      #565d73;   /* 4.5:1 on background AND on muted */
   --accent:                #ff9a3c;
   --accent-foreground:     #2b3044;
   --destructive:           #b91c1c;
@@ -45,17 +45,17 @@
   --input:                 #d3d8e2;
   --ring:                  #ff3b52;
 
-  /* Colori di STATO — pensati per il testo, quindi scuri quanto basta
-     a superare 4.5:1 sia su --background che sulle tinte qui sotto. */
+  /* STATUS colors — meant for text, so just dark enough
+     to exceed 4.5:1 on both --background and the tints below. */
   --info:           #1d4ed8;
   --success:        #116b33;
-  --warning:        #855105;   /* giallo   → avviso lieve   */
-  --warning-strong: #a3370b;   /* arancio  → avviso marcato */
+  --warning:        #855105;   /* yellow   → mild warning   */
+  --warning-strong: #a3370b;   /* orange   → strong warning */
   --danger:         #b91c1c;
-  --primary-ink:    #c81232;   /* rosso brand leggibile come testo */
+  --primary-ink:    #c81232;   /* brand red readable as text */
 
-  /* Tinte di SFONDO — devono distinguersi da --background (#e6e9ef),
-     altrimenti i pannelli informativi spariscono. */
+  /* BACKGROUND tints — must stand out from --background (#e6e9ef),
+     otherwise the info panels disappear. */
   --tint-info:           #dbe6fb;
   --tint-success:        #d9f2e2;
   --tint-warning:        #f9eed2;
@@ -64,18 +64,18 @@
   --tint-primary:        #fbdce1;
   --tint-neutral:        #dfe3ea;
 
-  /* testo sopra un colore di stato pieno: in chiaro gli stati sono scuri
-     (serve bianco), in scuro sono chiari (serve inchiostro scuro) */
+  /* text on a solid status color: in light mode the states are dark
+     (white needed), in dark mode they are light (dark ink needed) */
   --status-foreground:   #ffffff;
 
-  /* Sfondo delle CTA piene. NON è --primary: il corallo #ff3b52 col bianco
-     sopra dà 3.5:1, sotto il minimo per il testo. Il corallo resta per barre,
-     gradienti e range degli slider, dove non ci va testo sopra. */
+  /* Background of solid CTAs. NOT --primary: coral #ff3b52 with white
+     on top gives 3.5:1, below the minimum for text. Coral stays for bars,
+     gradients and slider ranges, where no text sits on top. */
   --cta:      #c81232;
   --cta-2:    #a8102c;
   --cta-foreground: #ffffff;
 
-  /* ombre speculari: l'intero linguaggio visivo si regge su queste due */
+  /* mirrored shadows: the whole visual language rests on these two */
   --sh-dark:  rgba(160, 169, 190, 0.58);
   --sh-light: rgba(255, 255, 255, 0.95);
   --hairline: rgba(43, 48, 68, 0.07);
@@ -107,7 +107,7 @@
   --primary-foreground:    #ffffff;
   --secondary:             #171a28;
   --secondary-foreground:  #e9ecf5;
-  --muted:                 #2e3450;   /* deve staccare da --background #23273a */
+  --muted:                 #2e3450;   /* must stand out from --background #23273a */
   --muted-foreground:      #a8afc6;
   --accent:                #ff9a3c;
   --accent-foreground:     #171a28;
@@ -158,7 +158,7 @@
   --sidebar-ring:               #ff3b52;
 }
 
-/* ---------------- 2. BRIDGE SHADCN ---------------- */
+/* ---------------- 2. SHADCN BRIDGE ---------------- */
 @theme inline {
   --color-background:            var(--background);
   --color-foreground:            var(--foreground);
@@ -224,14 +224,14 @@
     color: var(--foreground);
     -webkit-font-smoothing: antialiased;
   }
-  /* il focus resta sempre visibile: il neumorfismo da solo non lo comunica */
+  /* focus always stays visible: neumorphism alone does not convey it */
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 3px;
   }
 }
 
-/* ---------------- 4. PRIMITIVE ---------------- */
+/* ---------------- 4. PRIMITIVES ---------------- */
 @layer components {
   .nu-xs { box-shadow:  2px  2px  4px var(--sh-dark), -2px  -2px  4px var(--sh-light); }
   .nu-sm { box-shadow:  4px  4px  8px var(--sh-dark), -4px  -4px  8px var(--sh-light); }
@@ -241,7 +241,7 @@
   .nu-in-sm { box-shadow: inset 2px 2px 5px var(--sh-dark), inset -2px -2px 5px var(--sh-light); }
   .nu-flat  { box-shadow: none; }
 
-  /* superficie scura di contrasto (transport, dropdown, chip) */
+  /* dark contrast surface (transport, dropdown, chip) */
   .nu-contrast {
     background-color: var(--secondary);
     color: var(--secondary-foreground);
@@ -256,18 +256,18 @@
   }
 }
 
-/* ---------------- 5. OVERRIDE SLOT SHADCN ----------------
-   Le ui/* usano tutte data-slot: si restilizzano da qui, senza
-   toccare un solo file TSX. Se un componente viene rigenerato
-   da shadcn, questi stili continuano a valere.
+/* ---------------- 5. SHADCN SLOT OVERRIDES ----------------
+   The ui/* all use data-slot: they are restyled from here, without
+   touching a single TSX file. If a component is regenerated
+   by shadcn, these styles still apply.
 
-   ATTENZIONE — queste regole NON stanno dentro @layer.
-   Tailwind v4 dichiara `@layer theme, base, components, utilities`:
-   qualsiasi cosa dentro @layer components perde contro le utility
-   che shadcn mette già sui componenti (shadow-sm, border, bg-popover…).
-   Il CSS non in layer vince su tutto il CSS in layer, a prescindere
-   dalla specificità: è l'unico modo perché questi override attecchiscano.
-   Spostarle dentro un @layer = card senza ombra, dropdown non stilati. */
+   WARNING — these rules are NOT inside @layer.
+   Tailwind v4 declares `@layer theme, base, components, utilities`:
+   anything inside @layer components loses to the utilities
+   shadcn already puts on the components (shadow-sm, border, bg-popover…).
+   Unlayered CSS beats all layered CSS, regardless
+   of specificity: it is the only way for these overrides to take hold.
+   Moving them into an @layer = cards without shadow, unstyled dropdowns. */
 
   [data-slot='card'] {
     border: none;
@@ -283,7 +283,7 @@
     transition: box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
                 color 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* variante default: accento pieno */
+  /* default variant: solid accent */
   [data-slot='button'].bg-primary {
     background-image: linear-gradient(135deg, var(--cta), var(--cta-2));
     color: var(--cta-foreground);
@@ -296,12 +296,12 @@
     box-shadow: inset 3px 3px 8px rgba(150, 20, 35, 0.5),
                 inset -2px -2px 6px rgba(255, 255, 255, 0.22);
   }
-  /* Varianti in rilievo sulla superficie.
-     NOTA: qui NON si dichiara `color`. Queste regole sono fuori da @layer e
-     quindi batterebbero qualsiasi utility text-*: dichiarare il colore qui
-     cancellava il rosso di "Cancella tutto" e il verde/grigio del toggle di
-     monitoraggio, uccidendo il segnale semantico. Il colore lo decide il
-     componente; qui si gestiscono solo sfondo, bordo e ombra. */
+  /* Raised variants on the surface.
+     NOTE: `color` is NOT declared here. These rules are outside @layer and
+     so they would beat any text-* utility: declaring the color here
+     wiped out the red of "Cancella tutto" (Clear all) and the green/grey of the
+     monitoring toggle, killing the semantic signal. The color is decided by the
+     component; only background, border and shadow are handled here. */
   [data-slot='button'].bg-background,
   [data-slot='button'].bg-secondary,
   [data-slot='button'].hover\:bg-accent {
@@ -432,7 +432,7 @@
     background-color: var(--hairline);
   }
 
-/* ---------------- 6. CLASSI APP ---------------- */
+/* ---------------- 6. APP CLASSES ---------------- */
 @layer components {
   .waveform-container {
     position: relative;
@@ -441,7 +441,7 @@
     background-color: var(--background);
     box-shadow: inset 4px 4px 9px var(--sh-dark), inset -4px -4px 9px var(--sh-light);
   }
-  /* niente ombra sulle singole barre: sono centinaia di nodi, lo scroll ne soffrirebbe */
+  /* no shadow on individual bars: there are hundreds of nodes, scrolling would suffer */
   .waveform-bar {
     background-image: linear-gradient(180deg, var(--primary), var(--accent));
     transition: opacity 0.2s ease-in-out;
@@ -511,7 +511,7 @@
   .file-item.completed { box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light), inset 0 0 0 2px var(--success); }
   .file-item.error     { box-shadow: 5px 5px 11px var(--sh-dark), -5px -5px 11px var(--sh-light), inset 0 0 0 2px var(--destructive); }
 
-  /* stepper del wizard */
+  /* wizard stepper */
   .nu-step-bubble {
     background-color: var(--background);
     color: var(--muted-foreground);

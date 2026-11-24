@@ -1,25 +1,25 @@
 @echo off
-REM Audio Normalizer - Metodo di Emergenza
-REM Crea un EXE base funzionante usando solo Electron
+REM Audio Normalizer - Emergency Method
+REM Creates a basic working EXE using only Electron
 
 echo =====================================================
-echo    Audio Normalizer - Metodo di Emergenza
+echo    Audio Normalizer - Emergency Method
 echo =====================================================
 echo.
 
-echo 🚨 Creazione EXE con metodo di emergenza...
+echo 🚨 Creating EXE with the emergency method...
 echo.
 
 REM Install electron globally if needed
-echo 📦 Installazione Electron globale...
+echo 📦 Installing Electron globally...
 npm install -g electron
 if errorlevel 1 (
-    echo ⚠️ Installazione globale fallita, provo locale...
+    echo ⚠️ Global install failed, trying local...
     npm install electron --save-dev
 )
 
 echo.
-echo 🏗️ Creazione struttura minimale...
+echo 🏗️ Creating minimal structure...
 
 REM Create a simple main.js if it doesn't exist
 if not exist "main.js" (
@@ -54,47 +54,47 @@ if not exist "index.html" (
     echo ^</html^> >> index.html
 )
 
-echo ✅ Struttura creata
+echo ✅ Structure created
 echo.
 
 echo 🧪 Test Electron...
 timeout /t 3 /nobreak >nul
 start "" "npx electron ."
-echo ⏳ Electron avviato per test (si chiuderà automaticamente)...
+echo ⏳ Electron started for testing (it will close automatically)...
 timeout /t 5 /nobreak >nul
 taskkill /f /im electron.exe >nul 2>&1
 
 echo.
-echo 📦 Creazione EXE con electron-packager...
+echo 📦 Creating EXE with electron-packager...
 call npx electron-packager . "Audio-Normalizer-Emergency" --platform=win32 --arch=x64 --out=dist-emergency --overwrite
 if errorlevel 1 (
-    echo ❌ Anche il metodo di emergenza è fallito
+    echo ❌ The emergency method failed too
     echo.
-    echo 🆘 ULTIMA RISORSA:
-    echo   1. Riavvia il computer
-    echo   2. Prova da una cartella diversa (es. Desktop)
-    echo   3. Controlla antivirus e firewall
-    echo   4. Verifica permessi della cartella
+    echo 🆘 LAST RESORT:
+    echo   1. Restart the computer
+    echo   2. Try from a different folder (e.g. Desktop)
+    echo   3. Check antivirus and firewall
+    echo   4. Check the folder permissions
     pause
     exit /b 1
 )
 
-echo ✅ EXE DI EMERGENZA CREATO!
+echo ✅ EMERGENCY EXE CREATED!
 echo.
 
 REM Find the executable
 for /r "dist-emergency" %%i in (*.exe) do (
-    echo 🎉 File trovato: %%i
+    echo 🎉 File found: %%i
     echo.
-    echo 🧪 Test veloce...
+    echo 🧪 Quick test...
     start "" "%%i"
     timeout /t 3 /nobreak >nul
     taskkill /f /im "%%~nxi" >nul 2>&1
-    echo ✅ EXE funzionante!
+    echo ✅ EXE working!
 )
 
 echo.
-echo 📁 Aprendo cartella dei risultati...
+echo 📁 Opening the results folder...
 explorer dist-emergency
 
 pause

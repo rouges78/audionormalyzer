@@ -1,22 +1,22 @@
 // Core audio processing interfaces based on design document
 
 /**
- * Provenienza dei valori di un'AudioAnalysis. Serve a non spacciare mai una
- * stima per una misura: la UI deve poter dire all'utente quanto fidarsi.
+ * Provenance of the values of an AudioAnalysis. It exists so that an estimate
+ * is never passed off as a measurement: the UI must be able to tell the user how far to trust it.
  *
- *  - 'measured'  → tutto misurato davvero (richiede un ffmpeg reale che
- *                  esegua il filtro `ebur128`; vedi core-04).
- *  - 'partial'   → contenitore reale (durata, sample rate, canali, formato,
- *                  letti con `music-metadata`) ma loudness NON misurata.
- *  - 'estimated' → nessun valore reale: fallback deterministico ricavato dal
- *                  file. Utile solo per far girare la UI, non per decidere.
+ *  - 'measured'  → everything really measured (requires a real ffmpeg that
+ *                  runs the `ebur128` filter; see core-04).
+ *  - 'partial'   → real container (duration, sample rate, channels, format,
+ *                  read with `music-metadata`) but loudness NOT measured.
+ *  - 'estimated' → no real value: deterministic fallback derived from the
+ *                  file. Only useful to keep the UI running, not to decide.
  *
- * Opzionale per retrocompatibilità: se assente, tratta il dato come 'estimated'.
+ * Optional for backward compatibility: if absent, treat the data as 'estimated'.
  */
 export type AnalysisSource = 'measured' | 'partial' | 'estimated'
 
 export interface AudioAnalysis {
-  duration: number // secondi
+  duration: number // seconds
   sampleRate: number // Hz
   channels: number
   peakLevel: number // dBFS
@@ -25,34 +25,34 @@ export interface AudioAnalysis {
   truePeak: number // dBTP
   hasClipping: boolean
   /**
-   * Formato/estensione rilevato (es. "MP3", "WAV"). Opzionale: non tutti i
-   * produttori lo popolano (l'anteprima client, ad esempio, può ometterlo).
+   * Detected format/extension (e.g. "MP3", "WAV"). Optional: not all
+   * producers fill it in (the client preview, for example, may omit it).
    */
   format?: string
   /**
-   * Loudness Range in LU (EBU R128 LRA). Opzionale: disponibile solo dagli
-   * engine che eseguono una misura loudnorm reale (WASM/nativo), non
-   * dall'anteprima basata sul gain.
+   * Loudness Range in LU (EBU R128 LRA). Optional: only available from
+   * engines that run a real loudnorm measurement (WASM/native), not
+   * from the gain-based preview.
    */
   loudnessRange?: number
   /**
-   * Quanto di questa analisi è misurato davvero. Vedi {@link AnalysisSource}.
-   * Assente = da trattare come 'estimated'.
+   * How much of this analysis is really measured. See {@link AnalysisSource}.
+   * Absent = to be treated as 'estimated'.
    */
   source?: AnalysisSource
-  /** Bitrate in bit/s, quando il contenitore lo dichiara. */
+  /** Bitrate in bit/s, when the container declares it. */
   bitrate?: number
 }
 
-/** True se l'analisi contiene valori di loudness realmente misurati. */
+/** True if the analysis contains really measured loudness values. */
 export function hasMeasuredLoudness(a: Pick<AudioAnalysis, 'source'>): boolean {
   return a.source === 'measured'
 }
 
 /**
- * Predizione dell'analisi dopo l'applicazione di un guadagno costante.
- * Un gain puro trasla tutti i livelli in dB della stessa quantità; LUFS/LRA
- * "veri" richiedono comunque una nuova misura (vedi engine WASM/nativo).
+ * Prediction of the analysis after applying a constant gain.
+ * A pure gain shifts all dB levels by the same amount; "true"
+ * LUFS/LRA still require a new measurement (see WASM/native engine).
  */
 export interface AnalysisPrediction {
   peakLevel: number // dBFS
@@ -65,9 +65,9 @@ export interface AnalysisPrediction {
 export interface NormalizationOptions {
   method: 'peak' | 'loudness'
   /**
-   * Livello target. L'unità dipende dal metodo:
-   *  - method === 'peak'     → dBFS (tipicamente <= 0)
-   *  - method === 'loudness' → LUFS (tipicamente tra -30 e -6)
+   * Target level. The unit depends on the method:
+   *  - method === 'peak'     → dBFS (typically <= 0)
+   *  - method === 'loudness' → LUFS (typically between -30 and -6)
    */
   targetLevel: number
   preserveFormat: boolean
@@ -98,15 +98,15 @@ export interface ValidationResult {
   error?: string
 }
 
-/** Informazioni su un file temporaneo caricato, restituite da getTempFileInfo. */
+/** Info about an uploaded temporary file, returned by getTempFileInfo. */
 export interface TempFileInfo {
   path: string
   size: number
   created: Date
   /**
-   * Nome originale del file, quando è noto.
-   * Opzionale: su disco i temporanei sono salvati con il solo fileId, quindi
-   * chi legge questo campo deve prevedere un fallback.
+   * Original file name, when known.
+   * Optional: on disk temp files are saved with the fileId only, so
+   * whoever reads this field must provide a fallback.
    */
   originalName?: string
 }
@@ -143,22 +143,22 @@ export interface ProcessingResult {
 }
 
 /**
- * Esito del processing di un album.
+ * Outcome of processing an album.
  *
- * I campi ereditati da ProcessingResult descrivono l'album nel suo insieme
- * (loudness media, guadagno medio, tempo totale); `fileResults` conserva
- * l'esito traccia per traccia, che prima veniva calcolato e poi scartato —
- * la rotta /api/normalize lo cercava e trovava `undefined`.
+ * The fields inherited from ProcessingResult describe the album as a whole
+ * (average loudness, average gain, total time); `fileResults` keeps
+ * the outcome track by track, which used to be computed and then discarded —
+ * the /api/normalize route looked for it and found `undefined`.
  */
 export interface AlbumProcessingResult extends ProcessingResult {
   fileResults: ProcessingResult[]
-  /** Numero di tracce sottoposte a processing (= fileResults.length). */
+  /** Number of tracks processed (= fileResults.length). */
   totalFiles: number
-  /** Tracce completate con successo. */
+  /** Tracks completed successfully. */
   successfulFiles: number
-  /** Tracce fallite (totalFiles - successfulFiles). */
+  /** Failed tracks (totalFiles - successfulFiles). */
   failedFiles: number
-  /** Messaggi d'errore delle tracce fallite, uno per traccia. */
+  /** Error messages of the failed tracks, one per track. */
   errors: string[]
 }
 
@@ -201,14 +201,14 @@ export interface AudioFile {
 
 export interface NormalizationResult {
   success: boolean
-  /** Percorso file di output (engine server/desktop). */
+  /** Output file path (server/desktop engine). */
   outputPath?: string
-  /** Blob di output (engine browser: l'anteprima non scrive su filesystem). */
+  /** Output blob (browser engine: the preview does not write to the filesystem). */
   outputBlob?: Blob
-  /** Object URL del blob di output (browser), pronto per <audio>/download. */
+  /** Object URL of the output blob (browser), ready for <audio>/download. */
   outputUrl?: string
   gainApplied: number // dB
-  finalLoudness: number // LUFS (o stima, per anteprime basate sul gain)
+  finalLoudness: number // LUFS (or estimate, for gain-based previews)
   processingTime: number // ms
   error?: string
 }

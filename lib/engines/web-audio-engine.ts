@@ -1,13 +1,13 @@
 /**
- * Engine Web Audio: anteprima di normalizzazione lato browser.
+ * Web Audio engine: browser-side normalization preview.
  *
- * Non dipende da ffmpeg. Decodifica l'audio con la Web Audio API, misura il
- * picco/RMS e applica un guadagno costante producendo un WAV (Blob). È
- * un'ANTEPRIMA approssimata: non misura la LUFS integrata reale né esegue
- * true-peak limiting, quindi la normalizzazione "loudness" definitiva resta
- * appannaggio degli engine WASM/nativo.
+ * It does not depend on ffmpeg. It decodes the audio with the Web Audio API, measures the
+ * peak/RMS and applies a constant gain producing a WAV (Blob). It is
+ * an approximate PREVIEW: it neither measures the real integrated LUFS nor performs
+ * true-peak limiting, so final "loudness" normalization remains
+ * the job of the WASM/native engines.
  *
- * Riusa le utility già esistenti in `@/lib/audio-preview`.
+ * It reuses the existing utilities in `@/lib/audio-preview`.
  */
 
 import type {
@@ -52,7 +52,7 @@ async function toFile(input: EngineInput): Promise<File> {
       type: 'application/octet-stream',
     })
   }
-  // 'path' non è supportato nel browser: gestito da assertAccepts a monte.
+  // 'path' is not supported in the browser: handled upstream by assertAccepts.
   throw new Error('Input non supportato dal WebAudioEngine')
 }
 
@@ -90,9 +90,9 @@ export class WebAudioEngine implements AudioEngine {
       channels: buffer.numberOfChannels,
       peakLevel,
       rmsLevel,
-      // La Web Audio API non fornisce una misura LUFS/true-peak reale.
+      // The Web Audio API does not provide a real LUFS/true-peak measurement.
       lufsIntegrated: NaN,
-      truePeak: peakLevel, // approssimazione: picco campionato
+      truePeak: peakLevel, // approximation: sampled peak
       hasClipping: peakLevel >= 0,
       format: file.name.includes('.')
         ? file.name.split('.').pop()!.toUpperCase()
@@ -107,7 +107,7 @@ export class WebAudioEngine implements AudioEngine {
     assertAccepts(this, input)
 
     if (options.method === 'loudness') {
-      // Senza misura LUFS reale non possiamo normalizzare in loudness.
+      // Without a real LUFS measurement we cannot normalize for loudness.
       throw new UnsupportedCapabilityError(
         this.name,
         'normalizzazione loudness (LUFS reale non misurabile lato browser)',
@@ -135,7 +135,7 @@ export class WebAudioEngine implements AudioEngine {
       outputBlob: blob,
       outputUrl,
       gainApplied: gain.gainDb,
-      finalLoudness: NaN, // anteprima peak-based: LUFS finale non misurata
+      finalLoudness: NaN, // peak-based preview: final LUFS not measured
       processingTime: Date.now() - start,
     }
   }

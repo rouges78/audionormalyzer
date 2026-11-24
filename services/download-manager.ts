@@ -613,7 +613,7 @@ export class DownloadManagerImpl implements DownloadManager {
    * Start cleanup scheduler for expired downloads
    */
   private startCleanupScheduler(): void {
-    // Run cleanup every hour (non registrato in test, non blocca l'uscita)
+    // Run cleanup every hour (not registered in tests, does not block exit)
     scheduleBackgroundCleanup(() => this.cleanupExpiredDownloads(), 60 * 60 * 1000)
   }
 

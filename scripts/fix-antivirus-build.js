@@ -21,7 +21,7 @@ function runCommand(command, description) {
 function forceDeleteDirectory(dirPath) {
   if (fs.existsSync(dirPath)) {
     try {
-      console.log(`🗑️ Eliminazione forzata: ${dirPath}`);
+      console.log(`🗑️ Forced deletion: ${dirPath}`);
       
       // Try multiple deletion strategies
       const strategies = [
@@ -35,7 +35,7 @@ function forceDeleteDirectory(dirPath) {
         try {
           strategy();
           if (!fs.existsSync(dirPath)) {
-            console.log(`✅ Directory eliminata con successo`);
+            console.log(`✅ Directory deleted successfully`);
             return true;
           }
         } catch (e) {
@@ -43,10 +43,10 @@ function forceDeleteDirectory(dirPath) {
         }
       }
       
-      console.log(`⚠️ Impossibile eliminare completamente ${dirPath}`);
+      console.log(`⚠️ Unable to fully delete ${dirPath}`);
       return false;
     } catch (error) {
-      console.log(`⚠️ Errore durante eliminazione: ${error.message}`);
+      console.log(`⚠️ Error during deletion: ${error.message}`);
       return false;
     }
   }
@@ -55,10 +55,10 @@ function forceDeleteDirectory(dirPath) {
 
 async function main() {
   try {
-    console.log('🔧 Risoluzione problema file bloccati dall\'antivirus...\n');
+    console.log('🔧 Fixing files locked by the antivirus...\n');
     
     // Step 1: Force close any processes that might lock files
-    console.log('🛑 Chiusura processi che potrebbero bloccare file...');
+    console.log('🛑 Closing processes that could lock files...');
     const processesToKill = ['electron', 'Audio Normalizer'];
     
     processesToKill.forEach(proc => {
@@ -70,46 +70,46 @@ async function main() {
     });
     
     // Step 2: Wait a moment for antivirus to release files
-    console.log('⏳ Attesa rilascio file da parte dell\'antivirus...');
+    console.log('⏳ Waiting for the antivirus to release files...');
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Step 3: Force delete existing dist directory
-    console.log('🗑️ Eliminazione forzata directory dist...');
+    console.log('🗑️ Forced deletion of the dist directory...');
     forceDeleteDirectory('dist');
     
     // Step 4: Clear npm cache
-    console.log('🧹 Pulizia cache npm...');
+    console.log('🧹 Cleaning npm cache...');
     try {
       execSync('npm cache clean --force', { stdio: 'inherit' });
     } catch (e) {
-      console.log('⚠️ Cache npm non pulita, continuando...');
+      console.log('⚠️ npm cache not cleaned, continuing...');
     }
     
     // Step 5: Wait again
-    console.log('⏳ Attesa finale prima del build...');
+    console.log('⏳ Final wait before the build...');
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Step 6: Build with specific flags to avoid locks
-    console.log('🔨 Avvio build con flags anti-lock...');
+    console.log('🔨 Starting build with anti-lock flags...');
     const buildCommand = 'npx electron-builder --win --x64 --publish=never --config.nsis.oneClick=false';
     
-    if (!runCommand(buildCommand, 'Building executable con flags anti-lock')) {
+    if (!runCommand(buildCommand, 'Building executable with anti-lock flags')) {
       // Try alternative build method
-      console.log('🔄 Tentativo con metodo alternativo...');
+      console.log('🔄 Trying an alternative method...');
       if (!runCommand('npx electron-builder --win portable', 'Building portable version')) {
-        throw new Error('Entrambi i metodi di build sono falliti');
+        throw new Error('Both build methods failed');
       }
     }
     
     // Step 7: Verify output
-    console.log('✅ Build completato! Verifica file...');
+    console.log('✅ Build completed! Checking files...');
     const exePath = 'dist/Audio Normalizer 0.1.0.exe';
     const unpackedPath = 'dist/win-unpacked/Audio Normalizer.exe';
     
     const checkFile = (filePath) => {
       if (fs.existsSync(filePath)) {
         const stats = fs.statSync(filePath);
-        console.log(`✅ File creato: ${filePath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
+        console.log(`✅ File created: ${filePath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
         return true;
       }
       return false;
@@ -119,30 +119,30 @@ async function main() {
     const hasUnpacked = checkFile(unpackedPath);
     
     if (!hasPortable && !hasUnpacked) {
-      throw new Error('Nessun file eseguibile creato');
+      throw new Error('No executable file created');
     }
     
-    console.log('\n🎉 SUCCESS! Audio Normalizer build completato!\n');
+    console.log('\n🎉 SUCCESS! Audio Normalizer build completed!\n');
     
-    console.log('📋 Suggerimenti per evitare problemi futuri:');
-    console.log('   1. Aggiungi la cartella del progetto alle esclusioni antivirus');
-    console.log('   2. Disabilita temporaneamente la protezione real-time durante build');
-    console.log('   3. Esegui sempre come Amministratore');
-    console.log('   4. Chiudi tutte le applicazioni non necessarie');
+    console.log('📋 Tips to avoid future problems:');
+    console.log('   1. Add the project folder to the antivirus exclusions');
+    console.log('   2. Temporarily disable real-time protection during the build');
+    console.log('   3. Always run as Administrator');
+    console.log('   4. Close all unnecessary applications');
     
     if (hasPortable) {
-      console.log(`\n🚀 Per testare: "${exePath}"`);
+      console.log(`\n🚀 To test: "${exePath}"`);
     }
     
   } catch (error) {
-    console.error('\n❌ Build fallito:', error.message);
-    console.error('\n🛡️ Soluzioni antivirus:');
-    console.error('   1. Disabilita Windows Defender real-time protection');
-    console.error('   2. Aggiungi questa cartella alle esclusioni:');
+    console.error('\n❌ Build failed:', error.message);
+    console.error('\n🛡️ Antivirus solutions:');
+    console.error('   1. Disable Windows Defender real-time protection');
+    console.error('   2. Add this folder to the exclusions:');
     console.error(`      ${process.cwd()}`);
-    console.error('   3. Esegui PowerShell come Amministratore');
-    console.error('   4. Prova: Set-MpPreference -DisableRealtimeMonitoring $true');
-    console.error('   5. Dopo build: Set-MpPreference -DisableRealtimeMonitoring $false');
+    console.error('   3. Run PowerShell as Administrator');
+    console.error('   4. Try: Set-MpPreference -DisableRealtimeMonitoring $true');
+    console.error('   5. After the build: Set-MpPreference -DisableRealtimeMonitoring $false');
     process.exit(1);
   }
 }

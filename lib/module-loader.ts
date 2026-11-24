@@ -1,5 +1,5 @@
 // Dynamic Module Loader System
-// Sistema per caricamento dinamico di moduli e plugin a runtime
+// System for dynamic loading of modules and plugins at runtime
 
 import { PluginMetadata, BasePlugin, pluginManager } from './plugin-system'
 

@@ -215,5 +215,5 @@ class DownloadStorageClass {
 
 export const DownloadStorage = new DownloadStorageClass()
 
-// Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
+// Automatic cleanup every hour (not registered in tests, does not block exit).
 scheduleBackgroundCleanup(() => DownloadStorage.cleanup(), 60 * 60 * 1000)

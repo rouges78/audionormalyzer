@@ -19,8 +19,8 @@ export interface ProcessingResult {
 }
 
 /**
- * Statistiche di riepilogo esposte dalla rotta GET /api/process/[id]
- * quando l'elaborazione è conclusa.
+ * Summary statistics exposed by the GET /api/process/[id] route
+ * when processing has finished.
  */
 export interface ProcessingSummary {
   totalSuccessful: number
@@ -41,18 +41,18 @@ export interface ProcessingData {
   successfulFiles: number
   failedFiles: number
   results: ProcessingResult[]
-  /** Timestamp in millisecondi (Date.now()), non un oggetto Date. */
+  /** Timestamp in milliseconds (Date.now()), not a Date object. */
   startTime: number
-  /** Timestamp in millisecondi (Date.now()), non un oggetto Date. */
+  /** Timestamp in milliseconds (Date.now()), not a Date object. */
   endTime?: number
   processingTime?: number
   error?: string
   outputDirectory?: string
-  /** Modalità album: le tracce sono normalizzate come un insieme unico. */
+  /** Album mode: the tracks are normalized as a single whole. */
   albumMode?: boolean
-  /** In modalità album, conserva le differenze dinamiche fra le tracce. */
+  /** In album mode, keeps the dynamic differences between tracks. */
   maintainRelativeLoudness?: boolean
-  /** 'preserve' oppure un formato di uscita specifico. */
+  /** 'preserve' or a specific output format. */
   outputFormat?: string
 }
 
@@ -87,9 +87,9 @@ class ProcessingStorageClass {
   }
 
   /**
-   * Scrive (o sovrascrive) l'intero record di un'elaborazione.
-   * Le rotte API mutano l'oggetto ottenuto da get() e lo risalvano qui:
-   * a differenza di update(), che fonde un Partial, set() rimpiazza tutto.
+   * Writes (or overwrites) the whole record of a processing job.
+   * The API routes mutate the object obtained from get() and save it again here:
+   * unlike update(), which merges a Partial, set() replaces everything.
    */
   set(id: string, data: ProcessingData): ProcessingData {
     this.storage.set(id, data)
@@ -151,12 +151,12 @@ class ProcessingStorageClass {
     return existing
   }
 
-  /** Esiste un record con questo id? */
+  /** Is there a record with this id? */
   has(id: string): boolean {
     return this.storage.has(id)
   }
 
-  /** Numero di elaborazioni attualmente in memoria. */
+  /** Number of processing jobs currently in memory. */
   size(): number {
     return this.storage.size
   }
@@ -171,9 +171,9 @@ class ProcessingStorageClass {
 
   // Cleanup old entries (older than 24 hours)
   /**
-   * Rimuove le elaborazioni più vecchie della finestra di ritenzione.
-   * @returns Numero di record rimossi (prima non restituiva nulla, quindi il
-   * chiamante non poteva né loggare né verificare l'effetto della pulizia).
+   * Removes processing jobs older than the retention window.
+   * @returns Number of records removed (it used to return nothing, so the
+   * caller could neither log nor verify the effect of the cleanup).
    */
   cleanup(): number {
     const cutoff = Date.now() - (24 * 60 * 60 * 1000) // 24 hours
@@ -203,7 +203,7 @@ class ProcessingStorageClass {
     totalFilesProcessed: number
     totalSuccessful: number
     totalFailed: number
-    /** Istante di avvio dell'elaborazione più vecchia ancora in memoria. */
+    /** Start time of the oldest processing job still in memory. */
     oldestProcessing: number | null
   } {
     const all = Array.from(this.storage.values())
@@ -237,5 +237,5 @@ class ProcessingStorageClass {
 
 export const ProcessingStorage = new ProcessingStorageClass()
 
-// Pulizia automatica ogni ora (non registrata in test, non blocca l'uscita).
+// Automatic cleanup every hour (not registered in tests, does not block exit).
 scheduleBackgroundCleanup(() => { ProcessingStorage.cleanup() }, 60 * 60 * 1000)

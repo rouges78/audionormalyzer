@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script per creare l'eseguibile senza icone personalizzate
+ * Script to create the executable without custom icons
  */
 
 const { execSync } = require('child_process');

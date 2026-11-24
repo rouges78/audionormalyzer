@@ -1,6 +1,6 @@
 /**
  * Audio Normalizer - Electron Builder Configuration
- * Configurazione completa per la distribuzione desktop
+ * Complete configuration for desktop distribution
  */
 
 const { version, description, author } = require('./package.json')
@@ -12,12 +12,12 @@ module.exports = {
   asar: true,
   compression: 'maximum',
 
-  // Fix per problemi di file locking su Windows
+  // Fix for file locking problems on Windows
   buildDependenciesFromSource: false,
   npmRebuild: false,
   nodeGypRebuild: false,
 
-  // Evita conflitti durante il build
+  // Avoid conflicts during the build
   removePackageScripts: true,
   removePackageKeywords: true,
 
@@ -62,7 +62,7 @@ module.exports = {
     requestedExecutionLevel: 'asInvoker',
     artifactName: '${productName}-${version}-${arch}.${ext}',
     publisherName: 'Audio Normalizer Team',
-    // Fix per problemi di build su Windows
+    // Fix for build problems on Windows
     verifyUpdateCodeSignature: false,
     signAndEditExecutable: false
   },

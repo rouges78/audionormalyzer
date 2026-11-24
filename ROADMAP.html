@@ -351,8 +351,8 @@
 <script>
 /* ============================================================
    AUDIO NORMALIZER — ROADMAP DATA
-   Ogni task: id, cat, phase, prio (hi|md|lo), isNew, def (default done),
-   title, desc, dep (dipendenze opzionali)
+   Each task: id, cat, phase, prio (hi|md|lo), isNew, def (default done),
+   title, desc, dep (optional dependencies)
    ============================================================ */
 const ROADMAP_VERSION = "3.2";
 const LAST_UPDATE = "2026-08-04";
@@ -390,7 +390,7 @@ const PHASES = {
 };
 
 const TASKS = [
-  // ---------- ARCHITETTURA ----------
+  // ---------- ARCHITECTURE ----------
   {id:"arch-01", cat:"arch", phase:0, prio:"lo", def:true,  title:"Scaffolding Next.js 15 + React 19 + TypeScript", desc:"App Router, tsconfig, struttura <code>app/</code> e <code>services/</code> operativa."},
   {id:"arch-02", cat:"arch", phase:0, prio:"lo", def:true,  title:"Layer di servizi separato dal routing API", desc:"Servizi in <code>services/</code> (audio-processor, album-processor, download-manager, file/metadata-manager, processing-queue)."},
   {id:"arch-03", cat:"arch", phase:0, prio:"lo", def:true,  title:"Wrapper desktop Electron", desc:"Integrazione Electron con preload e main process."},
@@ -422,7 +422,7 @@ const TASKS = [
   {id:"uxui-06", cat:"uxui", phase:2, prio:"lo", def:true, title:"Tema chiaro/scuro con next-themes", desc:"✅ Fatto (27/07): <code>ThemeProvider</code> montato in <code>app/layout.tsx</code> (attribute=class, defaultTheme=system) e nuovo <code>components/theme-toggle.tsx</code> in stile Soft UI. Entrambi i temi hanno una palette completa di token in <code>app/globals.css</code>."},
   {id:"uxui-07", cat:"uxui", phase:4, prio:"lo", def:false, title:"Editor preset personalizzati salvabili", desc:"L'utente crea e riusa i propri profili di normalizzazione.", isNew:true},
 
-  // ---------- ACCESSIBILITÀ ----------
+  // ---------- ACCESSIBILITY ----------
   {id:"a11y-01", cat:"a11y", phase:2, prio:"md", def:false, title:"Navigazione da tastiera completa", desc:"Focus visibile, ordine logico, tutte le azioni raggiungibili senza mouse."},
   {id:"a11y-02", cat:"a11y", phase:2, prio:"md", def:false, title:"Etichette ARIA e ruoli su controlli e visualizzazioni", desc:"Slider, dropzone e grafici annunciati correttamente dagli screen reader."},
   {id:"a11y-03", cat:"a11y", phase:2, prio:"md", def:false, title:"Contrasto colori WCAG 2.1 AA", desc:"Verificare rapporti di contrasto testo/sfondo e stati."},
@@ -434,7 +434,7 @@ const TASKS = [
   {id:"resp-02", cat:"resp", phase:2, prio:"lo", def:false, title:"Visualizzazioni audio adattive", desc:"Waveform/spettrogramma ridimensionabili senza perdita di leggibilità."},
   {id:"resp-03", cat:"resp", phase:2, prio:"lo", def:false, title:"Target touch ≥ 44px", desc:"Aree di tocco adeguate su mobile.", isNew:true},
 
-  // ---------- PRESTAZIONI ----------
+  // ---------- PERFORMANCE ----------
   {id:"perf-01", cat:"perf", phase:0, prio:"lo", def:false,  title:"Elaborazione concorrente multi-file", desc:"⚠️ <b>Riaperto il 01/08: era segnato fatto ma non lo è.</b> <code>ProcessingQueue.addTask()</code> è uno stub che esegue il task subito (<i>\"Per ora esegue direttamente il task\"</i>), quindi <code>maxConcurrentJobs</code> non viene mai applicato e <code>processAlbum</code> elabora le tracce in un ciclo sequenziale. Emerso perché due test che verificavano il limite di concorrenza non potevano passare (ora saltati, vedi perf-08).<br><br><b>Riverificato il 04/08, invariato:</b> <code>services/processing-queue.ts:392-395</code>, <code>taskId</code> ignorato e <code>maxConcurrentJobs</code> mai consultato su questo percorso (è usato solo da <code>processNextJob()</code>, riga 182, che è un'altra strada). <code>addTask()</code> <b>non è chiamato da alcun file di produzione</b>, solo dai test: prima di implementarlo conviene decidere se serve davvero o se il limite va messo in <code>processAlbum</code>."},
   {id:"perf-08", cat:"perf", phase:2, prio:"md", def:false, title:"Concorrenza limitata nel pipeline dell'album", desc:"Far passare davvero il processing dell'album per la coda, rispettando <code>maxConcurrentJobs</code>. Sbloccando questo si riattivano due test già scritti e attualmente saltati: <i>should respect concurrent processing limits</i> (large-album-performance) e <i>should limit concurrent processing to prevent overload</i> (performance).", isNew:true, dep:["perf-01"]},
   {id:"perf-09", cat:"perf", phase:2, prio:"md", def:false, title:"Retry delle tracce fallite", desc:"Non esiste alcuna logica di ritentativo in <code>album-processor.ts</code> né in <code>audio-processor.ts</code>: un errore transitorio affonda definitivamente la traccia. Test già scritto e saltato: <i>should recover from temporary processing errors</i>.", isNew:true},
@@ -445,7 +445,7 @@ const TASKS = [
   {id:"perf-05", cat:"perf", phase:4, prio:"lo", def:false, title:"Accelerazione GPU / WebGPU per visualizzazioni", desc:"<code>lib/gpu-renderer.ts</code> presente: valutare rendering GPU dello spettrogramma.", isNew:true},
   {id:"perf-06", cat:"perf", phase:2, prio:"lo", def:false, title:"Budget di performance e misura (Lighthouse/Web Vitals)", desc:"Definire soglie e monitorarle in CI.", isNew:true},
 
-  // ---------- SICUREZZA ----------
+  // ---------- SECURITY ----------
   {id:"sec-01", cat:"sec", phase:1, prio:"hi", def:false, title:"Validazione robusta dei file caricati", desc:"<b>Misurato il 04/08.</b> La validazione esiste ed è doppia (rotta + servizio), ma è tutta <b>fondata su ciò che dichiara il client</b>.<br><br><code>app/api/upload/route.ts:35-56</code>: 500 MB per file, 2 GB totali, estensione ricavata da <code>file.name.split(.).pop()</code> contro una whitelist di 6 formati.<br><code>services/file-manager.ts:125-200</code> ripete il controllo e aggiunge il MIME type — ma alla riga 183 la guardia è <code>if (file.type &amp;&amp; ...)</code>, quindi <b>MIME vuoto significa nessuna verifica</b>.<br><br>🔴 <b>Nessuna lettura dei magic bytes.</b> Un eseguibile rinominato <code>.mp3</code> passa entrambi i livelli e finisce su disco, per poi essere dato in pasto a ffmpeg. È esattamente il buco che questo task descriveva, e dopo core-04 pesa di più: prima il file arrivava a un parser che non partiva, ora a un processo che parte davvero."},
   {id:"sec-02", cat:"sec", phase:1, prio:"hi", def:false, title:"Sanificazione nomi file e prevenzione path traversal", desc:"<b>Verificato il 04/08: in scrittura è meglio del previsto, con due punti scoperti.</b><br><br>✅ <b>Il percorso di scrittura è sano</b>, e non per caso: <code>services/file-manager.ts:82-85</code> nomina il file su disco con <code>randomUUID()</code> più estensione. <b>Il nome scelto dall'utente non tocca mai il filesystem.</b> Anche <code>getTempFileInfo()</code> (righe 349-373) cerca per prefisso su <code>readdir</code> invece di concatenare l'input al path: immune per costruzione.<br><br>🟡 <code>sanitizeFileName()</code> (righe 432-439) sostituisce i caratteri vietati di Windows ma <b>non filtra <code>..</code></b>. Oggi è innocuo perché al risultato viene appeso un timestamp — protezione accidentale, non voluta.<br><br>🟡 <code>app/api/download/[downloadId]/route.ts:47-48</code> passa <code>downloadId</code>, che arriva dall'URL, dentro <code>path.join</code> <b>senza validarlo come UUID</b>. Regge solo perché <code>getDownloadInfo()</code> deve prima trovare un record: la difesa è a valle, non nel path.<br><br>🟡 <code>GET /api/upload/[fileId]</code> accetta prefissi parziali (<code>startsWith</code>) e <b>restituisce il path assoluto sul server</b>: enumerabile, e informativo di troppo."},
   {id:"sec-03", cat:"sec", phase:3, prio:"hi", def:false, title:"Hardening Electron (contextIsolation, no nodeIntegration)", desc:"<b>Verificato il 04/08.</b> Le tre impostazioni di base sono corrette — <code>electron/main.js:94-98</code>: <code>nodeIntegration: false</code>, <code>contextIsolation: true</code>, <code>webSecurity: true</code>. <code>sandbox</code> non è dichiarato (default true dalle v20, ma implicito).<br><br>🔴 <b>Il difetto vero non è di sicurezza, è di funzionamento:</b> <code>preload</code> <b>non è configurato</b> nel <code>webPreferences</code> dell'unica <code>BrowserWindow</code>. <code>electron/preload.js</code> esiste, espone <code>electronAPI</code> via <code>contextBridge</code> — e non lo carica nessuno. Quindi tutti gli <code>ipcMain.handle</code> del main (<code>analyze-audio-visual</code> e gli altri) sono <b>irraggiungibili dal renderer</b>.<br><br>Il codice è scritto come se il ponte ci fosse. O lo si aggancia, o si ammette che il desktop è solo un browser attorno alla web app e si cancella il preload. Meglio deciderlo prima di dist-02.<br><br>Nota minore: <code>preload.js:31-34</code> fa <code>delete window.require</code>, ridondante con contextIsolation e comunque inefficace se il preload non gira. Manca ancora una CSP."},
@@ -453,13 +453,13 @@ const TASKS = [
   {id:"sec-05", cat:"sec", phase:2, prio:"md", def:true, title:"Audit dipendenze (npm audit) in CI", desc:"<b>Prima misura eseguita il 03/08</b>, resa possibile da maint-08/09: <code>npm audit</code> riportava <b>33 vulnerabilità</b> (5 critical, 23 high, 4 moderate, 1 low). Ma il totale diceva poco, la ripartizione molto.<br><br>🔴 <b>Una sola toccava la superficie d'attacco reale:</b> <code>music-metadata</code> (high, ciclo infinito nel parser ASF) — è il codice che legge i file caricati dall'utente, in <code>audio-processor.ts:109</code> e <code>metadata-manager.ts</code>. Un file malformato poteva piantare il processo. <b>Chiusa</b> aggiornando a 11.14.0.<br><br>🟡 <code>next</code> era critical per <i>Cache Key Confusion</i> sull'Image Optimization API, ma il progetto <b>non usa <code>next/image</code></b> (verificato: zero import), quindi l'esposizione pratica era nulla. Aggiornato comunque a 15.5.22 — minor, non breaking.<br><br>🟢 <code>vitest</code>/<code>@vitest/ui</code> erano critical solo con la UI server in ascolto, cioè <code>npm run test:ui</code>. Chiuse con 3.2.7, restando dentro la major.<br><br><b>Esito: da 33 a 13, e da 5 critical a 1.</b> Le 13 rimaste sono tutte build-time e concentrate in due alberi: <code>electron</code>/<code>electron-builder</code> (9 voci, inclusa l'unica critical rimasta, <code>tar</code>) e <code>postcss</code>/<code>sharp</code> ereditate da Next. Nessuna finisce nel bundle server o nell'eseguibile. Richiedono major → vedi maint-10.<br><br>✅ <b>Agganciato alla CI il 03/08</b> con test-10: <code>npm audit</code> gira su ogni push e PR e scrive il report nel riepilogo della run, <b>senza bloccare</b>. La soglia bloccante ha senso solo dopo maint-10: finché le residue sono tutte transitive di build, un gate rosso permanente verrebbe solo ignorato.", isNew:true},
   {id:"sec-06", cat:"sec", phase:3, prio:"md", def:false, title:"Firma del codice dell'eseguibile Windows", desc:"Evita blocchi antivirus/SmartScreen (vedi ANTIVIRUS-PROBLEM-SOLVED.md).", isNew:true},
 
-  // ---------- GESTIONE ERRORI ----------
+  // ---------- ERROR HANDLING ----------
   {id:"err-01", cat:"err", phase:0, prio:"lo", def:true,  title:"Error boundary e componenti di display errore", desc:"<code>error-boundary.tsx</code>, <code>error-display.tsx</code>, <code>server-error-handler.ts</code> presenti."},
   {id:"err-02", cat:"err", phase:1, prio:"md", def:false, title:"Gestione errori FFmpeg con messaggi azionabili", desc:"Tradurre errori di codifica in messaggi comprensibili + retry."},
   {id:"err-03", cat:"err", phase:2, prio:"md", def:false, title:"Recupero da fallimento parziale del batch", desc:"Se una traccia fallisce, le altre proseguono; report finale con esiti."},
   {id:"err-04", cat:"err", phase:2, prio:"lo", def:false, title:"Logging strutturato lato server/desktop", desc:"Log con livelli e rotazione (cartella <code>logs/</code> già presente).", isNew:true},
 
-  // ---------- QUALITÀ CODICE ----------
+  // ---------- CODE QUALITY ----------
   {id:"qual-01", cat:"quality", phase:0, prio:"md", def:false, title:"Eliminare i 16 README di troubleshooting alla radice", desc:"Censiti il 27/07: sono <b>esattamente 16</b> file da eliminare (ANTIVIRUS-PROBLEM-SOLVED, BUGFIX-TEMPLATE-LITERALS, CLEAN-DESIGN, DEMO-ADVANCED-EDITION, DESKTOP-APP-FINAL, ENOENT-FIX-SUMMARY, EXECUTABLE-FIXED-SUMMARY, EXECUTABLE, FINAL-FIXED, FINAL-SELFCONTAINED-SOLUTION, FIXED-VERSION, PROFESSIONAL-VISUALIZATIONS, REAL-AUDIO-PROCESSING, STANDALONE, TRACK-STATS, TRON-EDITION). Da tenere solo <code>README.md</code>, <code>CLAUDE.md</code> e <code>ROADMAP.html</code>: la documentazione buona è già in <code>docs/</code>. Diversi citano percorsi ormai <b>errati</b> (es. <code>electron/main-standalone.js</code>, spostato in legacy da arch-04).<br><br><b>Ricontato il 04/08: sempre 16</b>, nessuno aggiunto né tolto in una settimana. Il censimento regge."},
   {id:"qual-02", cat:"quality", phase:0, prio:"md", def:false, title:"Ridurre gli script di build legacy", desc:"Censimento 27/07. In <code>scripts/</code>: 22 file, di cui <b>5 orfani</b> (simple-build, fix-and-rebuild, test-executable-issues, fix-antivirus-build, build-antivirus-fix.ps1). Alla radice: <b>13 .bat, di cui 10 orfani</b>. Cinque npm script sono morti perché puntano a <code>electron/legacy/main-*.js</code> (build:minimal, build:full-ui, build:no-icon, build:real-audio, build:standalone). <code>scripts/fix-build.js:242</code> richiama <code>scripts/build-relaxed.js</code>, che <b>non esiste</b>.<br><br><b>Ricontato il 04/08:</b> alla radice <b>13 <code>.bat</code></b>, di cui <b>11 varianti di build/fix dell'eseguibile</b> sostanzialmente ridondanti (6 <code>build-*</code> più <code>create-exe-simple</code>, <code>emergency-exe-build</code>, <code>fix-exe-build</code>, <code>test-exe-build</code>, <code>diagnose-exe-problem</code>). Invariato rispetto al 27/07."},
   {id:"qual-08", cat:"quality", phase:0, prio:"md", def:false, title:"Unificare le 3 configurazioni electron-builder", desc:"Coesistono tre set di regole divergenti: il campo <code>build</code> in package.json (usato da electron:pack/dist, build:exe:quick, build:simple), <code>electron-builder.config.js</code> (solo build:exe:safe e fix-exe-build.bat) e <code>electron-builder-minimal.config.js</code> (solo create-exe-simple.bat e fix-file-locking.bat). Con tre liste <code>files:</code> diverse le build non sono riproducibili — probabile concausa dei problemi di dist-02/dist-07.", isNew:true},
@@ -477,20 +477,20 @@ const TASKS = [
   {id:"test-05", cat:"test", phase:3, prio:"md", def:false, title:"Test di avvio dell'eseguibile desktop", desc:"Smoke test post-build che l'exe portable si avvia e processa un file."},
   {id:"test-06", cat:"test", phase:2, prio:"lo", def:false, title:"Checklist di test manuale documentata", desc:"Scenari manuali per formati/edge case difficili da automatizzare.", isNew:true},
 
-  // ---------- COMPATIBILITÀ ----------
+  // ---------- COMPATIBILITY ----------
   {id:"compat-01", cat:"compat", phase:1, prio:"md", def:false, title:"Matrice formati supportati verificata", desc:"MP3, WAV, FLAC, AAC, M4A, OGG in ingresso/uscita testati realmente."},
   {id:"compat-02", cat:"compat", phase:3, prio:"md", def:false, title:"Compatibilità Windows / macOS / Linux (desktop)", desc:"Target build multipiattaforma o dichiarazione esplicita del supporto."},
   {id:"compat-03", cat:"compat", phase:2, prio:"lo", def:false, title:"Compatibilità browser (Chromium/Firefox/Safari)", desc:"Verifica WASM/AudioContext sui principali browser."},
   {id:"compat-04", cat:"compat", phase:2, prio:"lo", def:false, title:"Fallback anteprima per formati non decodificabili dal browser", desc:"L'anteprima A/B usa <code>decodeAudioData</code>: alcuni FLAC/formati potrebbero non decodificare. Prevedere fallback (motore server) o messaggio chiaro.", isNew:true, dep:["core-05"]},
 
-  // ---------- DOCUMENTAZIONE ----------
+  // ---------- DOCUMENTATION ----------
   {id:"docs-01", cat:"docs", phase:0, prio:"lo", def:true,  title:"README principale con feature e quick start", desc:"Presente e completo."},
   {id:"docs-02", cat:"docs", phase:2, prio:"md", def:false, title:"Guida utente finale (non tecnica)", desc:"Come normalizzare, scegliere target, batch, formati."},
   {id:"docs-03", cat:"docs", phase:2, prio:"md", def:false, title:"Documentazione API interna e servizi", desc:"Contratti endpoint e responsabilità dei servizi."},
   {id:"docs-04", cat:"docs", phase:0, prio:"lo", def:true,  title:"Convenzioni per agenti AI (CLAUDE.md)", desc:"Presente con build/test/note."},
   {id:"docs-05", cat:"docs", phase:3, prio:"lo", def:false, title:"CHANGELOG e note di versione", desc:"Storico rilasci strutturato (SemVer).", isNew:true},
 
-  // ---------- DISTRIBUZIONE ----------
+  // ---------- DISTRIBUTION ----------
   {id:"dist-01", cat:"dist", phase:0, prio:"lo", def:true,  title:"Supporto Docker (dev/prod)", desc:"Dockerfile, docker-compose e script <code>docker:*</code> presenti."},
   {id:"dist-02", cat:"dist", phase:3, prio:"hi", def:false, title:"Build desktop portable Windows affidabile", desc:"<code>build:exe:quick</code> stabile e riproducibile; ridurre le varianti di emergenza."},
   {id:"dist-03", cat:"dist", phase:3, prio:"md", def:false, title:"Installer con auto-update", desc:"NSIS/Squirrel + canale di aggiornamento (electron-updater).", isNew:true},
@@ -499,7 +499,7 @@ const TASKS = [
   {id:"dist-06", cat:"dist", phase:3, prio:"md", def:true, title:"Correggere l'ordine argomenti degli script build:exe", desc:"✅ Fatto (15/07): <code>electron-builder --win --x64 portable</code> dava 'Unknown argument: portable'. Corretto in <code>--win portable --x64</code> in build:exe:quick/safe/force.", isNew:true},
   {id:"dist-07", cat:"dist", phase:3, prio:"md", def:false, title:"Sbloccare l'estrazione winCodeSign per il portable single-file", desc:"La build produce <code>dist\\win-unpacked\\</code> (app funzionante), ma il <code>.exe</code> portable fallisce perché 7-Zip non crea i symlink macOS dentro winCodeSign senza privilegio. Fix: Modalità sviluppatore Windows o esecuzione come amministratore.", isNew:true, dep:["dist-06"]},
 
-  // ---------- BACKUP / RECUPERO ----------
+  // ---------- BACKUP / RECOVERY ----------
   {id:"backup-01", cat:"backup", phase:2, prio:"md", def:false, title:"Ripresa job dopo crash / riavvio", desc:"Persistere stato coda per recuperare batch interrotti (<code>processing-storage.ts</code> presente)."},
   {id:"backup-02", cat:"backup", phase:2, prio:"lo", def:false, title:"Non sovrascrivere gli originali", desc:"Output separato e conferma prima di sostituire file sorgente.", isNew:true},
   {id:"backup-03", cat:"backup", phase:4, prio:"lo", def:false, title:"Cronologia elaborazioni esportabile", desc:"Registro dei job con parametri, ripetibile/esportabile.", isNew:true},
@@ -509,7 +509,7 @@ const TASKS = [
   {id:"priv-02", cat:"privacy", phase:2, prio:"lo", def:false, title:"Nessuna telemetria non consensuale", desc:"Eventuale analytics opt-in e trasparente."},
   {id:"priv-03", cat:"privacy", phase:2, prio:"lo", def:false, title:"Cancellazione garantita dei temporanei", desc:"I file caricati vengono rimossi dopo l'elaborazione.", isNew:true},
 
-  // ---------- MANUTENZIONE ----------
+  // ---------- MAINTENANCE ----------
   {id:"maint-01", cat:"maint", phase:2, prio:"md", def:false, title:"Aggiornamento dipendenze pianificato", desc:"Dependabot/renovate + verifica breaking. <b>Primo giro fatto a mano il 03/08</b> (vedi sec-05): aggiornati <code>music-metadata</code> 11.14.0, <code>next</code> 15.5.22, <code>vitest</code>/<code>@vitest/ui</code> 3.2.7, tutti dentro la major, con build, tsc e 329 test verdi a valle.<br><br><b>Nota da sistemare al prossimo giro:</b> <code>eslint-config-next</code> è pinnato a 15.2.4 mentre <code>next</code> è a ^15.5.22. Non dà problemi, ma è stato lasciato indietro <b>di proposito</b>: allinearlo può cambiare le regole attive e quindi il conteggio di qual-13, e per ora quel 406 serve come riferimento stabile. Da riallineare quando il debito di lint verrà affrontato davvero."},
   {id:"maint-02", cat:"maint", phase:0, prio:"md", def:true, title:"Rimuovere artefatti dal repo (.next, dist, temp, logs)", desc:"✅ <b>Verificato il 04/08 su git, non a occhio.</b> <code>git ls-files</code> su <code>.next</code>, <code>dist</code>, <code>temp</code>, <code>logs</code>, <code>_backup</code>, <code>build</code> e <code>node_modules</code> restituisce <b>zero file tracciati</b> per ciascuno; <code>git status</code> è pulito, nessun untracked sfuggito. L'unico file tracciato sotto <code>output/</code> è il <code>.gitkeep</code>, voluto.<br><br>Su disco quegli artefatti pesano parecchio (<code>temp/</code> da sola ~1,6 GB, <code>dist/</code> ~311 MB, <code>.next/</code> ~158 MB) ma restano <b>fuori dal repo</b>: è igiene locale, non debito Git. <code>npm run clean:temp</code> esiste apposta.<br><br>Difetto minore rimasto: <code>.gitignore</code> ignora <code>temp/</code> solo per sottopercorsi (<code>temp/audio/*</code>, <code>temp/test-*/</code>) e <code>logs/</code> solo per <code>*.log</code>. Basta un artefatto con un nome diverso per rientrare nel radar."},
   {id:"maint-03", cat:"maint", phase:2, prio:"lo", def:false, title:"Script di diagnosi manutenuto", desc:"<code>npm run diagnose</code> aggiornato agli errori reali ricorrenti."},
@@ -538,22 +538,22 @@ const TASKS = [
   {id:"test-09", cat:"test", phase:1, prio:"md", def:false, title:"Non misurare i test sulla cartella montata", desc:"Promemoria operativo emerso il 01/08. Il filesystem FUSE su cui è montata la cartella di lavoro <b>non permette <code>unlink()</code></b>: qualunque test che cancelli file temporanei in <code>afterEach</code> fallisce con EPERM per motivi d'ambiente, gonfiando il conteggio dei rossi (71 riportati contro 62 reali). Le misure vanno fatte su disco locale — sulla macchina di Davide, oppure copiando l'albero in una cartella non montata. Vale anche per test-08.", isNew:true},
   {id:"test-08", cat:"test", phase:1, prio:"lo", def:false, title:"Verificare in locale che npm test termini", desc:"<b>Segnalazione ridimensionata il 31/07.</b> Era stato riportato che <code>vitest run</code> non terminava mai. <b>Falso allarme</b>: la misura era viziata dall'ambiente di sviluppo remoto, che congela i processi lanciati in background — i worker restavano vivi ma non avanzavano. Eseguiti in primo piano, tutti e tre i gruppi arrivano in fondo puliti: servizi 31 s, integrazione 16 s, API 31 s. Resta da confermare <b>sulla macchina di Davide</b> che anche la run completa senza filtri esca da sola, perché nell'ambiente remoto non è verificabile in un colpo solo. Nel frattempo sono stati comunque sanati 5 <code>setInterval</code> registrati all'import e mai fermati (vedi <code>lib/background-cleanup.ts</code>): non erano la causa del falso blocco, ma potevano ritardare l'uscita di Node in produzione.", isNew:true},
 
-  // ---------- SCALABILITÀ ----------
+  // ---------- SCALABILITY ----------
   {id:"scale-01", cat:"scale", phase:4, prio:"lo", def:false, title:"Elaborazione di code lunghe / cartelle intere", desc:"Gestire centinaia di file senza esaurire memoria."},
   {id:"scale-02", cat:"scale", phase:4, prio:"lo", def:false, title:"Modalità server multi-utente (opzionale)", desc:"Isolamento job per utente e limiti risorse, se si offre come servizio web.", isNew:true},
   {id:"scale-03", cat:"scale", phase:4, prio:"lo", def:false, title:"Elaborazione via CLI / batch headless", desc:"Interfaccia a riga di comando per automazioni.", isNew:true},
 
-  // ---------- RISCHI ----------
+  // ---------- RISKS ----------
   {id:"risk-01", cat:"risk", phase:1, prio:"hi", def:true, title:"Rischio: analisi audio non realistica", desc:"✅ <b>Rientrato il 03/08</b> con core-03 e core-04: dove c'è ffmpeg la misura è vera, e <code>source: measured</code> lo dichiara invece di lasciarlo intuire.<br><br><b>Non azzerato, però.</b> Resta il ripiego a stima quando ffmpeg manca (voluto: è ciò che tiene in piedi l'app altrove), e soprattutto <code>/api/analyze</code> non passa ancora dall'engine — vedi arch-09, trovato il 04/08. Il rischio scende da strutturale a residuo, non a zero.", dep:["core-03","arch-09"]},
   {id:"risk-02", cat:"risk", phase:1, prio:"hi", def:true, title:"Rischio: dipendenza da CDN per FFmpeg", desc:"✅ <b>Eliminato il 03/08 con core-05</b>, e non nel modo previsto: la chiamata a unpkg non è stata sostituita da un bundle locale, è stata <b>rimossa</b>, perché scaricava ~30 MB per un modulo che sotto Node non poteva partire comunque.<br><br>Nessuna dipendenza di rete resta nel percorso di elaborazione. Il rischio residuo si è spostato: ora ffmpeg dev'essere <i>presente</i> sulla macchina — vedi dist-02 e la decisione ancora aperta su <code>ffmpeg-static</code>.", dep:["core-05"]},
   {id:"risk-03", cat:"risk", phase:3, prio:"md", def:false, title:"Rischio: falsi positivi antivirus sull'exe", desc:"Storico di problemi (vari .md). Mitigazione: firma del codice (sec-06).", dep:["sec-06"]},
   {id:"risk-04", cat:"risk", phase:2, prio:"md", def:false, title:"Rischio: debito tecnico da proliferazione file", desc:"Molti main/script/README duplicati aumentano confusione. Mitigazione: qual-01/02, arch-04."},
 
-  // ---------- FEEDBACK UTENTI ----------
+  // ---------- USER FEEDBACK ----------
   {id:"fb-01", cat:"feedback", phase:4, prio:"lo", def:false, title:"Canale di feedback in-app", desc:"Pulsante per segnalare problemi/idee.", isNew:true},
   {id:"fb-02", cat:"feedback", phase:4, prio:"lo", def:false, title:"Test di usabilità con utenti reali", desc:"Sessioni osservate sul workflow di normalizzazione."},
 
-  // ---------- FUNZIONALITÀ FUTURE ----------
+  // ---------- FUTURE FEATURES ----------
   {id:"fut-01", cat:"future", phase:4, prio:"lo", def:false, title:"Preset piattaforme streaming aggiornati", desc:"Loudness target per Spotify/YT/Apple/Broadcast sempre allineati.", isNew:true},
   {id:"fut-02", cat:"future", phase:4, prio:"lo", def:false, title:"Analisi loudness in tempo reale durante la riproduzione", desc:"Metro LUFS live nel player.", isNew:true},
   {id:"fut-03", cat:"future", phase:4, prio:"lo", def:false, title:"Rimozione rumore / normalizzazione dialoghi (AI)", desc:"Modelli di denoise/dialog leveling. Beneficio alto, complessità alta.", isNew:true},
@@ -561,7 +561,7 @@ const TASKS = [
   {id:"fut-05", cat:"future", phase:4, prio:"lo", def:false, title:"Internazionalizzazione (i18n) IT/EN", desc:"Interfaccia multilingua.", isNew:true},
   {id:"fut-06", cat:"future", phase:4, prio:"lo", def:false, title:"Sistema di plugin per effetti utente", desc:"<code>lib/plugin-system.ts</code> e <code>plugin-manager.tsx</code> presenti: aprire un'API plugin documentata.", isNew:true},
 
-  // ---------- APP ANDROID / MOBILE ----------
+  // ---------- ANDROID / MOBILE APP ----------
   {id:"mob-01", cat:"mobile", phase:4, prio:"md", def:false, title:"Validare la domanda con una PWA installabile", desc:"Trasformare l'app web in PWA (manifest + service worker) per testare l'interesse a costo quasi nullo prima di investire su nativo.", isNew:true},
   {id:"mob-02", cat:"mobile", phase:4, prio:"md", def:false, title:"Scegliere lo stack mobile (Kotlin vs Capacitor vs React Native)", desc:"Decisione architetturale: nativo per prestazioni audio, o wrapper per riuso del codice web.", isNew:true, dep:["mob-01"]},
   {id:"mob-03", cat:"mobile", phase:4, prio:"md", def:false, title:"Motore audio on-device (ffmpeg-kit)", desc:"Integrare un FFmpeg mobile per analisi LUFS/peak e normalizzazione locale, con attenzione a batteria e RAM.", isNew:true, dep:["mob-02","core-04"]},
@@ -570,7 +570,7 @@ const TASKS = [
   {id:"mob-06", cat:"mobile", phase:4, prio:"lo", def:false, title:"Pubblicazione Google Play + ASO", desc:"Play Console, scheda ottimizzata (keyword 'normalizza volume MP3'), screenshot, privacy policy. L'ASO decide il 90% dei ricavi.", isNew:true, dep:["mob-05"]}
 ];
 
-// Criteri di fattibilità (0-100)
+// Feasibility criteria (0-100)
 const FEAS_CRITERIA = [
   {label:"Complessità tecnica", val:70, note:"gestibile, dominio noto"},
   {label:"Tempo necessario", val:75, note:"basi già pronte"},

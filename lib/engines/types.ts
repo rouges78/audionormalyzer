@@ -1,14 +1,14 @@
 /**
- * Astrazione "engine" pluggabile per il processing audio.
+ * Pluggable "engine" abstraction for audio processing.
  *
- * Separa la logica di elaborazione dal resto dell'app dietro un contratto
- * comune (`AudioEngine`), così da poter scegliere a runtime tra:
- *   - WASM (`@ffmpeg/ffmpeg`)   → browser e server, portabile
- *   - nativo (ffmpeg su PATH)   → solo server/desktop, veloce e completo
- *   - Web Audio                 → solo browser, anteprima basata sul gain
+ * Separates the processing logic from the rest of the app behind a common
+ * contract (`AudioEngine`), so we can choose at runtime between:
+ *   - WASM (`@ffmpeg/ffmpeg`)   → browser and server, portable
+ *   - native (ffmpeg on PATH)   → server/desktop only, fast and complete
+ *   - Web Audio                 → browser only, gain-based preview
  *
- * I tipi di dominio (AudioAnalysis / NormalizationOptions / NormalizationResult)
- * restano la fonte unica in `@/types/audio`: ogni engine li implementa.
+ * The domain types (AudioAnalysis / NormalizationOptions / NormalizationResult)
+ * remain the single source in `@/types/audio`: every engine implements them.
  */
 
 import type {
@@ -17,15 +17,15 @@ import type {
   NormalizationResult,
 } from '@/types/audio'
 
-/** Runtime/tecnologia con cui un engine esegue il processing. */
+/** Runtime/technology an engine uses to run processing. */
 export type EngineKind = 'wasm' | 'native' | 'web-audio'
 
 /**
- * Sorgente audio astratta, indipendente dall'ambiente:
- *  - `path`   → percorso su filesystem (server/desktop)
- *  - `file`   → oggetto `File` del browser
- *  - `buffer` → dati grezzi in memoria (browser o server)
- * Ogni engine dichiara in `capabilities.accepts` quali forme accetta.
+ * Abstract audio source, independent of the environment:
+ *  - `path`   → filesystem path (server/desktop)
+ *  - `file`   → browser `File` object
+ *  - `buffer` → raw in-memory data (browser or server)
+ * Each engine declares in `capabilities.accepts` which forms it accepts.
  */
 export type EngineInput =
   | { kind: 'path'; path: string }
@@ -34,51 +34,51 @@ export type EngineInput =
 
 export type EngineInputKind = EngineInput['kind']
 
-/** Descrive cosa un engine sa (e non sa) fare: usato per selezione e UI. */
+/** Describes what an engine can (and cannot) do: used for selection and UI. */
 export interface EngineCapabilities {
-  /** Ambienti in cui l'engine è utilizzabile. */
+  /** Environments where the engine can be used. */
   runtime: 'browser' | 'server' | 'both'
-  /** Misura la LUFS integrata reale (EBU R128). */
+  /** Measures the real integrated LUFS (EBU R128). */
   measuresLufs: boolean
-  /** Misura il Loudness Range reale (EBU R128 LRA). */
+  /** Measures the real Loudness Range (EBU R128 LRA). */
   measuresLoudnessRange: boolean
-  /** Applica true-peak limiting reale in fase di normalizzazione. */
+  /** Applies real true-peak limiting during normalization. */
   truePeakLimiting: boolean
   /**
-   * L'output è solo un'anteprima approssimata (guadagno costante), non una
-   * normalizzazione definitiva conforme allo standard.
+   * The output is only an approximate preview (constant gain), not a
+   * final standard-compliant normalization.
    */
   previewOnly: boolean
-  /** Forme di `EngineInput` accettate da questo engine. */
+  /** `EngineInput` forms accepted by this engine. */
   accepts: EngineInputKind[]
 }
 
 /**
- * Contratto comune a tutti gli engine di processing audio.
- * Un'implementazione DEVE essere sicura da istanziare anche quando non è
- * utilizzabile nel runtime corrente: la disponibilità va verificata con
- * `isAvailable()` prima dell'uso.
+ * Contract common to all audio processing engines.
+ * An implementation MUST be safe to instantiate even when it is not
+ * usable in the current runtime: availability must be checked with
+ * `isAvailable()` before use.
  */
 export interface AudioEngine {
-  /** Nome leggibile, es. "ffmpeg-wasm". */
+  /** Human-readable name, e.g. "ffmpeg-wasm". */
   readonly name: string
   readonly kind: EngineKind
   readonly capabilities: EngineCapabilities
 
-  /** Verifica se l'engine è utilizzabile nel runtime corrente. */
+  /** Checks whether the engine is usable in the current runtime. */
   isAvailable(): boolean | Promise<boolean>
 
-  /** Analizza l'audio ed estrae i metadati/misure disponibili. */
+  /** Analyzes the audio and extracts the available metadata/measurements. */
   analyze(input: EngineInput): Promise<AudioAnalysis>
 
-  /** Normalizza l'audio secondo le opzioni e restituisce l'esito. */
+  /** Normalizes the audio according to the options and returns the outcome. */
   normalize(
     input: EngineInput,
     options: NormalizationOptions,
   ): Promise<NormalizationResult>
 }
 
-/** Errore sollevato quando un engine riceve un input che non supporta. */
+/** Error raised when an engine receives an input it does not support. */
 export class UnsupportedInputError extends Error {
   constructor(engine: string, got: EngineInputKind, accepts: EngineInputKind[]) {
     super(
@@ -89,7 +89,7 @@ export class UnsupportedInputError extends Error {
   }
 }
 
-/** Errore sollevato quando una capability richiesta non è disponibile. */
+/** Error raised when a required capability is not available. */
 export class UnsupportedCapabilityError extends Error {
   constructor(engine: string, capability: string) {
     super(`L'engine "${engine}" non supporta: ${capability}.`)
@@ -97,7 +97,7 @@ export class UnsupportedCapabilityError extends Error {
   }
 }
 
-/** Verifica che un input sia tra quelli accettati, altrimenti solleva. */
+/** Checks that an input is among the accepted ones, otherwise throws. */
 export function assertAccepts(
   engine: AudioEngine,
   input: EngineInput,

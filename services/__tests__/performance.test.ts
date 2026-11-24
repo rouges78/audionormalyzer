@@ -11,9 +11,9 @@ describe('Performance Tests', () => {
   let albumProcessor: AlbumProcessorImpl
   let processingQueue: ProcessingQueueImpl
 
-  // Questo file NON mocka 'fs': i test che chiamavano analyzeAudio /
-  // normalizeAudio su percorsi inventati come '/test/file.mp3' fallivano con
-  // ENOENT. Usiamo file veri in una cartella temporanea.
+  // This file does NOT mock 'fs': the tests that called analyzeAudio /
+  // normalizeAudio on made-up paths like '/test/file.mp3' failed with
+  // ENOENT. We use real files in a temporary folder.
   let fixtureDir: string
   let realAudioPath: string
   let realOutputPath: string
@@ -31,7 +31,7 @@ describe('Performance Tests', () => {
 
   beforeEach(() => {
     audioProcessor = new AudioProcessorImpl()
-    // Stessa istanza degli spy (vedi il costruttore di AlbumProcessorImpl).
+    // Same instance as the spies (see the AlbumProcessorImpl constructor).
     albumProcessor = new AlbumProcessorImpl(audioProcessor)
     processingQueue = new ProcessingQueueImpl()
   })
@@ -148,11 +148,11 @@ describe('Performance Tests', () => {
       expect(memoryIncrease).toBeLessThan(100 * 1024 * 1024)
     })
 
-    // SALTATO: descrive una funzionalità non collegata. Il metodo privato
-    // cleanupProcessingData() esiste in album-processor.ts ma è un corpo vuoto
-    // e processAlbum non lo invoca mai, quindi cleanupCalled resta false.
-    // Riattivare quando il cleanup sarà davvero agganciato al termine del
-    // processing (vedi maint-07 in roadmap).
+    // SKIPPED: it describes a feature that is not wired up. The private method
+    // cleanupProcessingData() exists in album-processor.ts but has an empty body
+    // and processAlbum never calls it, so cleanupCalled stays false.
+    // Re-enable when cleanup is really hooked to the end of
+    // processing (see maint-07 in the roadmap).
     it.skip('should cleanup temporary data after processing', async () => {
       const mockFile = {
         id: 'test-file',
@@ -224,11 +224,11 @@ describe('Performance Tests', () => {
       expect(totalTime).toBeLessThan(10000)
     })
 
-    // SALTATO: ProcessingQueue.addTask() è uno stub che esegue il task
-    // immediatamente ("Per ora esegue direttamente il task"), quindi
-    // maxConcurrentJobs non viene applicato e i 10 task partono tutti
-    // insieme. Non è il test a essere rotto: è il limite di concorrenza a non
-    // esistere. Riattivare con perf-08 in roadmap.
+    // SKIPPED: ProcessingQueue.addTask() is a stub that runs the task
+    // immediately ("For now it runs the task directly"), so
+    // maxConcurrentJobs is not applied and the 10 tasks all start
+    // together. It is not the test that is broken: it is the concurrency limit that does not
+    // exist. Re-enable with perf-08 in the roadmap.
     it.skip('should limit concurrent processing to prevent overload', async () => {
       const maxConcurrent = 3
       let activeTasks = 0
@@ -335,12 +335,12 @@ describe('Performance Tests', () => {
     })
 
     it('should handle I/O efficiently', async () => {
-      // Il conteggio delle operazioni di I/O si basava su vi.doMock('fs')
-      // invocato DOPO l'import del modulo: non aveva alcun effetto, il
-      // contatore restava a 0 e il test passava (o falliva) per motivi
-      // scorrelati. Misuriamo invece qualcosa di verificabile: quante volte
-      // il percorso di normalizzazione tocca il filesystem tramite le API
-      // pubbliche, spiando i metodi di AudioProcessorImpl realmente usati.
+      // The I/O operation count relied on vi.doMock('fs')
+      // called AFTER the module import: it had no effect, the
+      // counter stayed at 0 and the test passed (or failed) for unrelated
+      // reasons. Instead we measure something verifiable: how many times
+      // the normalization path touches the filesystem through the public
+      // APIs, spying on the AudioProcessorImpl methods actually used.
       const analyzeSpy = vi.spyOn(audioProcessor, 'analyzeAudio')
 
       const options = {
@@ -353,7 +353,7 @@ describe('Performance Tests', () => {
       const output = await audioProcessor.normalizeAudio(realAudioPath, options)
 
       expect(output).toBe(realOutputPath)
-      // Una sola analisi del sorgente: nessuna rilettura ridondante.
+      // A single analysis of the source: no redundant re-reading.
       expect(analyzeSpy).toHaveBeenCalledTimes(1)
     })
   })

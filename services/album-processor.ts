@@ -15,49 +15,49 @@ import path from 'path'
 
 /**
  * AlbumProcessor service implementation
- * Gestisce il processing batch di album completi con analisi di consistenza
+ * Handles batch processing of complete albums with consistency analysis
  */
 export class AlbumProcessorImpl implements AlbumProcessor {
   private audioProcessor: AudioProcessorImpl
 
   /**
-   * @param audioProcessor Processore audio da usare. Iniettabile: prima era
-   * costruito qui dentro e non c'era modo di sostituirlo, quindi i test che
-   * mockavano una propria istanza di AudioProcessorImpl non avevano alcun
-   * effetto sull'album processor e finivano per analizzare file inesistenti.
+   * @param audioProcessor Audio processor to use. Injectable: it used to be
+   * built in here and there was no way to replace it, so tests that
+   * mocked their own AudioProcessorImpl instance had no
+   * effect on the album processor and ended up analyzing nonexistent files.
    */
   constructor(audioProcessor: AudioProcessorImpl = new AudioProcessorImpl()) {
     this.audioProcessor = audioProcessor
   }
 
   /**
-   * Processa un album completo applicando normalizzazione consistente
-   * @param files Array di file audio dell'album
-   * @param options Opzioni di processing per l'album
-   * @returns Promise<ProcessingResult> Risultato del processing dell'album
+   * Processes a complete album applying consistent normalization
+   * @param files Array of the album's audio files
+   * @param options Processing options for the album
+   * @returns Promise<ProcessingResult> Result of the album processing
    */
   async processAlbum(files: AudioFile[], options: AlbumOptions): Promise<AlbumProcessingResult> {
     const startTime = Date.now()
     
     try {
-      // Validazione input
+      // Input validation
       if (!files || files.length === 0) {
         throw new Error('Nessun file audio fornito per il processing')
       }
 
-      // Analizza tutti i file se non già analizzati
+      // Analyze all files if not already analyzed
       const analyzedFiles = await this.ensureFilesAnalyzed(files)
       
-      // Calcola loudness dell'album per consistenza
+      // Compute the album loudness for consistency
       const albumLoudness = await this.calculateAlbumLoudness(analyzedFiles)
       
-      // Determina target level ottimale per l'album
+      // Determine the optimal target level for the album
       const optimizedTargetLevel = this.calculateOptimalTargetLevel(
         albumLoudness, 
         options
       )
       
-      // Processa ogni file mantenendo consistenza relativa
+      // Process each file keeping relative consistency
       const results: ProcessingResult[] = []
       
       for (const file of analyzedFiles) {
@@ -70,7 +70,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
           )
           results.push(fileResult)
         } catch (error) {
-          // Gestisce errori per singoli file senza fermare l'intero album
+          // Handle errors for individual files without stopping the whole album
           results.push({
             fileId: file.id,
             success: false,
@@ -86,7 +86,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
       const processingTime = Date.now() - startTime
       const successfulResults = results.filter(r => r.success)
       
-      // Calcola statistiche aggregate per l'album
+      // Compute aggregate statistics for the album
       const avgGain = successfulResults.length > 0 
         ? successfulResults.reduce((sum, r) => sum + r.gainApplied, 0) / successfulResults.length
         : 0
@@ -96,7 +96,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         : 0
 
       return {
-        fileId: `album-${Date.now()}`, // ID per l'intero album
+        fileId: `album-${Date.now()}`, // ID for the whole album
         success: successfulResults.length > 0,
         originalLoudness: albumLoudness.averageLoudness,
         finalLoudness: avgFinalLoudness,
@@ -132,9 +132,9 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Assicura che tutti i file abbiano analisi audio completata
-   * @param files Array di file audio
-   * @returns Promise<AudioFile[]> File con analisi completata
+   * Ensures that all files have a completed audio analysis
+   * @param files Array of audio files
+   * @returns Promise<AudioFile[]> Files with completed analysis
    */
   private async ensureFilesAnalyzed(files: AudioFile[]): Promise<AudioFile[]> {
     const analyzedFiles: AudioFile[] = []
@@ -142,7 +142,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
     for (const file of files) {
       if (!file.analysis) {
         try {
-          // Usa il path temporaneo se disponibile, altrimenti quello originale
+          // Use the temporary path if available, otherwise the original one
           const filePath = file.tempPath || file.originalPath
           const analysis = await this.audioProcessor.analyzeAudio(filePath)
           
@@ -152,7 +152,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
             status: 'ready'
           })
         } catch (error) {
-          // Marca il file come errore ma continua con gli altri
+          // Mark the file as errored but continue with the others
           analyzedFiles.push({
             ...file,
             status: 'error',
@@ -168,9 +168,9 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Calcola la loudness complessiva dell'album per analisi di consistenza
-   * @param files Array di file audio analizzati
-   * @returns Promise<AlbumLoudnessData> Dati di loudness dell'album
+   * Computes the overall album loudness for consistency analysis
+   * @param files Array of analyzed audio files
+   * @returns Promise<AlbumLoudnessData> Album loudness data
    */
   async calculateAlbumLoudness(files: AudioFile[]): Promise<AlbumLoudnessData> {
     try {
@@ -180,16 +180,16 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         throw new Error('Nessun file valido per calcolo loudness album')
       }
 
-      // Calcola loudness media dell'album
+      // Compute the album average loudness
       const loudnessValues = validFiles.map(f => f.analysis!.lufsIntegrated)
       const averageLoudness = loudnessValues.reduce((sum, val) => sum + val, 0) / loudnessValues.length
       
-      // Calcola range di loudness (differenza tra max e min)
+      // Compute the loudness range (difference between max and min)
       const maxLoudness = Math.max(...loudnessValues)
       const minLoudness = Math.min(...loudnessValues)
       const loudnessRange = maxLoudness - minLoudness
       
-      // Crea mapping file-loudness per riferimento
+      // Create a file-loudness mapping for reference
       const filesLoudness = validFiles.map(f => ({
         id: f.id,
         loudness: f.analysis!.lufsIntegrated
@@ -206,10 +206,10 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Calcola il target level ottimale per l'album considerando la consistenza
-   * @param albumLoudness Dati di loudness dell'album
-   * @param options Opzioni di processing
-   * @returns Target level ottimizzato
+   * Computes the optimal target level for the album taking consistency into account
+   * @param albumLoudness Album loudness data
+   * @param options Processing options
+   * @returns Optimized target level
    */
   private calculateOptimalTargetLevel(
     albumLoudness: AlbumLoudnessData, 
@@ -218,22 +218,22 @@ export class AlbumProcessorImpl implements AlbumProcessor {
     let targetLevel = options.targetLevel
     
     if (options.maintainRelativeLoudness && options.normalizationMethod === 'loudness') {
-      // Per mantenere loudness relativa, usa la media dell'album come riferimento
-      // e applica un offset conservativo se necessario
+      // To keep relative loudness, use the album average as the reference
+      // and apply a conservative offset if needed
       const currentAverage = albumLoudness.averageLoudness
       const targetOffset = options.targetLevel - currentAverage
       
-      // Limita l'offset per evitare cambiamenti troppo drastici
+      // Limit the offset to avoid overly drastic changes
       const maxOffset = 6.0 // dB
       const limitedOffset = Math.max(-maxOffset, Math.min(maxOffset, targetOffset))
       
       targetLevel = currentAverage + limitedOffset
       
-      // Log se l'offset è stato limitato
+      // Log if the offset was limited
       if (Math.abs(limitedOffset - targetOffset) > 0.1) {
         console.warn(
-          `Target level ottimizzato da ${options.targetLevel} a ${targetLevel.toFixed(1)} LUFS ` +
-          `per mantenere consistenza album (range: ${albumLoudness.loudnessRange.toFixed(1)} LU)`
+          `Target level optimized from ${options.targetLevel} to ${targetLevel.toFixed(1)} LUFS ` +
+          `to keep album consistency (range: ${albumLoudness.loudnessRange.toFixed(1)} LU)`
         )
       }
     }
@@ -242,12 +242,12 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Processa un singolo file dell'album mantenendo consistenza
-   * @param file File audio da processare
-   * @param options Opzioni di processing
-   * @param targetLevel Target level ottimizzato per l'album
-   * @param albumLoudness Dati di loudness dell'album
-   * @returns Promise<ProcessingResult> Risultato del processing del file
+   * Processes a single album file keeping consistency
+   * @param file Audio file to process
+   * @param options Processing options
+   * @param targetLevel Target level optimized for the album
+   * @param albumLoudness Album loudness data
+   * @returns Promise<ProcessingResult> Result of processing the file
    */
   private async processAlbumFile(
     file: AudioFile,
@@ -266,15 +266,15 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         throw new Error(file.error || 'File in stato di errore')
       }
 
-      // Calcola target specifico per questo file se manteniamo loudness relativa
+      // Compute a specific target for this file if we keep relative loudness
       let fileTargetLevel = targetLevel
       
       if (options.maintainRelativeLoudness && options.normalizationMethod === 'loudness') {
-        // Mantiene la posizione relativa del file rispetto alla media dell'album
+        // Keep the file's position relative to the album average
         const currentRelativePosition = file.analysis.lufsIntegrated - albumLoudness.averageLoudness
         fileTargetLevel = targetLevel + currentRelativePosition
         
-        // Limita il target per evitare valori estremi
+        // Limit the target to avoid extreme values
         const maxDeviation = 3.0 // LUFS
         const limitedTarget = Math.max(
           targetLevel - maxDeviation,
@@ -283,14 +283,14 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         
         if (Math.abs(limitedTarget - fileTargetLevel) > 0.1) {
           console.warn(
-            `Target per file ${file.name} limitato da ${fileTargetLevel.toFixed(1)} a ${limitedTarget.toFixed(1)} LUFS`
+            `Target for file ${file.name} limited from ${fileTargetLevel.toFixed(1)} to ${limitedTarget.toFixed(1)} LUFS`
           )
         }
         
         fileTargetLevel = limitedTarget
       }
 
-      // Prepara opzioni di normalizzazione
+      // Prepare the normalization options
       const inputPath = file.tempPath || file.originalPath
       const outputPath = this.generateOutputPath(file, options.outputFormat)
       
@@ -301,10 +301,10 @@ export class AlbumProcessorImpl implements AlbumProcessor {
         outputPath
       }
 
-      // Applica normalizzazione
+      // Apply normalization
       const resultPath = await this.audioProcessor.normalizeAudio(inputPath, normalizationOptions)
       
-      // Analizza il risultato per verificare il processing
+      // Analyze the result to verify the processing
       const finalAnalysis = await this.audioProcessor.analyzeAudio(resultPath)
       
       const processingTime = Date.now() - startTime
@@ -335,10 +335,10 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Genera il path di output per un file processato
-   * @param file File audio originale
-   * @param outputFormat Formato di output desiderato
-   * @returns Path di output
+   * Generates the output path for a processed file
+   * @param file Original audio file
+   * @param outputFormat Desired output format
+   * @returns Output path
    */
   private generateOutputPath(file: AudioFile, outputFormat: string): string {
     const outputDir = path.join(process.cwd(), 'output', 'normalized')
@@ -361,9 +361,9 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Genera un report completo del processing dell'album
-   * @param results Array di risultati di processing
-   * @returns ProcessingReport Report dettagliato
+   * Generates a complete report of the album processing
+   * @param results Array of processing results
+   * @returns ProcessingReport Detailed report
    */
   generateProcessingReport(results: ProcessingResult[]): ProcessingReport {
     const totalFiles = results.length
@@ -388,9 +388,9 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Valida le opzioni di processing dell'album
-   * @param options Opzioni da validare
-   * @returns Risultato della validazione
+   * Validates the album processing options
+   * @param options Options to validate
+   * @returns Validation result
    */
   validateAlbumOptions(options: AlbumOptions): {
     isValid: boolean
@@ -398,12 +398,12 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   } {
     const errors: string[] = []
     
-    // Valida metodo di normalizzazione
+    // Validate the normalization method
     if (!['peak', 'loudness'].includes(options.normalizationMethod)) {
       errors.push('Metodo di normalizzazione non valido. Deve essere "peak" o "loudness"')
     }
     
-    // Valida target level
+    // Validate the target level
     if (options.normalizationMethod === 'peak') {
       if (options.targetLevel > 0) {
         errors.push('Target level per peak deve essere <= 0 dB')
@@ -420,7 +420,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
       }
     }
     
-    // Valida formato output
+    // Validate the output format
     const validFormats = ['original', 'mp3', 'wav', 'flac', 'aac']
     if (!validFormats.includes(options.outputFormat)) {
       errors.push(`Formato output non valido. Formati supportati: ${validFormats.join(', ')}`)
@@ -433,12 +433,12 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Calcola statistiche di consistenza per l'album
-   * @param files File dell'album analizzati
-   * @returns Statistiche di consistenza
+   * Computes consistency statistics for the album
+   * @param files Analyzed album files
+   * @returns Consistency statistics
    */
   calculateConsistencyStats(files: AudioFile[]): {
-    loudnessConsistency: number // 0-1, dove 1 è perfettamente consistente
+    loudnessConsistency: number // 0-1, where 1 is perfectly consistent
     dynamicRangeVariation: number // Variazione in dB
     recommendedMethod: 'peak' | 'loudness'
     notes: string[]
@@ -455,22 +455,22 @@ export class AlbumProcessorImpl implements AlbumProcessor {
       }
     }
 
-    // Calcola consistenza loudness (basata su deviazione standard)
+    // Compute loudness consistency (based on standard deviation)
     const loudnessValues = validFiles.map(f => f.analysis!.lufsIntegrated)
     const avgLoudness = loudnessValues.reduce((sum, val) => sum + val, 0) / loudnessValues.length
     const variance = loudnessValues.reduce((sum, val) => sum + Math.pow(val - avgLoudness, 2), 0) / loudnessValues.length
     const stdDev = Math.sqrt(variance)
     
-    // Consistenza: più bassa la deviazione standard, più alta la consistenza
-    const loudnessConsistency = Math.max(0, 1 - (stdDev / 10)) // Normalizzato su 10 LUFS di range
+    // Consistency: the lower the standard deviation, the higher the consistency
+    const loudnessConsistency = Math.max(0, 1 - (stdDev / 10)) // Normalized over a 10 LUFS range
     
-    // Calcola variazione dynamic range
+    // Compute dynamic range variation
     const dynamicRanges = validFiles.map(f => f.analysis!.peakLevel - f.analysis!.rmsLevel)
     const maxDR = Math.max(...dynamicRanges)
     const minDR = Math.min(...dynamicRanges)
     const dynamicRangeVariation = maxDR - minDR
     
-    // Raccomanda metodo basato su analisi
+    // Recommend a method based on the analysis
     let recommendedMethod: 'peak' | 'loudness' = 'loudness'
     
     if (stdDev < 2.0) {
@@ -486,7 +486,7 @@ export class AlbumProcessorImpl implements AlbumProcessor {
       }
     }
     
-    // Note aggiuntive basate su analisi
+    // Additional notes based on the analysis
     const clippingFiles = validFiles.filter(f => f.analysis!.hasClipping).length
     if (clippingFiles > 0) {
       notes.push(`${clippingFiles} file con clipping rilevato`)
@@ -506,16 +506,16 @@ export class AlbumProcessorImpl implements AlbumProcessor {
   }
 
   /**
-   * Pulisce i dati temporanei di processing (per test)
+   * Cleans up temporary processing data (for tests)
    */
   private async cleanupProcessingData(): Promise<void> {
-    // Implementazione di cleanup per test
-    // In futuro potrebbe pulire cache, file temporanei, etc.
+    // Cleanup implementation for tests
+    // In the future it could clean caches, temporary files, etc.
   }
 }
 
 /**
- * Factory function per creare istanza AlbumProcessor
+ * Factory function to create an AlbumProcessor instance
  */
 export function createAlbumProcessor(): AlbumProcessor {
   return new AlbumProcessorImpl()

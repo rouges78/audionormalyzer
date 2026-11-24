@@ -204,8 +204,8 @@ describe('Analyze API Integration Tests', () => {
       expect(analysisData?.status).toBe('completed')
       expect(analysisData?.results).toHaveLength(1)
       expect(analysisData?.results[0].success).toBe(false)
-      // Il messaggio ora arriva da ErrorTypes.FILE_NOT_FOUND e include l'id del
-      // file ('File not found: <id>'), più utile del vecchio 'File non trovato'.
+      // The message now comes from ErrorTypes.FILE_NOT_FOUND and includes the file
+      // id ('File not found: <id>'), more useful than the old 'File non trovato'.
       expect(analysisData?.results[0].error).toContain('non-existent-file-id')
     })
   })

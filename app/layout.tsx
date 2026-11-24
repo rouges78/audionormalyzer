@@ -38,9 +38,9 @@ export const viewport: Viewport = {
 }
 
 /**
- * Shell minimo: html + body + provider.
- * L'header vive in app/page.tsx: prima era definito in entrambi i file
- * e la pagina ne mostrava due sovrapposti.
+ * Minimal shell: html + body + providers.
+ * The header lives in app/page.tsx: it used to be defined in both files
+ * and the page showed two of them on top of each other.
  */
 export default function RootLayout({
   children,
@@ -65,11 +65,11 @@ export default function RootLayout({
         >
           <ErrorBoundary>{children}</ErrorBoundary>
           {/*
-            Il Toaster va montato una volta sola, qui: useToast() tiene lo stato
-            dei toast in un modulo condiviso, ma senza questo componente nessuno
-            lo legge e i toast prodotti da use-error-handling non compaiono a
-            schermo. È stato il bug qual-15: ogni errore di upload, validazione
-            o analisi veniva registrato e mostrato a nessuno.
+            The Toaster must be mounted exactly once, here: useToast() keeps the
+            toast state in a shared module, but without this component nobody
+            reads it and the toasts produced by use-error-handling never show up
+            on screen. That was bug qual-15: every upload, validation
+            or analysis error was recorded and shown to nobody.
           */}
           <Toaster />
         </ThemeProvider>

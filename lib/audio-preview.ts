@@ -1,30 +1,30 @@
 /**
  * Client-side audio preview & normalization utilities (Web Audio API).
  *
- * Questo modulo gira SOLO nel browser. Fornisce un'anteprima reale e
- * approssimata della normalizzazione applicando il guadagno (gain) previsto
- * direttamente all'audio, senza dipendere da FFmpeg lato server.
+ * This module runs ONLY in the browser. It provides a real, approximate
+ * preview of the normalization by applying the predicted gain
+ * directly to the audio, without depending on server-side FFmpeg.
  *
- * Nota: è un'anteprima basata sul guadagno. La misura LUFS/peak di partenza
- * arriva dall'analisi del backend; qui applichiamo semplicemente il gain
- * necessario a raggiungere il target. La normalizzazione EBU R128 "vera"
- * (misura a due passate + true-peak limiting) resta il task core-04.
+ * Note: it is a gain-based preview. The starting LUFS/peak measurement
+ * comes from the backend analysis; here we simply apply the gain
+ * needed to reach the target. "True" EBU R128 normalization
+ * (two-pass measurement + true-peak limiting) remains task core-04.
  */
 
 import type { AudioAnalysis, NormalizationOptions, AnalysisPrediction } from '@/types/audio'
 
 export interface GainComputation {
-  /** Guadagno da applicare, in dB. */
+  /** Gain to apply, in dB. */
   gainDb: number
-  /** Fattore lineare corrispondente (10^(dB/20)). */
+  /** Corresponding linear factor (10^(dB/20)). */
   gainLinear: number
-  /** Il gain è stato ridotto per evitare il clipping? */
+  /** Was the gain reduced to avoid clipping? */
   limited: boolean
-  /** Picco stimato dopo il gain, in dBFS (utile per avvisare sul clipping). */
+  /** Estimated peak after the gain, in dBFS (useful to warn about clipping). */
   predictedPeakDb: number
 }
 
-const TRUE_PEAK_CEILING_DB = -1 // dBTP: tetto di sicurezza tipico per lo streaming
+const TRUE_PEAK_CEILING_DB = -1 // dBTP: typical safety ceiling for streaming
 
 export function dbToLinear(db: number): number {
   return Math.pow(10, db / 20)
@@ -35,8 +35,8 @@ export function linearToDb(linear: number): number {
 }
 
 /**
- * Calcola il guadagno necessario per raggiungere il target scelto, con un
- * tetto di sicurezza sul picco per evitare clipping digitale.
+ * Computes the gain needed to reach the chosen target, with a
+ * safety ceiling on the peak to avoid digital clipping.
  */
 export function computeGain(
   analysis: Pick<AudioAnalysis, 'peakLevel' | 'lufsIntegrated' | 'truePeak'>,
@@ -46,7 +46,7 @@ export function computeGain(
   const reference = options.method === 'peak' ? analysis.peakLevel : analysis.lufsIntegrated
   let gainDb = options.targetLevel - reference
 
-  // Picco di partenza più affidabile disponibile
+  // Most reliable starting peak available
   const startPeakDb = Number.isFinite(analysis.truePeak) ? analysis.truePeak : analysis.peakLevel
 
   let limited = false
@@ -63,8 +63,8 @@ export function computeGain(
 }
 
 /**
- * Proietta l'analisi originale dopo l'applicazione di un guadagno costante.
- * Un gain puro trasla tutti i livelli in dB della stessa quantità.
+ * Projects the original analysis after applying a constant gain.
+ * A pure gain shifts all dB levels by the same amount.
  */
 export function predictAnalysis(analysis: AudioAnalysis, gainDb: number): AnalysisPrediction {
   return {
@@ -87,12 +87,12 @@ function getAudioContext(): AudioContext {
   return sharedCtx
 }
 
-/** Decodifica un File audio in un AudioBuffer. */
+/** Decodes an audio File into an AudioBuffer. */
 export async function decodeAudioFile(file: File): Promise<AudioBuffer> {
   const ctx = getAudioContext()
   const arrayBuffer = await file.arrayBuffer()
   try {
-    // decodeAudioData basato su Promise; copia perché alcune impl. consumano il buffer
+    // Promise-based decodeAudioData; copy because some impls consume the buffer
     return await ctx.decodeAudioData(arrayBuffer.slice(0))
   } catch (err) {
     throw new Error(
@@ -103,8 +103,8 @@ export async function decodeAudioFile(file: File): Promise<AudioBuffer> {
 }
 
 /**
- * Renderizza una versione dell'AudioBuffer con il guadagno applicato e la
- * codifica in WAV PCM 16-bit. Usa OfflineAudioContext (rendering headless).
+ * Renders a version of the AudioBuffer with the gain applied and
+ * encodes it as 16-bit PCM WAV. Uses OfflineAudioContext (headless rendering).
  */
 export async function renderNormalizedWav(
   source: AudioBuffer,
@@ -133,7 +133,7 @@ export async function renderNormalizedWav(
   return audioBufferToWavBlob(rendered)
 }
 
-/** Codifica un AudioBuffer in un Blob WAV (PCM 16-bit little-endian). */
+/** Encodes an AudioBuffer into a WAV Blob (16-bit little-endian PCM). */
 export function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels
   const sampleRate = buffer.sampleRate
@@ -181,7 +181,7 @@ export function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
   return new Blob([ab], { type: 'audio/wav' })
 }
 
-/** Misura il picco reale (campionato) di un AudioBuffer, in dBFS. */
+/** Measures the real (sampled) peak of an AudioBuffer, in dBFS. */
 export function measurePeakDb(buffer: AudioBuffer): number {
   let peak = 0
   for (let c = 0; c < buffer.numberOfChannels; c++) {

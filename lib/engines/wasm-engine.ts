@@ -1,13 +1,13 @@
 /**
- * Engine WASM: normalizzazione/analisi tramite `@ffmpeg/ffmpeg`.
+ * WASM engine: normalization/analysis via `@ffmpeg/ffmpeg`.
  *
- * Portabile (browser e server) ma più lento del nativo. Delega alla
- * implementazione esistente `AudioProcessorImpl` per non duplicare la logica
- * ffmpeg, esponendola dietro il contratto comune `AudioEngine`.
+ * Portable (browser and server) but slower than native. It delegates to the
+ * existing `AudioProcessorImpl` implementation so as not to duplicate the ffmpeg
+ * logic, exposing it behind the common `AudioEngine` contract.
  *
- * Accetta input come percorso file (server/desktop). Il supporto a `File`/
- * `buffer` nel browser sarà aggiunto quando servirà (scrittura su FS virtuale
- * di ffmpeg.wasm).
+ * It accepts input as a file path (server/desktop). Support for `File`/
+ * `buffer` in the browser will be added when needed (writing to ffmpeg.wasm's
+ * virtual FS).
  */
 
 import type { AudioAnalysis, NormalizationResult, NormalizationOptions } from '@/types/audio'
@@ -27,7 +27,7 @@ export class WasmEngine implements AudioEngine {
   readonly capabilities: EngineCapabilities = {
     runtime: 'both',
     measuresLufs: true,
-    measuresLoudnessRange: false, // loudnorm espone LRA, non ancora estratta qui
+    measuresLoudnessRange: false, // loudnorm exposes LRA, not extracted here yet
     truePeakLimiting: true,
     previewOnly: false,
     accepts: ['path'],
@@ -40,8 +40,8 @@ export class WasmEngine implements AudioEngine {
   }
 
   isAvailable(): boolean {
-    // ffmpeg.wasm è caricato lazy dal processor; consideriamo l'engine
-    // disponibile ovunque, con fallback interni gestiti dal processor.
+    // ffmpeg.wasm is lazy-loaded by the processor; we consider the engine
+    // available everywhere, with internal fallbacks handled by the processor.
     return true
   }
 
@@ -63,13 +63,13 @@ export class WasmEngine implements AudioEngine {
       const before = await this.processor.analyzeAudio(path)
       const outputPath = await this.processor.normalizeAudio(path, options)
 
-      // Misura reale post-normalizzazione quando possibile.
+      // Real post-normalization measurement when possible.
       let finalLoudness = options.method === 'loudness' ? options.targetLevel : before.lufsIntegrated
       try {
         const after = await this.processor.analyzeAudio(outputPath)
         finalLoudness = after.lufsIntegrated
       } catch {
-        // manteniamo la stima se la ri-analisi non è disponibile
+        // we keep the estimate if re-analysis is not available
       }
 
       const reference =

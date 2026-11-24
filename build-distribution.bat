@@ -1,6 +1,6 @@
 @echo off
 REM Audio Normalizer - Quick Distribution Builder for Windows
-REM Creazione rapida di tutte le distribuzioni
+REM Quick creation of all distributions
 
 echo =====================================================
 echo    Audio Normalizer - Distribution Builder
@@ -12,7 +12,7 @@ set BUILD_START_TIME=%time%
 REM Check Node.js
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Node.js non trovato. Installa Node.js 18+ e riprova.
+    echo ❌ Node.js not found. Install Node.js 18+ and try again.
     pause
     exit /b 1
 )
@@ -20,61 +20,61 @@ if errorlevel 1 (
 REM Check NPM
 npm --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ NPM non trovato. Installa Node.js con NPM e riprova.
+    echo ❌ NPM not found. Install Node.js with NPM and try again.
     pause
     exit /b 1
 )
 
-echo 📦 Avvio build distribuzione...
+echo 📦 Starting distribution build...
 echo.
 
 REM Install dependencies
-echo 📥 Installazione dipendenze...
+echo 📥 Installing dependencies...
 call npm ci
 if errorlevel 1 (
-    echo ❌ Errore durante installazione dipendenze
+    echo ❌ Error while installing dependencies
     pause
     exit /b 1
 )
 
 REM Setup audio environment
-echo 🎵 Setup ambiente audio...
+echo 🎵 Setting up the audio environment...
 call npm run setup:audio
 if errorlevel 1 (
-    echo ⚠️ Warning: Setup audio fallito, continuando...
+    echo ⚠️ Warning: Audio setup failed, continuing...
 )
 
 REM Run tests
-echo 🧪 Esecuzione test...
+echo 🧪 Running tests...
 call npm run test:comprehensive
 if errorlevel 1 (
-    echo ⚠️ Warning: Alcuni test falliti, continuando build...
+    echo ⚠️ Warning: Some tests failed, continuing the build...
 )
 
 REM Build all distributions
-echo 🚀 Build di tutte le distribuzioni...
+echo 🚀 Building all distributions...
 call npm run build:all
 if errorlevel 1 (
-    echo ❌ Errore durante build distribuzione
+    echo ❌ Error during the distribution build
     pause
     exit /b 1
 )
 
 echo.
-echo ✅ Build completato con successo!
+echo ✅ Build completed successfully!
 echo.
-echo 📁 File di distribuzione disponibili in:
-echo    - dist\ (applicazioni desktop)
-echo    - .next\ (applicazione web)
+echo 📁 Distribution files available in:
+echo    - dist\ (desktop applications)
+echo    - .next\ (web application)
 echo.
-echo 💡 Per deployment:
-echo    Desktop: Esegui i file in dist\
-echo    Web: usa 'npm start' o deploy .next\
-echo    Docker: usa 'docker-compose up'
+echo 💡 For deployment:
+echo    Desktop: Run the files in dist\
+echo    Web: use 'npm start' or deploy .next\
+echo    Docker: use 'docker-compose up'
 echo.
 
 set BUILD_END_TIME=%time%
-echo ⏱️ Build completato alle %BUILD_END_TIME%
+echo ⏱️ Build completed at %BUILD_END_TIME%
 echo.
 
 pause

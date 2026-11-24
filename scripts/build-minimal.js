@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script minimo per creare l'eseguibile che funziona
+ * Minimal script to create an executable that works
  */
 
 const { execSync } = require('child_process');

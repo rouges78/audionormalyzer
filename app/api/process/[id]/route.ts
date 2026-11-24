@@ -98,7 +98,7 @@ export async function GET(
     return NextResponse.json(response)
 
   } catch (error) {
-    console.error('Errore nel recupero stato processo:', error)
+    console.error('Error retrieving process status:', error)
     
     return NextResponse.json(
       { 
@@ -176,7 +176,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Errore nell\'eliminazione processo:', error)
+    console.error('Error deleting process:', error)
     
     return NextResponse.json(
       { 

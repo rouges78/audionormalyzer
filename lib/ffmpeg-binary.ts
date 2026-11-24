@@ -1,29 +1,29 @@
 /**
- * Risoluzione del binario ffmpeg nativo (core-04 / core-05).
+ * Resolution of the native ffmpeg binary (core-04 / core-05).
  *
- * L'engine nativo ha bisogno di un ffmpeg vero, e "vero" significa cose
- * diverse a seconda di dove gira l'app:
+ * The native engine needs a real ffmpeg, and "real" means different
+ * things depending on where the app runs:
  *
- *   1. sviluppo su una macchina che ha già ffmpeg installato
- *   2. server/container dove ffmpeg arriva dal package manager
- *   3. eseguibile Electron distribuito, dove il binario va bundlato
+ *   1. development on a machine that already has ffmpeg installed
+ *   2. server/container where ffmpeg comes from the package manager
+ *   3. distributed Electron executable, where the binary must be bundled
  *
- * Invece di scegliere una di queste tre, il modulo le prova in ordine di
- * specificità e si ferma alla prima che risponde a `-version`. Il risultato è
- * memorizzato: la ricerca costa un processo, e non ha senso rifarla a ogni
+ * Instead of picking one of these three, the module tries them in order of
+ * specificity and stops at the first that responds to `-version`. The result is
+ * memoized: the search costs a process, and there is no point redoing it for every
  * file.
  *
- * ORDINE DI RICERCA
- *   1. `FFMPEG_PATH`  — override esplicito, ha sempre la precedenza. Serve a
- *                       chi ha una build particolare o vuole forzare una
- *                       versione in test.
- *   2. `ffmpeg-static` — il binario bundlato col progetto, se il pacchetto è
- *                       installato. È la via dell'eseguibile desktop.
- *   3. `ffmpeg` su PATH — l'installazione di sistema.
+ * SEARCH ORDER
+ *   1. `FFMPEG_PATH`  — explicit override, always takes precedence. Useful
+ *                       for those with a special build or who want to force a
+ *                       version in tests.
+ *   2. `ffmpeg-static` — the binary bundled with the project, if the package is
+ *                       installed. It is the desktop executable route.
+ *   3. `ffmpeg` on PATH — the system installation.
  *
- * Se nessuna risponde, `resolveFfmpegPath()` restituisce `null` e l'engine
- * nativo si dichiara non disponibile: la factory ricade sul WASM senza che
- * nulla esploda. Questo è il motivo per cui il modulo non solleva mai.
+ * If none responds, `resolveFfmpegPath()` returns `null` and the native engine
+ * declares itself unavailable: the factory falls back to WASM without anything
+ * blowing up. This is why the module never throws.
  */
 
 import { execFile } from 'child_process'
@@ -31,36 +31,36 @@ import { promisify } from 'util'
 
 const execFileAsync = promisify(execFile)
 
-/** Esito della risoluzione, con la provenienza per diagnostica e log. */
+/** Outcome of the resolution, with the origin for diagnostics and logs. */
 export interface FfmpegBinary {
-  /** Percorso eseguibile verificato. */
+  /** Verified executable path. */
   path: string
-  /** Da dove arriva: utile in `npm run diagnose` e nei messaggi d'errore. */
+  /** Where it comes from: useful in `npm run diagnose` and in error messages. */
   source: 'env' | 'bundled' | 'system'
-  /** Versione dichiarata da `ffmpeg -version`, es. "6.1.1". */
+  /** Version declared by `ffmpeg -version`, e.g. "6.1.1". */
   version: string
 }
 
 /**
- * Cache della risoluzione. `undefined` = mai cercato; `null` = cercato e non
- * trovato. Distinguere i due casi evita di ripetere la ricerca fallita a ogni
- * chiamata, che su una coda di 100 tracce vorrebbe dire 300 processi inutili.
+ * Resolution cache. `undefined` = never searched; `null` = searched and not
+ * found. Telling the two cases apart avoids repeating the failed search on every
+ * call, which on a queue of 100 tracks would mean 300 useless processes.
  */
 let cached: FfmpegBinary | null | undefined
 
 /**
- * Il binario di `ffmpeg-static` finisce dentro `app.asar` quando Electron
- * impacchetta l'app, e da lì **non è eseguibile**: l'asar è un archivio, non
- * un filesystem. electron-builder lo estrae in `app.asar.unpacked`, ma il
- * percorso che il pacchetto restituisce continua a puntare dentro l'archivio.
- * La riscrittura va fatta a mano — è un classico degli errori "spawn ENOENT"
- * che si vedono solo nell'eseguibile e mai in sviluppo.
+ * The `ffmpeg-static` binary ends up inside `app.asar` when Electron
+ * packages the app, and from there it is **not executable**: asar is an archive, not
+ * a filesystem. electron-builder extracts it into `app.asar.unpacked`, but the
+ * path the package returns keeps pointing inside the archive.
+ * The rewrite has to be done by hand — a classic among the "spawn ENOENT" errors
+ * that show up only in the executable and never in development.
  */
 function unpackedPath(p: string): string {
   return p.includes('app.asar') ? p.replace('app.asar', 'app.asar.unpacked') : p
 }
 
-/** Esegue `<candidate> -version` ed estrae la versione, o null se non parte. */
+/** Runs `<candidate> -version` and extracts the version, or null if it does not start. */
 async function probe(candidate: string): Promise<string | null> {
   try {
     const { stdout } = await execFileAsync(candidate, ['-version'], {
@@ -75,19 +75,19 @@ async function probe(candidate: string): Promise<string | null> {
 }
 
 /**
- * Percorso proposto da `ffmpeg-static`, se il pacchetto è installato.
+ * Path proposed by `ffmpeg-static`, if the package is installed.
  *
- * `ffmpeg-static` è **volutamente non fra le dipendenze**: scarica ~80 MB di
- * binario a ogni installazione, il che peserebbe su ogni `npm ci` della CI per
- * un vantaggio che serve solo all'eseguibile desktop. La valutazione su quel
- * peso è appesa a dist-02/dist-07. Finché non è decisa, il pacchetto è
- * opzionale: se c'è lo usiamo, se non c'è si passa all'ffmpeg di sistema.
+ * `ffmpeg-static` is **deliberately not among the dependencies**: it downloads ~80 MB of
+ * binary on every install, which would weigh on every CI `npm ci` for
+ * an advantage only the desktop executable needs. The evaluation of that
+ * weight hangs on dist-02/dist-07. Until it is decided, the package is
+ * optional: if it is there we use it, if not we move on to the system ffmpeg.
  *
- * Lo specificatore sta in una variabile e non nel letterale dell'import per un
- * motivo pratico: sia TypeScript sia webpack proverebbero a risolvere un
- * modulo che di norma non esiste, il primo con un errore di compilazione e il
- * secondo tentando di impacchettarlo. `webpackIgnore` lascia l'import così
- * com'è, da risolvere a runtime.
+ * The specifier lives in a variable and not in the import literal for a
+ * practical reason: both TypeScript and webpack would try to resolve a
+ * module that normally does not exist, the former with a compile error and the
+ * latter trying to bundle it. `webpackIgnore` leaves the import as
+ * it is, to be resolved at runtime.
  */
 async function bundledCandidate(): Promise<string | null> {
   try {
@@ -101,14 +101,14 @@ async function bundledCandidate(): Promise<string | null> {
 }
 
 /**
- * Cerca un ffmpeg utilizzabile. Non solleva mai: restituisce `null` quando non
- * ne trova uno, perché "ffmpeg assente" è una condizione prevista (browser,
- * ambienti minimali) e non un errore da propagare.
+ * Looks for a usable ffmpeg. Never throws: it returns `null` when it does not
+ * find one, because "ffmpeg missing" is an expected condition (browser,
+ * minimal environments) and not an error to propagate.
  */
 export async function resolveFfmpeg(): Promise<FfmpegBinary | null> {
   if (cached !== undefined) return cached
 
-  // Nel browser non c'è nulla da cercare.
+  // In the browser there is nothing to look for.
   if (typeof window !== 'undefined') {
     cached = null
     return null
@@ -136,14 +136,14 @@ export async function resolveFfmpeg(): Promise<FfmpegBinary | null> {
   return null
 }
 
-/** Comodità: solo il percorso, o null. */
+/** Convenience: just the path, or null. */
 export async function resolveFfmpegPath(): Promise<string | null> {
   return (await resolveFfmpeg())?.path ?? null
 }
 
 /**
- * Azzera la cache. Serve ai test, che devono poter simulare ambienti diversi
- * nello stesso processo.
+ * Resets the cache. Needed by the tests, which must be able to simulate different
+ * environments in the same process.
  */
 export function resetFfmpegCache(): void {
   cached = undefined

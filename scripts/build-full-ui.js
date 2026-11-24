@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script per creare l'eseguibile con interfaccia completa
+ * Script to create the executable with the complete interface
  */
 
 const { execSync } = require('child_process');

@@ -3,7 +3,7 @@ import { FileManagerImpl, createFileManager } from '../file-manager'
 import { promises as fs } from 'fs'
 import path from 'path'
 
-// Mock delle dipendenze
+// Mock the dependencies
 vi.mock('fs', () => ({
   promises: {
     mkdir: vi.fn(),
@@ -47,7 +47,7 @@ describe('FileManager', () => {
   })
 
   describe('validateAudioFile', () => {
-    it('dovrebbe validare un file MP3 valido', async () => {
+    it('should validate a valid MP3 file', async () => {
       const mockFile = new File(['test content'], 'test.mp3', {
         type: 'audio/mpeg'
       })
@@ -58,7 +58,7 @@ describe('FileManager', () => {
       expect(result.format).toBe('MP3')
     })
 
-    it('dovrebbe rifiutare un file con formato non supportato', async () => {
+    it('should reject a file with an unsupported format', async () => {
       const mockFile = new File(['test content'], 'test.txt', {
         type: 'text/plain'
       })
@@ -69,7 +69,7 @@ describe('FileManager', () => {
       expect(result.error).toContain('Formato non supportato')
     })
 
-    it('dovrebbe rifiutare un file vuoto', async () => {
+    it('should reject an empty file', async () => {
       const mockFile = new File([], 'test.mp3', {
         type: 'audio/mpeg'
       })
@@ -80,8 +80,8 @@ describe('FileManager', () => {
       expect(result.error).toBe('File vuoto')
     })
 
-    it('dovrebbe rifiutare un file troppo grande', async () => {
-      // Crea un file mock che supera il limite di 500MB
+    it('should reject a file that is too large', async () => {
+      // Create a mock file that exceeds the 500MB limit
       const largeSize = 600 * 1024 * 1024 // 600MB
       const mockFile = {
         name: 'large.mp3',
@@ -95,7 +95,7 @@ describe('FileManager', () => {
       expect(result.error).toContain('File troppo grande')
     })
 
-    it('dovrebbe validare tutti i formati supportati', async () => {
+    it('should validate all supported formats', async () => {
       const supportedFormats = [
         { ext: 'mp3', type: 'audio/mpeg', format: 'MP3' },
         { ext: 'wav', type: 'audio/wav', format: 'WAV' },
@@ -117,7 +117,7 @@ describe('FileManager', () => {
       }
     })
 
-    it('dovrebbe gestire file senza MIME type', async () => {
+    it('should handle files without a MIME type', async () => {
       const mockFile = new File(['test content'], 'test.mp3')
 
       const result = await fileManager.validateAudioFile(mockFile)
@@ -126,7 +126,7 @@ describe('FileManager', () => {
       expect(result.format).toBe('MP3')
     })
 
-    it('dovrebbe rifiutare oggetti non validi', async () => {
+    it('should reject invalid objects', async () => {
       const result = await fileManager.validateAudioFile(null as any)
 
       expect(result.isValid).toBe(false)
@@ -142,7 +142,7 @@ describe('FileManager', () => {
       })
     })
 
-    it('dovrebbe caricare con successo file validi', async () => {
+    it('should successfully upload valid files', async () => {
       const mockFile1 = {
         name: 'test1.mp3',
         size: 1000,
@@ -169,11 +169,11 @@ describe('FileManager', () => {
       expect(mockFs.writeFile).toHaveBeenCalledTimes(2)
     })
 
-    it('dovrebbe lanciare errore se nessun file fornito', async () => {
+    it('should throw if no file is provided', async () => {
       await expect(fileManager.uploadFiles([])).rejects.toThrow('Nessun file fornito')
     })
 
-    it('dovrebbe lanciare errore se la dimensione totale supera il limite', async () => {
+    it('should throw if the total size exceeds the limit', async () => {
       const largeFile = {
         name: 'large.mp3',
         size: 1.5 * 1024 * 1024 * 1024, // 1.5GB
@@ -190,7 +190,7 @@ describe('FileManager', () => {
         .rejects.toThrow('Dimensione totale album troppo grande')
     })
 
-    it('dovrebbe pulire i file in caso di errore parziale', async () => {
+    it('should clean up files on partial error', async () => {
       const mockFile1 = {
         name: 'test1.mp3',
         size: 1000,
@@ -201,7 +201,7 @@ describe('FileManager', () => {
       const mockFile2 = {
         name: 'test2.txt',
         size: 1000,
-        type: 'text/plain' // File non valido
+        type: 'text/plain' // Invalid file
       }
 
       const mockFiles = [mockFile1 as unknown as File, mockFile2 as unknown as File]
@@ -211,7 +211,7 @@ describe('FileManager', () => {
       expect(mockFs.unlink).toHaveBeenCalled()
     })
 
-    it('dovrebbe gestire errori di scrittura file', async () => {
+    it('should handle file write errors', async () => {
       const mockFile = {
         name: 'test.mp3',
         size: 1000,
@@ -226,7 +226,7 @@ describe('FileManager', () => {
   })
 
   describe('createOutputDirectory', () => {
-    it('dovrebbe creare directory di output con nome valido', async () => {
+    it('should create an output directory with a valid name', async () => {
       const albumName = 'My Album'
       
       const result = await fileManager.createOutputDirectory(albumName)
@@ -238,7 +238,7 @@ describe('FileManager', () => {
       expect(result).toContain('My_Album')
     })
 
-    it('dovrebbe sanitizzare nomi di album con caratteri speciali', async () => {
+    it('should sanitize album names with special characters', async () => {
       const albumName = 'Album/With<Special>Characters'
       
       await fileManager.createOutputDirectory(albumName)
@@ -249,12 +249,12 @@ describe('FileManager', () => {
       )
     })
 
-    it('dovrebbe lanciare errore per nome album vuoto', async () => {
+    it('should throw for an empty album name', async () => {
       await expect(fileManager.createOutputDirectory('')).rejects.toThrow('Nome album richiesto')
       await expect(fileManager.createOutputDirectory('   ')).rejects.toThrow('Nome album richiesto')
     })
 
-    it('dovrebbe gestire errori di creazione directory', async () => {
+    it('should handle directory creation errors', async () => {
       mockFs.mkdir.mockRejectedValue(new Error('Permessi insufficienti'))
 
       await expect(fileManager.createOutputDirectory('Test Album'))
@@ -263,7 +263,7 @@ describe('FileManager', () => {
   })
 
   describe('cleanupFiles', () => {
-    it('dovrebbe eliminare file specificati', async () => {
+    it('should delete the specified files', async () => {
       const filePaths = ['/temp/file1.mp3', '/temp/file2.wav']
       mockFs.unlink.mockResolvedValue(undefined)
 
@@ -274,19 +274,19 @@ describe('FileManager', () => {
       expect(mockFs.unlink).toHaveBeenCalledWith('/temp/file2.wav')
     })
 
-    it('dovrebbe gestire errori di eliminazione senza lanciare eccezioni', async () => {
+    it('should handle deletion errors without throwing', async () => {
       const filePaths = ['/temp/file1.mp3']
       mockFs.unlink.mockRejectedValue(new Error('File non trovato'))
 
-      // Non dovrebbe lanciare errore
+      // Should not throw
       await expect(fileManager.cleanupFiles(filePaths)).resolves.toBeUndefined()
     })
   })
 
   describe('cleanupOldTempFiles', () => {
-    it('dovrebbe eliminare file più vecchi del limite specificato', async () => {
-      const oldDate = new Date(Date.now() - 25 * 60 * 60 * 1000) // 25 ore fa
-      const recentDate = new Date(Date.now() - 1 * 60 * 60 * 1000) // 1 ora fa
+    it('should delete files older than the specified limit', async () => {
+      const oldDate = new Date(Date.now() - 25 * 60 * 60 * 1000) // 25 hours ago
+      const recentDate = new Date(Date.now() - 1 * 60 * 60 * 1000) // 1 hour ago
 
       mockFs.readdir.mockResolvedValue(['old-file.mp3', 'recent-file.mp3'])
       mockFs.stat
@@ -302,16 +302,16 @@ describe('FileManager', () => {
       )
     })
 
-    it('dovrebbe gestire directory temporanea inesistente', async () => {
+    it('should handle a nonexistent temporary directory', async () => {
       mockFs.readdir.mockRejectedValue(new Error('Directory non trovata'))
 
-      // Non dovrebbe lanciare errore
+      // Should not throw
       await expect(fileManager.cleanupOldTempFiles()).resolves.toBeUndefined()
     })
   })
 
   describe('getTempFileInfo', () => {
-    it('dovrebbe restituire informazioni su file esistente', async () => {
+    it('should return info about an existing file', async () => {
       const fileId = 'test-uuid-123'
       const fileName = `${fileId}.mp3`
       const mockStats = {
@@ -331,7 +331,7 @@ describe('FileManager', () => {
       })
     })
 
-    it('dovrebbe restituire null per file inesistente', async () => {
+    it('should return null for a nonexistent file', async () => {
       mockFs.readdir.mockResolvedValue(['other-file.mp3'])
 
       const result = await fileManager.getTempFileInfo('non-existent-id')
@@ -339,7 +339,7 @@ describe('FileManager', () => {
       expect(result).toBeNull()
     })
 
-    it('dovrebbe gestire errori di accesso directory', async () => {
+    it('should handle directory access errors', async () => {
       mockFs.readdir.mockRejectedValue(new Error('Accesso negato'))
 
       const result = await fileManager.getTempFileInfo('test-id')
@@ -349,11 +349,11 @@ describe('FileManager', () => {
   })
 
   describe('preserveMetadata', () => {
-    it('dovrebbe verificare esistenza file sorgente e destinazione', async () => {
+    it('should check that source and destination files exist', async () => {
       const sourcePath = '/temp/source.mp3'
       const targetPath = '/output/target.mp3'
 
-      // Mock del MetadataManager
+      // Mock the MetadataManager
       vi.doMock('../metadata-manager', () => ({
         createMetadataManager: () => ({
           supportsMetadata: vi.fn().mockReturnValue(true),
@@ -367,17 +367,17 @@ describe('FileManager', () => {
       expect(mockFs.access).toHaveBeenCalledWith(targetPath, 4)
     })
 
-    it('dovrebbe lanciare errore se file sorgente non esiste', async () => {
+    it('should throw if the source file does not exist', async () => {
       mockFs.access.mockRejectedValue(new Error('File non trovato'))
 
       await expect(fileManager.preserveMetadata('/nonexistent.mp3', '/target.mp3'))
         .rejects.toThrow('Errore nella preservazione metadati')
     })
 
-    it('dovrebbe gestire file che non supportano metadati', async () => {
+    it('should handle files that do not support metadata', async () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
       
-      // Mock del MetadataManager che non supporta metadati
+      // Mock a MetadataManager that does not support metadata
       vi.doMock('../metadata-manager', () => ({
         createMetadataManager: () => ({
           supportsMetadata: vi.fn().mockReturnValue(false)
@@ -387,7 +387,7 @@ describe('FileManager', () => {
       await fileManager.preserveMetadata('/source.txt', '/target.txt')
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('non supporta metadati')
+        expect.stringContaining('does not support metadata')
       )
       
       consoleSpy.mockRestore()
@@ -395,7 +395,7 @@ describe('FileManager', () => {
   })
 
   describe('extractFileMetadata', () => {
-    it('dovrebbe estrarre metadati da file supportato', async () => {
+    it('should extract metadata from a supported file', async () => {
       const mockMetadata = { title: 'Test Song', artist: 'Test Artist' }
       
       vi.doMock('../metadata-manager', () => ({
@@ -410,7 +410,7 @@ describe('FileManager', () => {
       expect(result).toEqual(mockMetadata)
     })
 
-    it('dovrebbe restituire null per file non supportato', async () => {
+    it('should return null for an unsupported file', async () => {
       vi.doMock('../metadata-manager', () => ({
         createMetadataManager: () => ({
           supportsMetadata: vi.fn().mockReturnValue(false)
@@ -422,7 +422,7 @@ describe('FileManager', () => {
       expect(result).toBeNull()
     })
 
-    it('dovrebbe gestire errori di estrazione', async () => {
+    it('should handle extraction errors', async () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
       
       vi.doMock('../metadata-manager', () => ({
@@ -442,7 +442,7 @@ describe('FileManager', () => {
   })
 
   describe('fileSupportsMetadata', () => {
-    it('dovrebbe identificare formati supportati', () => {
+    it('should identify supported formats', () => {
       expect(fileManager.fileSupportsMetadata('/test.mp3')).toBe(true)
       expect(fileManager.fileSupportsMetadata('/test.flac')).toBe(true)
       expect(fileManager.fileSupportsMetadata('/test.ogg')).toBe(true)
@@ -450,14 +450,14 @@ describe('FileManager', () => {
       expect(fileManager.fileSupportsMetadata('/test.aac')).toBe(true)
     })
 
-    it('dovrebbe identificare formati non supportati', () => {
+    it('should identify unsupported formats', () => {
       expect(fileManager.fileSupportsMetadata('/test.wav')).toBe(false)
       expect(fileManager.fileSupportsMetadata('/test.txt')).toBe(false)
     })
   })
 
   describe('getMetadataSupport', () => {
-    it('dovrebbe restituire informazioni supporto metadati', async () => {
+    it('should return metadata support info', async () => {
       const mockSupport = {
         format: 'ID3v2',
         supportsBasicTags: true,
@@ -477,7 +477,7 @@ describe('FileManager', () => {
       expect(result).toEqual(mockSupport)
     })
 
-    it('dovrebbe gestire errori', async () => {
+    it('should handle errors', async () => {
       vi.doMock('../metadata-manager', () => ({
         createMetadataManager: () => {
           throw new Error('Errore inizializzazione')
@@ -492,7 +492,7 @@ describe('FileManager', () => {
   })
 
   describe('createFileManager factory', () => {
-    it('dovrebbe creare istanza FileManager', () => {
+    it('should create a FileManager instance', () => {
       const manager = createFileManager()
       expect(manager).toBeInstanceOf(FileManagerImpl)
     })

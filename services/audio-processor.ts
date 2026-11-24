@@ -2,19 +2,19 @@ import { AudioProcessor, AudioAnalysis, NormalizationOptions } from '@/types/aud
 import { promises as fs, constants as fsConstants } from 'fs'
 import path from 'path'
 /**
- * NOTA (core-05, 03/08): qui c'erano `FFmpeg` da `@ffmpeg/ffmpeg` e
- * `toBlobURL` da `@ffmpeg/util`, usati per caricare il core WASM da
- * `unpkg.com` al momento della costruzione del servizio. Sono stati rimossi
- * perché quel percorso **non ha mai funzionato**: questo file gira lato
- * server, e ffmpeg.wasm rifiuta esplicitamente Node — `f.load()` termina con
- * "ffmpeg.wasm does not support nodejs". L'errore veniva inghiottito da un
- * catch che stampava "using fallback methods", e il fallback era l'analisi
- * simulata di core-03.
+ * NOTE (core-05, 03/08): here there were `FFmpeg` from `@ffmpeg/ffmpeg` and
+ * `toBlobURL` from `@ffmpeg/util`, used to load the WASM core from
+ * `unpkg.com` when the service was constructed. They were removed
+ * because that path **never worked**: this file runs server
+ * side, and ffmpeg.wasm explicitly rejects Node — `f.load()` ends with
+ * "ffmpeg.wasm does not support nodejs". The error was swallowed by a
+ * catch that printed "using fallback methods", and the fallback was the simulated
+ * analysis of core-03.
  *
- * Il risultato pratico: l'app scaricava a ogni avvio ~30 MB da un CDN per un
- * modulo che non poteva caricare, e questa era anche la ragione per cui il
- * desktop non funzionava offline. Il processing server/desktop ora passa dal
- * NativeEngine (core-04), che usa un ffmpeg vero.
+ * The practical result: on every start the app downloaded ~30 MB from a CDN for a
+ * module it could not load, and this was also the reason why the
+ * desktop did not work offline. Server/desktop processing now goes through the
+ * NativeEngine (core-04), which uses a real ffmpeg.
  */
 import type { FFmpeg as FFmpegInstance } from '@ffmpeg/ffmpeg'
 
@@ -24,21 +24,21 @@ import type { FFmpeg as FFmpegInstance } from '@ffmpeg/ffmpeg'
  */
 export class AudioProcessorImpl implements AudioProcessor {
   /**
-   * Istanza di ffmpeg.wasm. Resta `null` per sempre: vedi la nota di core-05 in
-   * testa al file. I due campi sopravvivono perché una ventina di rami più
-   * sotto li interrogano, e quei rami vanno rimossi in un passaggio dedicato
-   * (qual-17) invece che di striscio insieme al motore nuovo.
+   * ffmpeg.wasm instance. It stays `null` forever: see the core-05 note at
+   * the top of the file. The two fields survive because some twenty branches further
+   * down query them, and those branches must be removed in a dedicated pass
+   * (qual-17) rather than in passing together with the new engine.
    *
-   * Il tipo arriva da un `import type`, che TypeScript cancella in
-   * compilazione: i rami morti restano tipizzati e verificabili, ma la
-   * libreria non finisce nel bundle.
+   * The type comes from an `import type`, which TypeScript erases at
+   * compile time: the dead branches stay typed and checkable, but the
+   * library does not end up in the bundle.
    */
   private ffmpeg: FFmpegInstance | null = null
   private isFFmpegLoaded = false
 
   constructor() {
-    // Nessuna inizializzazione: il caricamento del core WASM da CDN è stato
-    // rimosso (core-05). Il processing reale passa dal NativeEngine.
+    // No initialization: loading the WASM core from a CDN was
+    // removed (core-05). Real processing goes through the NativeEngine.
   }
 
   /**
@@ -54,18 +54,18 @@ export class AudioProcessorImpl implements AudioProcessor {
       const stats = await fs.stat(filePath)
       const ext = path.extname(filePath).toLowerCase()
 
-      // 1) Dati di contenitore: REALI, letti dall'header del file.
+      // 1) Container data: REAL, read from the file header.
       const container = await this.readContainerInfo(filePath)
 
-      // 2) Loudness: dal 03/08 (core-04) è misurata davvero, quando c'è un
-      //    ffmpeg nativo. L'engine esegue `ebur128` e restituisce LUFS, LRA,
-      //    sample peak e true peak reali, con `source: 'measured'`.
+      // 2) Loudness: since 03/08 (core-04) it is really measured, when there is a
+      //    native ffmpeg. The engine runs `ebur128` and returns real LUFS, LRA,
+      //    sample peak and true peak, with `source: 'measured'`.
       const misurata = await this.measureWithNativeEngine(filePath)
       if (misurata) return misurata
 
-      // 3) Senza ffmpeg restano i valori di ripiego, DICHIARATI come tali via
-      //    `source` invece di essere spacciati per misure. La UI avvisa
-      //    l'utente quando source !== 'measured'.
+      // 3) Without ffmpeg the fallback values remain, DECLARED as such via
+      //    `source` instead of being passed off as measurements. The UI warns
+      //    the user when source !== 'measured'.
       const fileHash = this.generateFileHash(filePath, stats.size)
       const loudness = this.placeholderLoudness(fileHash)
 
@@ -81,8 +81,8 @@ export class AudioProcessorImpl implements AudioProcessor {
         }
       }
 
-      // Fallback: nemmeno il contenitore è leggibile (file corrotto, formato
-      // non riconosciuto, o ambiente di test senza file reale).
+      // Fallback: not even the container is readable (corrupt file, format
+      // not recognized, or test environment without a real file).
       return {
         duration: 120 + (fileHash % 300),
         sampleRate: [44100, 48000, 96000][fileHash % 3],
@@ -97,12 +97,12 @@ export class AudioProcessorImpl implements AudioProcessor {
   }
 
   /**
-   * Misura la loudness con l'engine nativo, se un ffmpeg è raggiungibile.
+   * Measures loudness with the native engine, if an ffmpeg is reachable.
    *
-   * Restituisce `null` — senza sollevare — quando ffmpeg non c'è o il file non
-   * è misurabile: è la condizione che fa degradare l'analisi ai valori di
-   * ripiego dichiarati. Un'eccezione qui farebbe fallire un'analisi che invece
-   * può ancora restituire dati di contenitore validi.
+   * Returns `null` — without throwing — when ffmpeg is missing or the file is not
+   * measurable: that is the condition that makes the analysis degrade to the declared
+   * fallback values. An exception here would fail an analysis that can
+   * still return valid container data.
    */
   private async measureWithNativeEngine(
     filePath: string,
@@ -113,8 +113,8 @@ export class AudioProcessorImpl implements AudioProcessor {
       if (!(await engine.isAvailable())) return null
 
       const analisi = await engine.analyze({ kind: 'path', path: filePath })
-      // L'engine marca 'partial' quando ebur128 non ha prodotto un riepilogo
-      // (file corrotto o vuoto): in quel caso il ripiego resta più informativo.
+      // The engine marks 'partial' when ebur128 produced no summary
+      // (corrupt or empty file): in that case the fallback stays more informative.
       return analisi.source === 'measured' ? analisi : null
     } catch {
       return null
@@ -122,12 +122,12 @@ export class AudioProcessorImpl implements AudioProcessor {
   }
 
   /**
-   * Legge i dati reali del contenitore audio (durata, sample rate, canali,
-   * formato, bitrate) tramite `music-metadata`, che analizza l'header del file
-   * senza bisogno di ffmpeg.
+   * Reads the real audio container data (duration, sample rate, channels,
+   * format, bitrate) via `music-metadata`, which parses the file header
+   * without needing ffmpeg.
    *
-   * Restituisce `null` — senza sollevare — se il file non è interpretabile:
-   * chi chiama decide come degradare.
+   * Returns `null` — without throwing — if the file cannot be interpreted:
+   * the caller decides how to degrade.
    */
   private async readContainerInfo(filePath: string): Promise<{
     duration: number
@@ -141,8 +141,8 @@ export class AudioProcessorImpl implements AudioProcessor {
       const meta = await parseFile(filePath, { duration: true })
       const info = meta.format
 
-      // Senza questi tre il dato non è utilizzabile: meglio dichiararlo assente
-      // che restituire zeri che poi finiscono nei calcoli di guadagno.
+      // Without these three the data is unusable: better to declare it missing
+      // than to return zeros that then end up in the gain calculations.
       if (!info?.duration || !info.sampleRate || !info.numberOfChannels) {
         return null
       }
@@ -155,18 +155,18 @@ export class AudioProcessorImpl implements AudioProcessor {
         bitrate: info.bitrate,
       }
     } catch {
-      // music-metadata assente, file illeggibile o formato non supportato.
+      // music-metadata missing, unreadable file or unsupported format.
       return null
     }
   }
 
   /**
-   * Valori di loudness di ripiego, deterministici rispetto al file.
+   * Fallback loudness values, deterministic with respect to the file.
    *
-   * NON sono misure. Esistono solo perché l'interfaccia possa funzionare prima
-   * che l'engine nativo sia pronto (core-04); vanno sempre accompagnati da
-   * `source: 'partial' | 'estimated'`. Da eliminare quando ffmpeg misurerà
-   * davvero via `ebur128`.
+   * They are NOT measurements. They exist only so the interface can work before
+   * the native engine is ready (core-04); they must always come with
+   * `source: 'partial' | 'estimated'`. To be removed when ffmpeg really measures
+   * via `ebur128`.
    */
   private placeholderLoudness(fileHash: number): {
     peakLevel: number
@@ -180,7 +180,7 @@ export class AudioProcessorImpl implements AudioProcessor {
       peakLevel,
       rmsLevel: peakLevel - 6 - (fileHash % 12),
       lufsIntegrated: -23 + ((fileHash % 40) - 20), // -43 .. -3 LUFS
-      // il true peak sta appena sopra il picco campionato, ma mai sopra 0 dBTP
+      // the true peak sits just above the sampled peak, but never above 0 dBTP
       truePeak: Math.min(0, peakLevel + 0.1 + ((fileHash % 10) / 10)),
       hasClipping: fileHash % 10 < 2,
     }
@@ -399,16 +399,16 @@ export class AudioProcessorImpl implements AudioProcessor {
    */
   async validateFormat(filePath: string): Promise<boolean> {
     try {
-      // Verifica estensione supportata con controllo robusto su stringa
+      // Check for a supported extension with a robust string check
       const detectedFormat = this.detectAudioFormat(filePath)
       if (!detectedFormat.isSupported) {
         return false
       }
 
-      // Verifica che il file esista ed è leggibile
+      // Check that the file exists and is readable
       await fs.access(filePath, fsConstants.R_OK)
 
-      // Verifica dimensione file (deve essere > 0)
+      // Check the file size (must be > 0)
       const stats = await fs.stat(filePath)
       if (stats.size === 0) {
         return false
@@ -468,7 +468,7 @@ export class AudioProcessorImpl implements AudioProcessor {
     error?: string
   }> {
     try {
-      // Controllo formato
+      // Format check
       const formatInfo = this.detectAudioFormat(filePath)
       if (!formatInfo.isSupported) {
         return {
@@ -477,7 +477,7 @@ export class AudioProcessorImpl implements AudioProcessor {
         }
       }
 
-      // Controllo esistenza file
+      // File existence check
       try {
         await fs.access(filePath, fsConstants.R_OK)
       } catch {
@@ -487,7 +487,7 @@ export class AudioProcessorImpl implements AudioProcessor {
         }
       }
 
-      // Controllo dimensione file
+      // File size check
       const stats = await fs.stat(filePath)
       if (stats.size === 0) {
         return {

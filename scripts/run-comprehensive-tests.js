@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script per eseguire la suite completa di test per il sistema di normalizzazione audio
+ * Script to run the complete test suite of the audio normalization system
  */
 
 const { execSync } = require('child_process');
@@ -10,56 +10,56 @@ const path = require('path');
 console.log('🎵 Audio Normalizer - Comprehensive Test Suite');
 console.log('='.repeat(50));
 
-// NOTA sui pattern: il filtro posizionale di vitest NON è una glob, è una
-// corrispondenza di sottostringa sul percorso del file. Pattern come
-// 'services/__tests__/**\/*.test.ts' non corrispondono a nulla e fanno uscire
-// vitest con codice 1 e zero test eseguiti — su qualunque sistema operativo.
-// Vedi test-11 in ROADMAP.html. Qui usiamo prefissi di percorso.
+// NOTE on the patterns: vitest's positional filter is NOT a glob, it is a
+// substring match on the file path. Patterns like
+// 'services/__tests__/**\/*.test.ts' match nothing and make vitest exit
+// with code 1 and zero tests run — on any operating system.
+// See test-11 in ROADMAP.html. Here we use path prefixes.
 const testCategories = [
   {
     name: 'Unit Tests - Core Functionality',
     pattern: 'services/__tests__',
-    description: 'Test delle funzionalità core (audio processing, file management, etc.)'
+    description: 'Tests of the core functionality (audio processing, file management, etc.)'
   },
   {
     name: 'Unit Tests - Normalization Algorithms',
     pattern: 'services/__tests__/normalization-algorithms.test.ts',
-    description: 'Test degli algoritmi di normalizzazione (peak, loudness, EBU R128)'
+    description: 'Tests of the normalization algorithms (peak, loudness, EBU R128)'
   },
   {
     name: 'Unit Tests - Error Handling',
     pattern: 'services/__tests__/error-handling.test.ts',
-    description: 'Test della gestione errori e scenari di fallimento'
+    description: 'Tests of error handling and failure scenarios'
   },
   {
     name: 'Unit Tests - Performance',
     pattern: 'services/__tests__/performance.test.ts',
-    description: 'Test delle performance e gestione memoria'
+    description: 'Performance and memory management tests'
   },
   {
     name: 'Integration Tests - API Endpoints',
     pattern: 'app/api',
-    description: 'Test di integrazione degli endpoint API'
+    description: 'Integration tests of the API endpoints'
   },
   {
     name: 'Integration Tests - Complete Workflows',
     pattern: '__tests__/integration/complete-workflow.test.ts',
-    description: 'Test end-to-end del workflow completo (upload → analyze → normalize → download)'
+    description: 'End-to-end tests of the complete workflow (upload → analyze → normalize → download)'
   },
   {
     name: 'Integration Tests - Format Compatibility',
     pattern: '__tests__/integration/format-compatibility.test.ts',
-    description: 'Test di compatibilità con diversi formati audio'
+    description: 'Compatibility tests with different audio formats'
   },
   {
     name: 'Integration Tests - Large Album Performance',
     pattern: '__tests__/integration/large-album-performance.test.ts',
-    description: 'Test delle performance con album di grandi dimensioni'
+    description: 'Performance tests with large albums'
   },
   {
     name: 'Integration Tests - Concurrent Processing',
     pattern: '__tests__/integration/concurrent-processing.test.ts',
-    description: 'Test del processing concorrente e gestione risorse'
+    description: 'Tests of concurrent processing and resource management'
   }
 ];
 

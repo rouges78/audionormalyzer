@@ -1,38 +1,38 @@
 @echo off
-REM Audio Normalizer - Diagnosi Problemi EXE
-REM Identifica perché il file EXE non viene creato
+REM Audio Normalizer - EXE Problem Diagnosis
+REM Finds out why the EXE file is not created
 
 echo =====================================================
-echo    Audio Normalizer - Diagnosi Problemi EXE
+echo    Audio Normalizer - EXE Problem Diagnosis
 echo =====================================================
 echo.
 
-echo 🔍 Controllo sistema e dipendenze...
+echo 🔍 Checking system and dependencies...
 echo.
 
 REM Check Node.js version
-echo 📋 Versione Node.js:
+echo 📋 Node.js version:
 node --version
 if errorlevel 1 (
-    echo ❌ Node.js non trovato!
+    echo ❌ Node.js not found!
     pause
     exit /b 1
 )
 
 REM Check npm version
-echo 📋 Versione NPM:
+echo 📋 NPM version:
 npm --version
 
 REM Check if electron-builder is installed
 echo 📋 Electron Builder:
 npx electron-builder --version
 if errorlevel 1 (
-    echo ⚠️ Electron Builder non trovato, installandolo...
+    echo ⚠️ Electron Builder not found, installing it...
     npm install electron-builder --save-dev
 )
 
 echo.
-echo 🧹 Pulizia completa del progetto...
+echo 🧹 Full project cleanup...
 echo.
 
 REM Kill all processes
@@ -45,30 +45,30 @@ if exist "dist" rmdir /s /q "dist" >nul 2>&1
 if exist ".next" rmdir /s /q ".next" >nul 2>&1
 if exist "node_modules\.cache" rmdir /s /q "node_modules\.cache" >nul 2>&1
 
-echo ✅ Pulizia completata
+echo ✅ Cleanup completed
 echo.
 
-echo 🔨 Test build Next.js...
+echo 🔨 Testing Next.js build...
 call npm run build
 if errorlevel 1 (
-    echo ❌ BUILD NEXT.JS FALLITO!
+    echo ❌ NEXT.JS BUILD FAILED!
     echo.
-    echo 💡 Il problema è nel build web. Controlla:
-    echo    - Errori TypeScript
-    echo    - Problemi Tailwind CSS  
-    echo    - Dipendenze mancanti
+    echo 💡 The problem is in the web build. Check:
+    echo    - TypeScript errors
+    echo    - Tailwind CSS problems  
+    echo    - Missing dependencies
     echo.
     pause
     exit /b 1
 )
 
-echo ✅ Build Next.js riuscito!
+echo ✅ Next.js build succeeded!
 echo.
 
-echo 📁 Controllo file necessari per Electron...
+echo 📁 Checking files required by Electron...
 if not exist "electron\main.js" (
-    echo ❌ File Electron main mancante!
-    echo Creo un file Electron semplice...
+    echo ❌ Electron main file missing!
+    echo Creating a simple Electron file...
     
     if not exist "electron" mkdir "electron"
     
@@ -88,49 +88,49 @@ if not exist "electron\main.js" (
     echo. >> "electron\main-simple.js"
     echo app.whenReady().then(createWindow); >> "electron\main-simple.js"
     
-    echo ✅ File Electron creato
+    echo ✅ Electron file created
 )
 
 echo.
-echo 🚀 Test creazione EXE (versione semplificata)...
+echo 🚀 Testing EXE creation (simplified version)...
 echo.
 
 REM Try simple electron-builder command
-echo Tentativo 1: Comando base
+echo Attempt 1: Basic command
 call npx electron-builder --win --x64 portable
 if errorlevel 1 (
-    echo ❌ Tentativo 1 fallito
+    echo ❌ Attempt 1 failed
     echo.
-    echo Tentativo 2: Con configurazione inline
+    echo Attempt 2: With inline configuration
     call npx electron-builder --win --x64 portable --config.directories.output=dist --config.files="**/*" --config.win.target=portable
     if errorlevel 1 (
-        echo ❌ Tentativo 2 fallito
+        echo ❌ Attempt 2 failed
         echo.
-        echo 🔧 Provo build con package.json base...
+        echo 🔧 Trying build with a basic package.json...
         
         REM Create minimal electron-builder config in package.json
-        echo Aggiornamento package.json...
+        echo Updating package.json...
         
-        echo Tentativo 3: Build minimale
+        echo Attempt 3: Minimal build
         call npx electron-builder --win portable --config.appId=com.audionormalizer.app --config.productName="Audio Normalizer" --config.directories.output=dist
         if errorlevel 1 (
-            echo ❌ TUTTI I TENTATIVI FALLITI
+            echo ❌ ALL ATTEMPTS FAILED
             echo.
-            echo 🚨 ANALISI ERRORI:
+            echo 🚨 ERROR ANALYSIS:
             echo.
-            echo 1. Controlla antivirus - potrebbe bloccare la creazione
-            echo 2. Esegui come amministratore
-            echo 3. Spazio disco insufficiente?
-            echo 4. Percorso troppo lungo?
-            echo 5. File in uso da altri processi?
+            echo 1. Check the antivirus - it could block the creation
+            echo 2. Run as administrator
+            echo 3. Insufficient disk space?
+            echo 4. Path too long?
+            echo 5. Files in use by other processes?
             echo.
-            echo 💡 SOLUZIONI DA PROVARE:
+            echo 💡 SOLUTIONS TO TRY:
             echo.
-            echo A. Riavvia il computer
-            echo B. Disabilita temporaneamente antivirus
-            echo C. Esegui da cartella con percorso più breve (es. C:\temp\audio\)
-            echo D. Libera spazio su disco
-            echo E. Chiudi tutti i programmi non necessari
+            echo A. Restart the computer
+            echo B. Temporarily disable the antivirus
+            echo C. Run from a folder with a shorter path (e.g. C:\temp\audio\)
+            echo D. Free up disk space
+            echo E. Close all unnecessary programs
             echo.
             pause
             exit /b 1
@@ -139,38 +139,38 @@ if errorlevel 1 (
 )
 
 echo.
-echo ✅ SUCCESSO! File EXE creato!
+echo ✅ SUCCESS! EXE file created!
 echo.
 
 REM Check what was created
-echo 📁 File creati in dist:
+echo 📁 Files created in dist:
 dir "dist\*.exe" /b 2>nul
 if errorlevel 1 (
-    echo ⚠️ Nessun file .exe trovato in dist, controllo altre cartelle...
+    echo ⚠️ No .exe file found in dist, checking other folders...
     dir "*.exe" /s /b | findstr "Audio-Normalizer"
 ) else (
     echo.
-    echo 🎉 EXE trovato! Aprendo cartella dist...
+    echo 🎉 EXE found! Opening dist folder...
     explorer dist
 )
 
 echo.
-echo 🧪 Test rapido del file EXE...
+echo 🧪 Quick test of the EXE file...
 for %%f in (dist\*.exe) do (
-    echo Testando: %%f
+    echo Testing: %%f
     start "" "%%f"
-    echo ⏳ EXE avviato, controlla se funziona...
+    echo ⏳ EXE started, check whether it works...
     timeout /t 5 /nobreak >nul
     tasklist | findstr "%%~nf" >nul
     if errorlevel 1 (
-        echo ⚠️ EXE non sembra essere in esecuzione
+        echo ⚠️ EXE does not seem to be running
     ) else (
-        echo ✅ EXE in esecuzione!
+        echo ✅ EXE running!
         taskkill /f /im "%%~nxf" >nul 2>&1
     )
 )
 
 echo.
-echo 📋 RIEPILOGO DIAGNOSI COMPLETATA
+echo 📋 DIAGNOSIS COMPLETED - SUMMARY
 echo =====================================
 pause
