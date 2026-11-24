@@ -1,6 +1,6 @@
 /**
- * Audio Normalizer - Configurazione Electron Builder Minimale
- * Configurazione semplificata per garantire la creazione dell'EXE
+ * Audio Normalizer - Minimal Electron Builder Configuration
+ * Simplified configuration to guarantee the EXE gets created
  */
 
 module.exports = {
@@ -31,11 +31,11 @@ module.exports = {
     artifactName: '${productName}-${version}-Portable.exe'
   },
 
-  // Configurazione minimale senza dipendenze esterne
+  // Minimal configuration without external dependencies
   buildDependenciesFromSource: false,
   npmRebuild: false,
   nodeGypRebuild: false,
   
-  // Disabilita funzionalità che potrebbero causare problemi
+  // Disable features that could cause problems
   forceCodeSigning: false
 }

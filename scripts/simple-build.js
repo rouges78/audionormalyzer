@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script semplificato per creare l'eseguibile Windows
+ * Simplified script to create the Windows executable
  */
 
 const { execSync } = require('child_process');

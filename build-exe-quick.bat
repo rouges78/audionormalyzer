@@ -1,47 +1,47 @@
 @echo off
 REM Audio Normalizer - Quick Windows EXE Builder
-REM Creazione rapida solo EXE portable per Windows
+REM Quick creation of the portable Windows EXE only
 
 echo =====================================================
 echo    Audio Normalizer - Windows EXE Builder
 echo =====================================================
 echo.
 
-echo 📦 Creazione EXE per Windows...
+echo 📦 Creating EXE for Windows...
 echo.
 
 REM Check Node.js
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Node.js non trovato. Installa Node.js 18+ e riprova.
+    echo ❌ Node.js not found. Install Node.js 18+ and try again.
     pause
     exit /b 1
 )
 
 REM Build Next.js app first
-echo 🔨 Build applicazione web...
+echo 🔨 Building the web application...
 call npm run build
 if errorlevel 1 (
-    echo ❌ Errore durante build web
+    echo ❌ Error during the web build
     pause
     exit /b 1
 )
 
 REM Build Electron app
-echo 🚀 Creazione EXE...
+echo 🚀 Creating EXE...
 call npm run electron:dist
 if errorlevel 1 (
-    echo ❌ Errore durante creazione EXE
+    echo ❌ Error while creating the EXE
     pause
     exit /b 1
 )
 
 echo.
-echo ✅ EXE creato con successo!
+echo ✅ EXE created successfully!
 echo.
-echo 📁 File disponibile in: dist\Audio-Normalizer-Professional-*-Portable.exe
+echo 📁 File available in: dist\Audio-Normalizer-Professional-*-Portable.exe
 echo.
-echo 💡 Per testare: Vai nella cartella dist\ e esegui il file .exe
+echo 💡 To test: go to the dist\ folder and run the .exe file
 echo.
 
 REM Open dist folder

@@ -182,7 +182,7 @@ describe('AudioProcessorImpl', () => {
 
       await audioProcessor.validateFormat(mp3Path)
       
-      // Verifica che venga controllato l'accesso in lettura
+      // Check that read access is verified
       expect(fs.access).toHaveBeenCalledWith(mp3Path, 4) // R_OK = 4
     })
 
@@ -233,8 +233,8 @@ describe('AudioProcessorImpl', () => {
     beforeEach(() => {
       vi.mocked(fs.access).mockResolvedValue(undefined)
       vi.mocked(fs.readFile).mockResolvedValue(Buffer.from('mock audio data'))
-      // analyzeAudio legge fs.stat per derivare l'hash del file: senza questo
-      // mock stats è undefined e l'analisi esplode su stats.size.
+      // analyzeAudio reads fs.stat to derive the file hash: without this
+      // mock stats is undefined and the analysis blows up on stats.size.
       vi.mocked(fs.stat).mockResolvedValue({ size: 1024 * 1024 } as any)
 
       // Mock FFmpeg responses

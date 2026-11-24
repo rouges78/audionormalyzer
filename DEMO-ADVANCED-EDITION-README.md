@@ -1,18 +1,18 @@
-# 🎵 Audio Normalizer - Demo Avanzata Edition 🚀✨
+# 🎵 Audio Normalizer - Advanced Demo Edition 🚀✨
 
-## ✅ **DEMO AVANZATA COMPLETAMENTE MIGLIORATA!**
+## ✅ **ADVANCED DEMO FULLY IMPROVED!**
 
-Ho potenziato la demo professionale con simulazioni ancora più realistiche e funzionalità avanzate! La versione Demo Avanzata ora include pattern audio sofisticati, 10 preset professionali, visualizzazioni stereo, phase meter e file history simulation.
+I have boosted the professional demo with even more realistic simulations and advanced features! The Advanced Demo version now includes sophisticated audio patterns, 10 professional presets, stereo visualizations, a phase meter and file history simulation.
 
-## 🎯 **NUOVE FUNZIONALITÀ DEMO AVANZATA:**
+## 🎯 **NEW ADVANCED DEMO FEATURES:**
 
-### 🎵 **Pattern Waveform Ultra-Realistici:**
-- **Musica Pattern** - Armoniche multiple, decay naturale, frequenze sovrapposte
-- **Voce/Podcast Pattern** - Pattern vocali realistici con modulazione naturale
-- **Elettronico Pattern** - Sintetizzato con boost medi e dinamiche controllate
-- **Noise & Dynamics** - Rumore realistico e limitazione naturale
+### 🎵 **Ultra-Realistic Waveform Patterns:**
+- **Music Pattern** - Multiple harmonics, natural decay, overlapping frequencies
+- **Voice/Podcast Pattern** - Realistic vocal patterns with natural modulation
+- **Electronic Pattern** - Synthesized, with mid boost and controlled dynamics
+- **Noise & Dynamics** - Realistic noise and natural limiting
 
-### 🎚️ **10 Preset Professionali Completi:**
+### 🎚️ **10 Complete Professional Presets:**
 ```
 📺 Broadcast (-23 LUFS)    - EBU R128 compliant TV/Radio
 📱 Streaming (-16 LUFS)    - Spotify/Apple Music optimized  
@@ -26,46 +26,46 @@ Ho potenziato la demo professionale con simulazioni ancora più realistiche e fu
 📻 Radio (-22 LUFS)       - Radio broadcasting standard
 ```
 
-### 📊 **Visualizzazioni Avanzate Aggiunte:**
+### 📊 **Advanced Visualizations Added:**
 
 #### 🎧 **Stereo Field Visualization:**
-- **Stereo imaging** in tempo reale con dots distribution
-- **Center line reference** per mono/stereo comparison
-- **Dynamic content representation** con movement naturale
-- **Professional stereo field display** come nei DAW reali
+- **Real-time stereo imaging** with dots distribution
+- **Center line reference** for mono/stereo comparison
+- **Dynamic content representation** with natural movement
+- **Professional stereo field display** like in real DAWs
 
-#### ⚡ **Phase Meter Professionale:**
-- **Phase correlation** da -180° a +180°
-- **Color coding** - Verde (buono), Giallo (attenzione), Arancione (warning)
-- **Real-time indicator** con smooth transitions
-- **Phase relationship** simulation realistica
+#### ⚡ **Professional Phase Meter:**
+- **Phase correlation** from -180° to +180°
+- **Color coding** - Green (good), Yellow (caution), Orange (warning)
+- **Real-time indicator** with smooth transitions
+- **Realistic phase relationship** simulation
 
 ### 📄 **File History & Recent Projects:**
-- **Recent Files list** con durate simulate
+- **Recent Files list** with simulated durations
 - **Click to load** file simulation
-- **File icons** per tipo (🎵 MP3, 🎤 WAV, 🎼 FLAC, 🎙️ Podcast)
-- **Hover effects** professionali con feedback visivo
-- **Status feedback** quando si carica un file recent
+- **File icons** by type (🎵 MP3, 🎤 WAV, 🎼 FLAC, 🎙️ Podcast)
+- **Professional hover effects** with visual feedback
+- **Status feedback** when a recent file is loaded
 
-## 🎨 **SIMULAZIONI ANCORA PIÙ REALISTICHE:**
+## 🎨 **EVEN MORE REALISTIC SIMULATIONS:**
 
-### 🎵 **Algoritmi Waveform Avanzati:**
+### 🎵 **Advanced Waveform Algorithms:**
 ```javascript
-// Pattern Musicale con Armoniche
+// Musical pattern with harmonics
 if (patternType < 0.3) {
     amplitude = Math.sin(x * Math.PI * 12) * Math.exp(-x * 1.5) * (0.4 + Math.random() * 0.3);
     amplitude += Math.sin(x * Math.PI * 24) * 0.2 * Math.exp(-x * 2);     // 2nd harmonic
     amplitude += Math.sin(x * Math.PI * 48) * 0.1 * Math.exp(-x * 3);     // 4th harmonic
 }
 
-// Pattern Vocale con Modulazione
+// Vocal pattern with modulation
 else if (patternType < 0.6) {
     amplitude = Math.sin(x * Math.PI * 6) * Math.exp(-x * 1.2);
     amplitude *= (0.3 + 0.4 * Math.sin(x * Math.PI * 3));                 // Natural modulation
     amplitude += (Math.random() - 0.5) * 0.1;                            // Voice noise
 }
 
-// Pattern Elettronico
+// Electronic pattern
 else {
     amplitude = Math.sin(x * Math.PI * 16) * Math.exp(-x * 2) * (0.5 + Math.random() * 0.2);
     amplitude += Math.sin(x * Math.PI * 32) * 0.3 * Math.exp(-x * 2.5);
@@ -75,7 +75,7 @@ else {
 
 ### 📊 **Stereo Field Algorithm:**
 ```javascript
-// Simulazione contenuto stereo realistico
+// Realistic stereo content simulation
 for (let i = 0; i < 15; i++) {
     const x = canvas.width / 2 + (Math.random() - 0.5) * canvas.width * 0.6;  // Stereo spread
     const y = canvas.height / 2 + (Math.random() - 0.5) * canvas.height * 0.8; // Vertical dist
@@ -89,19 +89,19 @@ for (let i = 0; i < 15; i++) {
 
 ### ⚡ **Phase Correlation Simulation:**
 ```javascript
-// Phase correlation realistica (-1 to +1)
+// Realistic phase correlation (-1 to +1)
 const phase = (Math.random() - 0.5) * 1.8; // Mostly centered around 0
 const percentage = ((phase + 1) / 2) * 100;
 
-// Color coding professionale
+// Professional color coding
 if (Math.abs(phase) < 0.3) phaseValue.style.color = '#00ff00';      // Good correlation
 else if (Math.abs(phase) < 0.7) phaseValue.style.color = '#ffff00'; // Caution
 else phaseValue.style.color = '#ff6600';                             // Warning
 ```
 
-## 📋 **LAYOUT DEMO AVANZATA:**
+## 📋 **ADVANCED DEMO LAYOUT:**
 
-### 🎛️ **Interface Professionale Completa:**
+### 🎛️ **Complete Professional Interface:**
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │ 🎵 Audio Normalizer Professional        ⚙️Settings 📋Presets 📊Analyze│
@@ -136,104 +136,104 @@ else phaseValue.style.color = '#ff6600';                             // Warning
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 **MIGLIORAMENTI DEMO IMPLEMENTATI:**
+## 🚀 **DEMO IMPROVEMENTS IMPLEMENTED:**
 
-### ✅ **Simulazioni Ultra-Realistiche:**
-- **3 pattern waveform** distinti (Musica, Voce, Elettronico)
-- **Armoniche multiple** per pattern musicali realistici
-- **Modulazione naturale** per pattern vocali
-- **Dynamic range** e noise naturale su tutti i pattern
+### ✅ **Ultra-Realistic Simulations:**
+- **3 distinct waveform patterns** (Music, Voice, Electronic)
+- **Multiple harmonics** for realistic musical patterns
+- **Natural modulation** for vocal patterns
+- **Dynamic range** and natural noise on all patterns
 
-### ✅ **Preset System Espanso:**
-- **10 preset professionali** invece di 5
-- **Standards industriali** (Cinema -27 LUFS, Gaming -18 LUFS)
-- **Feedback visivo** quando si carica un preset
-- **Descrizioni complete** per ogni scenario d'uso
+### ✅ **Expanded Preset System:**
+- **10 professional presets** instead of 5
+- **Industry standards** (Cinema -27 LUFS, Gaming -18 LUFS)
+- **Visual feedback** when a preset is loaded
+- **Full descriptions** for every use case
 
-### ✅ **Visualizzazioni Professionali Avanzate:**
-- **Stereo field** con movimento naturale del contenuto
-- **Phase meter** con correlation reale e color coding
-- **Smooth animations** per tutte le visualizzazioni
-- **Professional styling** coerente con standard DAW
+### ✅ **Advanced Professional Visualizations:**
+- **Stereo field** with natural content movement
+- **Phase meter** with real correlation and color coding
+- **Smooth animations** for all visualizations
+- **Professional styling** consistent with DAW standards
 
-### ✅ **User Experience Migliorata:**
-- **Recent files** con durate e icone per tipo
-- **Status feedback** per tutte le azioni
-- **Hover effects** professionali su tutti gli elementi
-- **File loading simulation** realistica
+### ✅ **Improved User Experience:**
+- **Recent files** with durations and icons by type
+- **Status feedback** for all actions
+- **Professional hover effects** on all elements
+- **Realistic file loading simulation**
 
-## 🎯 **DEMO AVANZATA VS VERSIONE REALE:**
+## 🎯 **ADVANCED DEMO VS REAL VERSION:**
 
-### 🔄 **Cosa È Simulato (Ma Ultra-Realistico):**
-- **Waveform generation** - 3 algoritmi sofisticati
-- **Audio analysis** - Valori plausibili e realistici  
-- **Stereo/Phase meters** - Movimento naturale audio
-- **File loading** - Timing e feedback realistici
-- **Preset application** - Configurazione visibile
+### 🔄 **What Is Simulated (But Ultra-Realistic):**
+- **Waveform generation** - 3 sophisticated algorithms
+- **Audio analysis** - Plausible, realistic values  
+- **Stereo/Phase meters** - Natural audio movement
+- **File loading** - Realistic timing and feedback
+- **Preset application** - Visible configuration
 
-### ❌ **Cosa Ancora Manca (Solo Per Produzione):**
-- **Real FFmpeg processing** - File audio veri
-- **Actual normalization** - Output file reali
-- **Persistent storage** - Salvataggio settings
-- **File I/O** - Save/load progetti reali
+### ❌ **What Is Still Missing (Production Only):**
+- **Real FFmpeg processing** - Real audio files
+- **Actual normalization** - Real output files
+- **Persistent storage** - Saving settings
+- **File I/O** - Saving/loading real projects
 
-## 🎵 **COME USARE LA DEMO AVANZATA:**
+## 🎵 **HOW TO USE THE ADVANCED DEMO:**
 
-### 📁 **Workflow Demo Completo:**
+### 📁 **Complete Demo Workflow:**
 1. **Launch** `Audio Normalizer Professional 0.1.0.exe`
-2. **Explore Presets** - Clicca sui 10 preset per vedere configurazioni
-3. **Load Recent Files** - Clicca sui file nella sezione Recent Files
-4. **Drag & Drop** - Trascina file audio per waveform realistiche
-5. **Analyze Tracks** - Vedi pattern audio sofisticati
-6. **Watch Meters** - Osserva level meters, spectrum, stereo field, phase
-7. **Preset Testing** - Testa tutti i preset professionali
+2. **Explore Presets** - Click the 10 presets to see their configurations
+3. **Load Recent Files** - Click the files in the Recent Files section
+4. **Drag & Drop** - Drag audio files in for realistic waveforms
+5. **Analyze Tracks** - See sophisticated audio patterns
+6. **Watch Meters** - Watch the level meters, spectrum, stereo field, phase
+7. **Preset Testing** - Test all the professional presets
 
-### 🎛️ **Funzionalità Demo Interattive:**
-- **Real-time Visualizations** - Tutte le visualizzazioni animate
-- **Professional Presets** - 10 scenari diversi da esplorare
-- **File Simulation** - Recent files caricabili con un click
-- **Hover Effects** - Feedback visivo su tutti gli elementi
-- **Status Updates** - Messaggi per ogni azione
+### 🎛️ **Interactive Demo Features:**
+- **Real-time Visualizations** - All visualizations animated
+- **Professional Presets** - 10 different scenarios to explore
+- **File Simulation** - Recent files loadable with one click
+- **Hover Effects** - Visual feedback on all elements
+- **Status Updates** - Messages for every action
 
-## 📦 **ESEGUIBILE DEMO AVANZATA:**
+## 📦 **ADVANCED DEMO EXECUTABLE:**
 
 ```
 Audio Normalizer Professional 0.1.0.exe (64.62 MB)
 ```
 
-### ✅ **Funzionalità Demo Complete:**
-- ✅ **3 Pattern Waveform** ultra-realistici
-- ✅ **10 Preset Professionali** per tutti gli scenari
-- ✅ **Stereo Field Visualization** con contenuto dinamico
-- ✅ **Phase Meter** con correlation e color coding
-- ✅ **Recent Files Simulation** con durate e icone
-- ✅ **Status System** con feedback per ogni azione
-- ✅ **Professional UI** con hover effects avanzati
-- ✅ **Smooth Animations** per massimo realismo
+### ✅ **Complete Demo Features:**
+- ✅ **3 Ultra-realistic Waveform Patterns**
+- ✅ **10 Professional Presets** for every scenario
+- ✅ **Stereo Field Visualization** with dynamic content
+- ✅ **Phase Meter** with correlation and color coding
+- ✅ **Recent Files Simulation** with durations and icons
+- ✅ **Status System** with feedback for every action
+- ✅ **Professional UI** with advanced hover effects
+- ✅ **Smooth Animations** for maximum realism
 
-## 🎉 **RISULTATO FINALE DEMO AVANZATA:**
+## 🎉 **ADVANCED DEMO FINAL RESULT:**
 
-L'Audio Normalizer Professional Demo Avanzata ora offre:
+Audio Normalizer Professional Advanced Demo now offers:
 
-- 🎵 **Simulazioni audio** indistinguibili dalla realtà
-- 🎛️ **10 preset professionali** per ogni scenario
-- 📊 **Visualizzazioni complete** (spectrum + stereo + phase)
-- 📄 **File management** con history simulation
-- 🎨 **Interface professionale** con effects avanzati
-- ⚡ **Performance ottimizzate** per uso fluido
-- 🔧 **User experience** completa e coinvolgente
+- 🎵 **Audio simulations** indistinguishable from reality
+- 🎛️ **10 professional presets** for every scenario
+- 📊 **Complete visualizations** (spectrum + stereo + phase)
+- 📄 **File management** with history simulation
+- 🎨 **Professional interface** with advanced effects
+- ⚡ **Optimized performance** for smooth use
+- 🔧 **Complete, engaging user experience**
 
-### 🚀 **Demo Pronta per Presentazioni Professionali:**
+### 🚀 **Demo Ready for Professional Presentations:**
 
-La demo è ora sufficientemente avanzata per:
-- **Presentazioni clienti** con massimo realismo
-- **Training/formazione** su workflow audio
-- **Demonstration** di funzionalità professionali
-- **User testing** di interface e workflow
-- **Marketing material** per promozione prodotto
+The demo is now advanced enough for:
+- **Client presentations** with maximum realism
+- **Training** on audio workflows
+- **Demonstration** of professional features
+- **User testing** of interface and workflow
+- **Marketing material** for product promotion
 
 ---
 
-**🎵 DEMO AVANZATA PERFEZIONATA! 🚀📊✨**
+**🎵 ADVANCED DEMO PERFECTED! 🚀📊✨**
 
-*Simulazioni ultra-realistiche per un'esperienza professionale completa!*
+*Ultra-realistic simulations for a complete professional experience!*

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script di diagnostica per identificare problemi di build
+ * Diagnostic script to identify build problems
  */
 
 const { execSync } = require('child_process');

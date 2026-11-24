@@ -1,6 +1,6 @@
 @echo off
 REM Audio Normalizer - Quick Tailwind CSS Test
-REM Verifica che Tailwind CSS funzioni correttamente
+REM Checks that Tailwind CSS works correctly
 
 echo =====================================================
 echo    Audio Normalizer - Tailwind CSS Test

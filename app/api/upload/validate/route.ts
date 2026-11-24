@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Errore nell\'endpoint di validazione:', error)
+    console.error('Validation endpoint error:', error)
     
     return NextResponse.json(
       { 

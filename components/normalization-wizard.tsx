@@ -73,11 +73,11 @@ export function NormalizationWizard() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const folderInputRef = useRef<HTMLInputElement>(null)
-  // File originali trattenuti lato client (chiave: nome__dimensione)
+  // Original files kept client-side (key: name__size)
   const filesRef = useRef<Map<string, File>>(new Map())
-  // Cache dei render WAV per file
+  // Cache of WAV renders per file
   const renderRef = useRef<Map<string, RenderResult>>(new Map())
-  // Object URL dei file originali
+  // Object URLs of the original files
   const origUrlRef = useRef<Map<string, string>>(new Map())
   const previewToken = useRef(0)
 
@@ -100,7 +100,7 @@ export function NormalizationWizard() {
     return url
   }, [getFile])
 
-  // Render (con cache) del WAV normalizzato per un file alla config corrente
+  // Render (cached) of the normalized WAV for a file at the current config
   const renderFor = useCallback(async (af: AudioFile): Promise<RenderResult> => {
     const cacheId = `${af.id}:${configKey}`
     const cached = renderRef.current.get(cacheId)
@@ -120,7 +120,7 @@ export function NormalizationWizard() {
     return res
   }, [configKey, getFile, method, target])
 
-  // Invalida i render quando cambia la configurazione
+  // Invalidate renders when the configuration changes
   useEffect(() => {
     renderRef.current.forEach(r => r.url && URL.revokeObjectURL(r.url))
     renderRef.current.clear()
@@ -149,7 +149,7 @@ export function NormalizationWizard() {
     }
   }, [getOriginalUrl, renderFor])
 
-  // Quando entro in Anteprima o cambio file/config, (ri)genera l'anteprima
+  // When entering Preview or changing file/config, (re)generate the preview
   useEffect(() => {
     if (step !== "preview") return
     const id = previewId ?? readyFiles[0]?.id ?? null
@@ -162,7 +162,7 @@ export function NormalizationWizard() {
   const previewFile = readyFiles.find(f => f.id === (previewId ?? readyFiles[0]?.id))
   const previewGain = previewFile?.analysis ? computeGain(previewFile.analysis, { method, targetLevel: target }) : null
 
-  // ---- Processing (tutti i file) ----------------------------------------
+  // ---- Processing (all files) ---------------------------------------------
   const runProcessing = useCallback(async () => {
     setProcessing(true)
     const init: typeof procMap = {}
@@ -233,8 +233,8 @@ export function NormalizationWizard() {
   const targetMax = method === "peak" ? 0 : -6
   const targetUnit = method === "peak" ? "dBFS" : "LUFS"
 
-  // Quanti file hanno valori di loudness NON realmente misurati.
-  // `source` assente = analisi vecchia, da trattare come non misurata.
+  // How many files have loudness values that were NOT actually measured.
+  // missing `source` = old analysis, to be treated as not measured.
   const unmeasuredCount = readyFiles.filter(
     f => f.analysis?.source !== "measured"
   ).length
@@ -251,9 +251,9 @@ export function NormalizationWizard() {
         </Alert>
       )}
 
-      {/* I valori di loudness non sono ancora misurati davvero (serve ffmpeg
-          con il filtro ebur128, task core-04). Finché è così l'utente deve
-          saperlo: mostrare numeri senza avviso equivale a mentirgli. */}
+      {/* Loudness values are not really measured yet (needs ffmpeg
+          with the ebur128 filter, task core-04). Until then the user must
+          know it: showing numbers without a warning amounts to lying to them. */}
       {unmeasuredCount > 0 && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
@@ -397,7 +397,7 @@ export function NormalizationWizard() {
               </div>
             </div>
 
-            {/* Anteprima guadagni previsti */}
+            {/* Preview of the predicted gains */}
             <div className="rounded-lg border overflow-hidden">
               <div className="bg-muted px-3 py-2 text-xs font-medium text-muted-foreground">Guadagno previsto per file</div>
               <div className="divide-y max-h-56 overflow-auto">
@@ -579,7 +579,7 @@ export function NormalizationWizard() {
     </div>
   )
 
-  // ---- helpers che usano lo stato del componente ----
+  // ---- helpers that use the component state ----
   function downloadAll() {
     readyFiles.forEach((f, i) => {
       const res = renderRef.current.get(`${f.id}:${configKey}`)
@@ -616,8 +616,8 @@ function Stepper({ stepIndex, onGoto }: { stepIndex: number; onGoto: (i: number)
                 className="nu-step-bubble flex h-11 w-11 items-center justify-center rounded-full">
                 {done ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
               </div>
-              {/* attivo e completato restano distinguibili: il primo è affondato
-                  e in rosso brand, il secondo è in rilievo e pieno di gradiente */}
+              {/* active and completed stay distinguishable: the first is sunken
+                  and in brand red, the second is raised and filled with gradient */}
               <span className={`text-xs font-semibold ${
                 active ? "text-[color:var(--primary-ink)]"
                   : done ? "text-foreground"

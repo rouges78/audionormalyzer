@@ -1,50 +1,50 @@
 # 🎵 Audio Normalizer - Standalone Working Version
 
-## ✅ RISOLTO! Eseguibile Funzionante Creato
+## ✅ SOLVED! Working Executable Created
 
-Ho risolto il problema dell'errore JavaScript! L'Audio Normalizer ora funziona perfettamente come applicazione desktop standalone.
+I have solved the JavaScript error problem! The Audio Normalizer now works perfectly as a standalone desktop application.
 
-## 🔧 Cosa è stato risolto:
+## 🔧 What was solved:
 
-### ❌ Problema Precedente:
-- L'eseguibile cercava di avviare un server Node.js esterno
-- Errore "spawn node ENOENT" perché Node.js non era disponibile nell'exe
-- Dipendenza da processi esterni che non funzionavano nell'eseguibile
+### ❌ Previous Problem:
+- The executable tried to start an external Node.js server
+- "spawn node ENOENT" error because Node.js was not available inside the exe
+- Dependency on external processes that did not work inside the executable
 
-### ✅ Soluzione Implementata:
-- **Interfaccia completamente embedded** nell'eseguibile
-- **Nessuna dipendenza esterna** (no Node.js, no server)
-- **Avvio immediato** senza errori
-- **UI professionale** con drag & drop
+### ✅ Solution Implemented:
+- **Interface fully embedded** in the executable
+- **No external dependencies** (no Node.js, no server)
+- **Immediate startup** without errors
+- **Professional UI** with drag & drop
 
-## 📁 File Funzionanti:
+## 📁 Working Files:
 
-- **`dist/Audio Normalizer 0.1.0.exe`** (111 MB) - **FUNZIONA PERFETTAMENTE**
-- **`dist/win-unpacked/Audio Normalizer.exe`** (165 MB) - Versione unpacked
+- **`dist/Audio Normalizer 0.1.0.exe`** (111 MB) - **WORKS PERFECTLY**
+- **`dist/win-unpacked/Audio Normalizer.exe`** (165 MB) - Unpacked version
 
-## 🚀 Come Usare:
+## 🚀 How To Use:
 
 ```bash
-# Costruire nuovo eseguibile
+# Build a new executable
 npm run build:standalone
 
-# Oppure eseguire direttamente
+# Or run it directly
 "dist/Audio Normalizer 0.1.0.exe"
 ```
 
-## 🎯 Cosa Succede Quando Lo Avvii:
+## 🎯 What Happens When You Launch It:
 
-1. **✅ Si apre immediatamente** - Nessun errore JavaScript
-2. **✅ Interfaccia professionale** - Design moderno con gradiente
-3. **✅ Drag & Drop funzionante** - Trascina file audio
-4. **✅ Selezione file** - Click per selezionare
-5. **✅ Impostazioni normalizzazione** - Peak/Loudness
-6. **✅ Barra di progresso** - Feedback visivo
-7. **✅ Nessuna dipendenza** - Tutto incluso nell'exe
+1. **✅ It opens immediately** - No JavaScript errors
+2. **✅ Professional interface** - Modern design with gradient
+3. **✅ Working Drag & Drop** - Drag audio files
+4. **✅ File selection** - Click to select
+5. **✅ Normalization settings** - Peak/Loudness
+6. **✅ Progress bar** - Visual feedback
+7. **✅ No dependencies** - Everything included in the exe
 
-## 🎵 Interfaccia Inclusa:
+## 🎵 Included Interface:
 
-### Sidebar con Features:
+### Sidebar with Features:
 - ✓ Peak Normalization
 - ✓ Loudness Normalization  
 - ✓ EBU R128 Compliance
@@ -52,18 +52,18 @@ npm run build:standalone
 - ✓ Batch Processing
 - ✓ Real-time Analysis
 
-### Formati Supportati:
+### Supported Formats:
 - ✓ MP3, WAV, FLAC
 - ✓ AAC, M4A, OGG
 
-### Area Principale:
-- 📁 **Upload Area** - Drag & drop o click
-- 📋 **File List** - File selezionati
-- ⚙️ **Controls** - Impostazioni normalizzazione
-- 📊 **Progress** - Barra di progresso
-- ✅ **Status** - Messaggi di stato
+### Main Area:
+- 📁 **Upload Area** - Drag & drop or click
+- 📋 **File List** - Selected files
+- ⚙️ **Controls** - Normalization settings
+- 📊 **Progress** - Progress bar
+- ✅ **Status** - Status messages
 
-## 🔧 Architettura Standalone:
+## 🔧 Standalone Architecture:
 
 ```
 Audio Normalizer.exe
@@ -74,46 +74,46 @@ Audio Normalizer.exe
 └── No External Dependencies
 ```
 
-## ✅ Test Confermati:
+## ✅ Confirmed Tests:
 
-- ✅ **Avvio senza errori**
-- ✅ **Interfaccia carica correttamente**
-- ✅ **Drag & drop funziona**
-- ✅ **Selezione file funziona**
-- ✅ **Impostazioni responsive**
-- ✅ **Barra progresso animata**
-- ✅ **Nessuna dipendenza esterna**
+- ✅ **Starts without errors**
+- ✅ **Interface loads correctly**
+- ✅ **Drag & drop works**
+- ✅ **File selection works**
+- ✅ **Responsive settings**
+- ✅ **Animated progress bar**
+- ✅ **No external dependencies**
 
-## 📋 Comandi Disponibili:
+## 📋 Available Commands:
 
 ```bash
-# Costruire versione standalone
+# Build the standalone version
 npm run build:standalone
 
-# Testare eseguibile
+# Test the executable
 npm run test:exe
 
-# Versione sviluppo (web)
+# Development version (web)
 npm run dev
 
-# Versione sviluppo (electron)
+# Development version (electron)
 npm run electron:dev
 ```
 
-## 🎉 SUCCESSO!
+## 🎉 SUCCESS!
 
-L'Audio Normalizer è ora:
-- ✅ **Completamente Funzionante**
-- ✅ **Standalone (nessuna dipendenza)**
-- ✅ **Interfaccia Professionale**
-- ✅ **Drag & Drop Integrato**
-- ✅ **Avvio Immediato**
-- ✅ **Nessun Errore JavaScript**
+The Audio Normalizer is now:
+- ✅ **Fully Working**
+- ✅ **Standalone (no dependencies)**
+- ✅ **Professional Interface**
+- ✅ **Built-in Drag & Drop**
+- ✅ **Immediate Startup**
+- ✅ **No JavaScript Errors**
 
-## 🚀 Pronto per l'Uso!
+## 🚀 Ready to Use!
 
-L'eseguibile `dist/Audio Normalizer 0.1.0.exe` è ora completamente funzionante e può essere distribuito senza problemi!
+The executable `dist/Audio Normalizer 0.1.0.exe` is now fully working and can be distributed without problems!
 
 ---
 
-**🎵 Audio Normalizer - Problema Risolto! ✨**
+**🎵 Audio Normalizer - Problem Solved! ✨**

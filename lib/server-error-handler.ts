@@ -322,11 +322,11 @@ export function withErrorHandling(
 // Common error types
 export const ErrorTypes = {
   /**
-   * @param code Codice specifico dell'errore di validazione. Prima era sempre
-   * 'VALIDATION_ERROR' per qualunque causa, quindi il client non poteva
-   * distinguere "manca l'elenco dei file" da "metodo non valido" da "livello
-   * target fuori scala" — tutte cose che la UI deve saper segnalare in modo
-   * diverso. Il default resta invariato per i chiamanti che non lo passano.
+   * @param code Specific code of the validation error. It used to be always
+   * 'VALIDATION_ERROR' for any cause, so the client could not
+   * tell "the file list is missing" from "invalid method" from "target
+   * level out of range" — all things the UI must be able to report
+   * differently. The default stays unchanged for callers that do not pass it.
    */
   VALIDATION_ERROR: (
     message: string,

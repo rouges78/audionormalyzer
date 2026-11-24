@@ -1,127 +1,127 @@
-# 🎵 AUDIO NORMALIZER - VERSIONE CORRETTA ⚡
+# 🎵 AUDIO NORMALIZER - CORRECTED VERSION ⚡
 
-## ✅ **PROBLEMI RISOLTI!**
+## ✅ **PROBLEMS SOLVED!**
 
-Ho risolto entrambi i problemi che hai segnalato:
+I have solved both of the problems you reported:
 
-### 🔧 **1. LAYOUT FISSO - Non si muove più!**
-- **Flexbox layout** migliorato per stabilità
-- **Altezze fisse** per evitare spostamenti
-- **Scroll container** per la lista file
-- **Flex-shrink: 0** sui controlli per mantenerli fissi
+### 🔧 **1. FIXED LAYOUT - It no longer moves!**
+- **Flexbox layout** improved for stability
+- **Fixed heights** to avoid shifting
+- **Scroll container** for the file list
+- **Flex-shrink: 0** on the controls to keep them fixed
 
-### ⏱️ **2. ALBUM NORMALIZATION LENTA - Ora è dettagliata!**
-- **Processamento track-by-track** con dettagli
-- **Fasi di elaborazione** mostrate per ogni traccia
-- **Messaggi di stato** informativi
-- **Validazione completa** prima di iniziare
+### ⏱️ **2. SLOW ALBUM NORMALIZATION - Now it is detailed!**
+- **Track-by-track processing** with details
+- **Processing phases** shown for each track
+- **Informative status messages**
+- **Full validation** before starting
 
-## 🎯 **MIGLIORAMENTI LAYOUT:**
+## 🎯 **LAYOUT IMPROVEMENTS:**
 
-### 📐 **Struttura Stabile:**
+### 📐 **Stable Structure:**
 ```css
 .main-content {
     display: flex;
-    flex-direction: column;  /* Layout verticale stabile */
+    flex-direction: column;  /* Stable vertical layout */
 }
 
 .file-list {
-    flex: 1;                 /* Cresce per riempire spazio */
-    min-height: 200px;       /* Altezza minima garantita */
-    max-height: 400px;       /* Altezza massima con scroll */
-    overflow-y: auto;        /* Scroll interno se necessario */
+    flex: 1;                 /* Grows to fill the space */
+    min-height: 200px;       /* Guaranteed minimum height */
+    max-height: 400px;       /* Maximum height with scroll */
+    overflow-y: auto;        /* Internal scroll if needed */
 }
 
 .controls, .album-info {
-    flex-shrink: 0;          /* Non si rimpiccioliscono mai */
+    flex-shrink: 0;          /* They never shrink */
 }
 ```
 
-### 🎨 **Risultato:**
-- ✅ **Controlli sempre visibili** in basso
-- ✅ **Lista file scorrevole** senza spostare il resto
-- ✅ **Layout stabile** indipendentemente dal numero di file
-- ✅ **Nessun movimento** quando si aggiungono/rimuovono tracce
+### 🎨 **Result:**
+- ✅ **Controls always visible** at the bottom
+- ✅ **Scrollable file list** without moving the rest
+- ✅ **Stable layout** regardless of the number of files
+- ✅ **No movement** when tracks are added/removed
 
-## ⚡ **ALBUM NORMALIZATION MIGLIORATA:**
+## ⚡ **IMPROVED ALBUM NORMALIZATION:**
 
-### 🔍 **Processamento Dettagliato:**
-1. **Validazione iniziale** - Controlla se album mode è attivo
-2. **Analisi prerequisiti** - Verifica che l'analisi sia completa
-3. **Processamento sequenziale** - Una traccia alla volta
-4. **Fasi dettagliate** per ogni traccia:
+### 🔍 **Detailed Processing:**
+1. **Initial validation** - Checks whether album mode is active
+2. **Prerequisite analysis** - Checks that the analysis is complete
+3. **Sequential processing** - One track at a time
+4. **Detailed phases** for each track:
    - 🔍 **ANALYZING PEAKS** (0-30%)
    - ⚙️ **CALCULATING GAIN** (30-60%)
    - 🎵 **APPLYING NORMALIZATION** (60-90%)
    - ✅ **FINALIZING** (90-100%)
 
-### 📊 **Messaggi Informativi:**
-- **Status iniziale**: "ALBUM NORMALIZATION STARTED!"
-- **Per ogni traccia**: "Processing track X/Y: Nome_File.mp3"
-- **Fasi elaborate**: "ANALYZING PEAKS: Nome_File.mp3"
-- **Completamento**: "Track X/Y normalized. Moving to next track..."
-- **Finale**: "ALBUM NORMALIZED! X tracks processed with optimal peak level"
+### 📊 **Informative Messages:**
+- **Initial status**: "ALBUM NORMALIZATION STARTED!"
+- **For each track**: "Processing track X/Y: File_Name.mp3"
+- **Processing phases**: "ANALYZING PEAKS: File_Name.mp3"
+- **Completion**: "Track X/Y normalized. Moving to next track..."
+- **Final**: "ALBUM NORMALIZED! X tracks processed with optimal peak level"
 
-### ⚠️ **Validazioni Aggiunte:**
+### ⚠️ **Validations Added:**
 - **No files**: "No files selected. Please select audio files first."
-- **Album mode senza folder**: "Album mode requires selecting a folder first."
-- **Analisi incompleta**: "Album analysis not complete. Please wait for analysis."
+- **Album mode without a folder**: "Album mode requires selecting a folder first."
+- **Incomplete analysis**: "Album analysis not complete. Please wait for analysis."
 
-## 🎵 **ESPERIENZA UTENTE MIGLIORATA:**
+## 🎵 **IMPROVED USER EXPERIENCE:**
 
-### 📂 **Per Album:**
-1. Seleziona cartella con "ALBUM FOLDER"
-2. Aspetta l'analisi automatica (2-3 secondi)
-3. Modalità "ALBUM NORMALIZATION" si attiva
+### 📂 **For Albums:**
+1. Select a folder with "ALBUM FOLDER"
+2. Wait for the automatic analysis (2-3 seconds)
+3. The "ALBUM NORMALIZATION" mode switches on
 4. Click "NORMALIZE AUDIO"
-5. **Processamento dettagliato** traccia per traccia
-6. **Messaggi informativi** per ogni fase
-7. **Completamento** con statistiche finali
+5. **Detailed processing** track by track
+6. **Informative messages** for each phase
+7. **Completion** with final statistics
 
-### 🎵 **Per File Singoli:**
-1. Trascina file in "INDIVIDUAL FILES"
-2. Seleziona modalità (Peak/Loudness)
+### 🎵 **For Single Files:**
+1. Drag files into "INDIVIDUAL FILES"
+2. Select the mode (Peak/Loudness)
 3. Click "NORMALIZE AUDIO"
-4. **Processamento rapido** con progress bar
-5. **Completamento** con messaggio di successo
+4. **Fast processing** with progress bar
+5. **Completion** with a success message
 
-## 🔧 **DETTAGLI TECNICI:**
+## 🔧 **TECHNICAL DETAILS:**
 
-### ⏱️ **Timing Album Mode:**
-- **Analisi per traccia**: 1-3 secondi
-- **Processamento per traccia**: 3-8 secondi
-- **Pausa tra tracce**: 0.8 secondi
-- **Totale per album 10 tracce**: ~60-90 secondi
+### ⏱️ **Album Mode Timing:**
+- **Analysis per track**: 1-3 seconds
+- **Processing per track**: 3-8 seconds
+- **Pause between tracks**: 0.8 seconds
+- **Total for a 10-track album**: ~60-90 seconds
 
-### 📊 **Progress Bar Dettagliata:**
-- **Overall progress**: Basato su tracce completate
-- **Current track progress**: Fasi di elaborazione
-- **Status messages**: Aggiornati in tempo reale
-- **Final completion**: Messaggio dettagliato con statistiche
+### 📊 **Detailed Progress Bar:**
+- **Overall progress**: Based on completed tracks
+- **Current track progress**: Processing phases
+- **Status messages**: Updated in real time
+- **Final completion**: Detailed message with statistics
 
-## ✅ **PROBLEMI RISOLTI:**
+## ✅ **PROBLEMS SOLVED:**
 
 ### 🔧 **Layout:**
-- ❌ **Prima**: Layout si spostava quando cambiavano le dimensioni
-- ✅ **Ora**: Layout stabile con flexbox e altezze fisse
+- ❌ **Before**: The layout shifted when sizes changed
+- ✅ **Now**: Stable layout with flexbox and fixed heights
 
 ### ⚡ **Album Processing:**
-- ❌ **Prima**: Troppo veloce, nessun messaggio, finiva subito
-- ✅ **Ora**: Processamento dettagliato, messaggi informativi, timing realistico
+- ❌ **Before**: Too fast, no messages, finished immediately
+- ✅ **Now**: Detailed processing, informative messages, realistic timing
 
-### 🛡️ **Validazioni:**
-- ❌ **Prima**: Nessun controllo, errori silenziosi
-- ✅ **Ora**: Validazioni complete, messaggi di errore chiari
+### 🛡️ **Validations:**
+- ❌ **Before**: No checks, silent errors
+- ✅ **Now**: Full validations, clear error messages
 
-## 🚀 **PRONTO PER L'USO!**
+## 🚀 **READY TO USE!**
 
-L'eseguibile `dist/Audio Normalizer 0.1.0.exe` ora ha:
-- ✅ **Layout stabile** che non si muove
-- ✅ **Album normalization dettagliata** con timing realistico
-- ✅ **Messaggi informativi** per ogni fase
-- ✅ **Validazioni complete** per evitare errori
-- ✅ **Esperienza utente professionale**
+The executable `dist/Audio Normalizer 0.1.0.exe` now has:
+- ✅ **Stable layout** that does not move
+- ✅ **Detailed album normalization** with realistic timing
+- ✅ **Informative messages** for each phase
+- ✅ **Full validations** to avoid errors
+- ✅ **Professional user experience**
 
 ---
 
-**🎵 TRON AUDIO NORMALIZER - VERSIONE PERFEZIONATA! ⚡✨**
+**🎵 TRON AUDIO NORMALIZER - PERFECTED VERSION! ⚡✨**

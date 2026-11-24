@@ -76,10 +76,10 @@ export async function GET(
           sampleRates: [...new Set(analyses.map((a: any) => a.sampleRate))]
         }
         
-        // Si partiva da `analysisData` grezzo, e così il ramo "con riepilogo"
-        // restituiva una forma DIVERSA dall'altro: spariva `progress` (che
-        // esiste solo nell'oggetto `response`) proprio per le analisi
-        // completate, cioè quelle in cui il client se lo aspetta a 100.
+        // It started from raw `analysisData`, so the "with summary" branch
+        // returned a DIFFERENT shape from the other one: `progress` (which
+        // exists only on the `response` object) vanished precisely for
+        // completed analyses, i.e. the ones where the client expects it at 100.
         return NextResponse.json({
           success: true,
           data: { ...response.data, summary }
@@ -90,7 +90,7 @@ export async function GET(
     return NextResponse.json(response)
 
   } catch (error) {
-    console.error('Errore nel recupero risultati analisi:', error)
+    console.error('Error retrieving analysis results:', error)
     
     return NextResponse.json(
       { 
@@ -151,7 +151,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Errore nell\'eliminazione risultati analisi:', error)
+    console.error('Error deleting analysis results:', error)
     
     return NextResponse.json(
       { 

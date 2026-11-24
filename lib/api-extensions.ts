@@ -1,5 +1,5 @@
 // API Extensions System
-// Sistema di estensioni API per architettura estensibile e integrazioni
+// API extension system for an extensible architecture and integrations
 
 import { EventEmitter } from 'events'
 import { pluginManager, PluginAPI } from './plugin-system'
@@ -548,7 +548,7 @@ export class APIExtensionManager extends EventEmitter {
 
   private setupRateLimiters(): void {
     // Cleanup old rate limiters periodically
-    // (non registrato in test, non blocca l'uscita del processo)
+    // (not registered in tests, does not block process exit)
     scheduleBackgroundCleanup(() => {
       const now = Date.now()
       for (const [key, limiter] of this.rateLimiters.entries()) {

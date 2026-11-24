@@ -1,5 +1,5 @@
 // Plugin Architecture System
-// Sistema architetturale per caricamento dinamico di plugin e estensioni
+// Architectural system for dynamic loading of plugins and extensions
 
 import { AudioAnalysis } from '@/types/audio'
 import { EventEmitter } from 'events'

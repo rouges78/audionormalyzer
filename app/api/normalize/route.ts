@@ -67,9 +67,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const fileManager = createFileManager()
 
   // Initialize processing result.
-  // create() copre i campi comuni; albumMode, maintainRelativeLoudness e
-  // outputFormat vanno scritti a parte, altrimenti processAlbumAsync e la rotta
-  // GET /api/process/[id] li leggono e trovano undefined.
+  // create() covers the common fields; albumMode, maintainRelativeLoudness and
+  // outputFormat must be written separately, otherwise processAlbumAsync and the
+  // GET /api/process/[id] route read them and find undefined.
   ProcessingStorage.create(processId, method, targetLevel, fileIds.length)
   const processingData = ProcessingStorage.update(processId, {
     albumMode,
@@ -148,14 +148,14 @@ async function processFilesAsync(
   const tempPaths: string[] = [];
 
   try {
-    // Engine di processing selezionato per il runtime (server → WASM finché
-    // il NativeEngine non è pronto in core-04).
+    // Processing engine selected for the runtime (server → WASM until
+    // the NativeEngine is ready in core-04).
     const engine = await resolveAudioEngine()
 
     for (const fileId of fileIds) {
       const fileStartTime = Date.now();
 
-      // Dichiarato fuori dal try: il blocco catch lo usa per il nome del file.
+      // Declared outside the try: the catch block uses it for the file name.
       let fileInfo: TempFileInfo | null = null;
 
       try {
@@ -174,11 +174,11 @@ async function processFilesAsync(
         }
 
         // Create output path.
-        // getTempFileInfo() non restituisce `originalName` — non l'ha mai
-        // restituito — quindi il ramo di fallback scattava SEMPRE e produceva
-        // nomi senza estensione (es. "processed-<uuid>_2026-...-586Z"),
-        // rendendo il file di uscita non riconoscibile nonostante
-        // preserveFormat: true. Recuperiamo l'estensione dal file temporaneo.
+        // getTempFileInfo() does not return `originalName` — it never has —
+        // so the fallback branch ALWAYS fired and produced
+        // names without extension (e.g. "processed-<uuid>_2026-...-586Z"),
+        // making the output file unrecognizable despite
+        // preserveFormat: true. We recover the extension from the temp file.
         const sourceExtension = extname(fileInfo.path)
         const outputPath = await fileManager.createOutputPath(
           fileInfo.originalName || `processed-${fileId}${sourceExtension}`
@@ -295,8 +295,8 @@ async function processAlbumAsync(
     const albumProcessor = createAlbumProcessor()
 
     // Get all file infos.
-    // getTempFileInfo non restituisce il nome originale (i temporanei su disco
-    // sono salvati con il solo fileId), quindi lo deriviamo dal percorso.
+    // getTempFileInfo does not return the original name (temp files on disk
+    // are saved with the fileId only), so we derive it from the path.
     const fileInfos: AudioFile[] = []
     for (const fileId of fileIds) {
       const fileInfo = await fileManager.getTempFileInfo(fileId)
@@ -331,10 +331,10 @@ async function processAlbumAsync(
 
     const albumResult = await albumProcessor.processAlbum(fileInfos, albumOptions)
 
-    // Update results — fileResults contiene l'esito traccia per traccia,
-    // mentre albumResult descrive l'album nel suo insieme.
-    // Il ProcessingResult dell'album non porta il nome del file: lo recuperiamo
-    // dai fileInfos raccolti sopra.
+    // Update results — fileResults holds the outcome track by track,
+    // while albumResult describes the album as a whole.
+    // The album ProcessingResult does not carry the file name: we recover it
+    // from the fileInfos collected above.
     const nameByFileId = new Map<string, string>(fileInfos.map(info => [info.id, info.name]))
 
     processingData.results = albumResult.fileResults.map(result => ({
@@ -357,7 +357,7 @@ async function processAlbumAsync(
     ProcessingStorage.set(processId, processingData)
 
   } catch (error) {
-    console.error('Errore nel processing album:', error)
+    console.error('Album processing error:', error)
     processingData.status = 'error'
     processingData.error = error instanceof Error ? error.message : 'Errore di processing album'
     processingData.endTime = Date.now()

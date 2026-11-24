@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { MetadataManager, createMetadataManager, AudioMetadata } from '../metadata-manager'
 import { promises as fs } from 'fs'
 
-// Mock delle dipendenze
+// Mock the dependencies
 vi.mock('fs', () => ({
   promises: {
     access: vi.fn()
@@ -37,7 +37,7 @@ describe('MetadataManager', () => {
   })
 
   describe('extractMetadata', () => {
-    it('dovrebbe estrarre metadati da un file MP3', async () => {
+    it('should extract metadata from an MP3 file', async () => {
       const mockMetadata = {
         common: {
           title: 'Test Song',
@@ -75,7 +75,7 @@ describe('MetadataManager', () => {
       expect(result.channels).toBe(2)
     })
 
-    it('dovrebbe gestire file senza metadati', async () => {
+    it('should handle files without metadata', async () => {
       const mockMetadata = {
         common: {},
         format: {
@@ -94,14 +94,14 @@ describe('MetadataManager', () => {
       expect(result.duration).toBe(120)
     })
 
-    it('dovrebbe lanciare errore per file inesistente', async () => {
+    it('should throw for a nonexistent file', async () => {
       mockFs.access.mockRejectedValue(new Error('File non trovato'))
 
       await expect(metadataManager.extractMetadata('/nonexistent.mp3'))
         .rejects.toThrow('Errore nell\'estrazione metadati')
     })
 
-    it('dovrebbe gestire errori di parsing', async () => {
+    it('should handle parsing errors', async () => {
       const { parseFile } = await import('music-metadata')
       vi.mocked(parseFile).mockRejectedValue(new Error('Formato non supportato'))
 
@@ -111,7 +111,7 @@ describe('MetadataManager', () => {
   })
 
   describe('preserveMetadata', () => {
-    it('dovrebbe preservare metadati tra due file MP3', async () => {
+    it('should preserve metadata between two MP3 files', async () => {
       const mockSourceMetadata = {
         common: {
           title: 'Source Song',
@@ -142,7 +142,7 @@ describe('MetadataManager', () => {
       )
     })
 
-    it('dovrebbe gestire errori di scrittura ID3', async () => {
+    it('should handle ID3 write errors', async () => {
       const mockSourceMetadata = {
         common: { title: 'Test' },
         format: { container: 'MPEG' }
@@ -160,7 +160,7 @@ describe('MetadataManager', () => {
   })
 
   describe('supportsMetadata', () => {
-    it('dovrebbe identificare formati supportati', () => {
+    it('should identify supported formats', () => {
       expect(metadataManager.supportsMetadata('/test.mp3')).toBe(true)
       expect(metadataManager.supportsMetadata('/test.flac')).toBe(true)
       expect(metadataManager.supportsMetadata('/test.ogg')).toBe(true)
@@ -169,7 +169,7 @@ describe('MetadataManager', () => {
       expect(metadataManager.supportsMetadata('/test.wav')).toBe(true)
     })
 
-    it('dovrebbe identificare formati non supportati', () => {
+    it('should identify unsupported formats', () => {
       expect(metadataManager.supportsMetadata('/test.txt')).toBe(false)
       expect(metadataManager.supportsMetadata('/test.pdf')).toBe(false)
       expect(metadataManager.supportsMetadata('/test')).toBe(false)
@@ -177,7 +177,7 @@ describe('MetadataManager', () => {
   })
 
   describe('getMetadataSupport', () => {
-    it('dovrebbe restituire informazioni corrette per MP3', () => {
+    it('should return correct info for MP3', () => {
       const support = metadataManager.getMetadataSupport('/test.mp3')
 
       expect(support.format).toBe('ID3v2')
@@ -187,7 +187,7 @@ describe('MetadataManager', () => {
       expect(support.readOnly).toBe(false)
     })
 
-    it('dovrebbe restituire informazioni corrette per FLAC', () => {
+    it('should return correct info for FLAC', () => {
       const support = metadataManager.getMetadataSupport('/test.flac')
 
       expect(support.format).toBe('Vorbis Comments')
@@ -196,7 +196,7 @@ describe('MetadataManager', () => {
       expect(support.readOnly).toBe(true)
     })
 
-    it('dovrebbe restituire informazioni corrette per WAV', () => {
+    it('should return correct info for WAV', () => {
       const support = metadataManager.getMetadataSupport('/test.wav')
 
       expect(support.format).toBe('Limited')
@@ -205,7 +205,7 @@ describe('MetadataManager', () => {
       expect(support.readOnly).toBe(true)
     })
 
-    it('dovrebbe gestire formati non supportati', () => {
+    it('should handle unsupported formats', () => {
       const support = metadataManager.getMetadataSupport('/test.unknown')
 
       expect(support.format).toBe('Unsupported')
@@ -216,7 +216,7 @@ describe('MetadataManager', () => {
   })
 
   describe('createMetadataManager factory', () => {
-    it('dovrebbe creare istanza MetadataManager', () => {
+    it('should create a MetadataManager instance', () => {
       const manager = createMetadataManager()
       expect(manager).toBeInstanceOf(MetadataManager)
     })

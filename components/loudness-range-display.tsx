@@ -61,7 +61,7 @@ export function LoudnessRangeDisplay({ analysis, fileName, className }: Loudness
             <div className="flex-1 bg-[color:var(--tint-danger)]"></div>
           </div>
 
-          {/* Current level indicator — semitrasparente per non coprire le zone */}
+          {/* Current level indicator — semi-transparent so it does not hide the zones */}
           <div
             className="absolute top-0 left-0 h-full bg-[color:var(--cta)]/70 transition-all duration-300"
             style={{ width: `${percentage}%` }}
@@ -74,7 +74,7 @@ export function LoudnessRangeDisplay({ analysis, fileName, className }: Loudness
           ></div>
         </div>
 
-        {/* Etichette sotto la barra: sopra il riempimento erano illeggibili */}
+        {/* Labels below the bar: on top of the fill they were unreadable */}
         <div className="flex items-center justify-between px-1 pt-1 text-xs font-medium text-muted-foreground">
           <span>-30</span>
           <span>-14</span>
@@ -99,14 +99,14 @@ export function LoudnessRangeDisplay({ analysis, fileName, className }: Loudness
             <div className="w-3/5 bg-[color:var(--tint-success)]"></div>
           </div>
 
-          {/* Current level indicator — semitrasparente per non coprire le zone */}
+          {/* Current level indicator — semi-transparent so it does not hide the zones */}
           <div
             className="absolute top-0 left-0 h-full bg-[color:var(--info)]/70 transition-all duration-300"
             style={{ width: `${percentage}%` }}
           ></div>
         </div>
 
-        {/* Etichette sotto la barra: sopra il riempimento erano illeggibili */}
+        {/* Labels below the bar: on top of the fill they were unreadable */}
         <div className="flex items-center justify-between px-1 pt-1 text-xs font-medium text-muted-foreground">
           <span>0</span>
           <span>15</span>

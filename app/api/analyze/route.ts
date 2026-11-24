@@ -159,7 +159,7 @@ async function processFilesAsync(
 
         AnalysisStorage.addResult(analysisId, {
           fileId,
-          fileName: `file-${fileId}`, // Placeholder, dovrebbe essere il nome reale
+          fileName: `file-${fileId}`, // Placeholder, should be the real name
           success: false,
           error: fileError instanceof Error ? fileError.message : 'Errore di analisi'
         });

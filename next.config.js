@@ -1,14 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // NON aggiungere qui `typescript: { ignoreBuildErrors: true }`.
-  // Era una toppa per i 30 errori TypeScript sanati con qual-07: ora
-  // `npx tsc --noEmit` e pulito, .next/types compresi, e il build deve
-  // tornare a fallire se qualcuno reintroduce un errore di tipi.
+  // Do NOT add `typescript: { ignoreBuildErrors: true }` here.
+  // It was a patch for the 30 TypeScript errors fixed with qual-07: now
+  // `npx tsc --noEmit` is clean, .next/types included, and the build must
+  // fail again if someone reintroduces a type error.
   //
-  // `eslint.ignoreDuringBuilds` resta finche non c'e un ESLint da
-  // eseguire: nel progetto non ci sono ne la dipendenza ne una
-  // configurazione, quindi togliendolo il build si fermerebbe a chiedere
-  // di installare ESLint. Vedi qual-13 in ROADMAP.html.
+  // `eslint.ignoreDuringBuilds` stays until there is an ESLint to
+  // run: the project has neither the dependency nor a
+  // configuration, so removing it would stop the build to ask
+  // to install ESLint. See qual-13 in ROADMAP.html.
   eslint: {
     ignoreDuringBuilds: true,
   },

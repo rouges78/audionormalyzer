@@ -3,7 +3,7 @@ import { AudioFile, ProcessingResult, AlbumOptions } from '@/types/audio'
 import { AlbumProcessorImpl } from './album-processor'
 
 /**
- * Stato di un job nella coda di processing
+ * State of a job in the processing queue
  */
 export interface ProcessingJob {
   id: string
@@ -21,7 +21,7 @@ export interface ProcessingJob {
 }
 
 /**
- * Evento di aggiornamento progresso
+ * Progress update event
  */
 export interface ProgressUpdate {
   jobId: string
@@ -32,17 +32,17 @@ export interface ProgressUpdate {
 }
 
 /**
- * Configurazione per retry logic
+ * Configuration for retry logic
  */
 export interface RetryConfig {
   maxRetries: number
-  retryDelay: number // millisecondi
+  retryDelay: number // milliseconds
   backoffMultiplier: number
   retryableErrors: string[]
 }
 
 /**
- * ProcessingQueue - Gestisce la coda di processing con tracking del progresso
+ * ProcessingQueue - Manages the processing queue with progress tracking
  */
 export class ProcessingQueue extends EventEmitter {
   private jobs: Map<string, ProcessingJob> = new Map()
@@ -56,23 +56,23 @@ export class ProcessingQueue extends EventEmitter {
     this.maxConcurrentJobs = maxConcurrentJobs
     this.albumProcessor = new AlbumProcessorImpl()
     
-    // Configurazione default per retry
+    // Default configuration for retry
     this.retryConfig = {
       maxRetries: 3,
-      retryDelay: 5000, // 5 secondi
+      retryDelay: 5000, // 5 seconds
       backoffMultiplier: 2,
       retryableErrors: [
-        'ENOENT', // File non trovato
-        'EMFILE', // Troppi file aperti
-        'ENOMEM', // Memoria insufficiente
+        'ENOENT', // File not found
+        'EMFILE', // Too many open files
+        'ENOMEM', // Out of memory
         'timeout', // Timeout processing
-        'network' // Errori di rete
+        'network' // Network errors
       ]
     }
   }
 
   /**
-   * Aggiunge un nuovo job alla coda
+   * Adds a new job to the queue
    */
   addJob(albumName: string, files: AudioFile[], options: AlbumOptions): string {
     const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -80,8 +80,8 @@ export class ProcessingQueue extends EventEmitter {
     const job: ProcessingJob = {
       id: jobId,
       albumName,
-      files: [...files], // Copia per evitare modifiche esterne
-      options: { ...options }, // Copia delle opzioni
+      files: [...files], // Copy to avoid external changes
+      options: { ...options }, // Copy of the options
       status: 'pending',
       progress: 0,
       retryCount: 0
@@ -90,20 +90,20 @@ export class ProcessingQueue extends EventEmitter {
     this.jobs.set(jobId, job)
     this.emit('jobAdded', job)
     
-    // Avvia processing se ci sono slot disponibili
+    // Start processing if slots are available
     this.processNextJob()
     
     return jobId
   }  /**
    
-* Rimuove un job dalla coda (se non in processing)
+* Removes a job from the queue (if not processing)
    */
   removeJob(jobId: string): boolean {
     const job = this.jobs.get(jobId)
     if (!job) return false
     
     if (job.status === 'processing') {
-      // Marca per cancellazione invece di rimuovere immediatamente
+      // Mark for cancellation instead of removing immediately
       job.status = 'cancelled'
       this.emit('jobCancelled', job)
       return true
@@ -115,14 +115,14 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Ottiene informazioni su un job specifico
+   * Gets info about a specific job
    */
   getJob(jobId: string): ProcessingJob | undefined {
     return this.jobs.get(jobId)
   }
 
   /**
-   * Ottiene tutti i job con filtro opzionale per status
+   * Gets all jobs with an optional status filter
    */
   getJobs(status?: ProcessingJob['status']): ProcessingJob[] {
     const allJobs = Array.from(this.jobs.values())
@@ -130,7 +130,7 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Ottiene statistiche della coda
+   * Gets queue statistics
    */
   getQueueStats(): {
     total: number
@@ -152,7 +152,7 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Pulisce job completati più vecchi di un certo tempo
+   * Cleans up completed jobs older than a certain time
    */
   cleanupOldJobs(maxAgeMs: number = 24 * 60 * 60 * 1000): number {
     const cutoffTime = Date.now() - maxAgeMs
@@ -176,14 +176,14 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Processa il prossimo job disponibile se ci sono slot liberi
+   * Processes the next available job if there are free slots
    */
   private async processNextJob(): Promise<void> {
     if (this.activeJobs.size >= this.maxConcurrentJobs) {
-      return // Nessun slot disponibile
+      return // No slot available
     }
 
-    // Trova il prossimo job pending
+    // Find the next pending job
     const pendingJob = Array.from(this.jobs.values())
       .find(job => job.status === 'pending')
     
@@ -191,12 +191,12 @@ export class ProcessingQueue extends EventEmitter {
       return // Nessun job in attesa
     }
 
-    // Avvia processing del job
+    // Start processing the job
     await this.processJob(pendingJob)
   }
 
   /**
-   * Processa un singolo job
+   * Processes a single job
    */
   private async processJob(job: ProcessingJob): Promise<void> {
     this.activeJobs.add(job.id)
@@ -208,14 +208,14 @@ export class ProcessingQueue extends EventEmitter {
     this.emitProgressUpdate(job)
 
     try {
-      // Stima tempo totale basata su dimensione file e processing precedenti
+      // Estimate total time based on file size and previous processing
       const estimatedTotalTime = this.estimateProcessingTime(job.files)
       job.estimatedTimeRemaining = estimatedTotalTime
       
-      // Processa l'album con tracking del progresso
+      // Process the album with progress tracking
       const result = await this.processAlbumWithProgress(job)
       
-      // Job completato con successo
+      // Job completed successfully
       job.status = 'completed'
       job.progress = 100
       job.endTime = new Date()
@@ -226,28 +226,28 @@ export class ProcessingQueue extends EventEmitter {
       this.emitProgressUpdate(job)
       
     } catch (error) {
-      // Gestisce errore e retry se applicabile
+      // Handle error and retry if applicable
       await this.handleJobError(job, error)
     } finally {
       this.activeJobs.delete(job.id)
       
-      // Avvia il prossimo job se disponibile
+      // Start the next job if available
       setImmediate(() => this.processNextJob())
     }
   }  /**
 
-   * Processa album con tracking dettagliato del progresso
+   * Processes an album with detailed progress tracking
    */
   private async processAlbumWithProgress(job: ProcessingJob): Promise<ProcessingResult> {
     const totalFiles = job.files.length
     let processedFiles = 0
     
-    // Simula processing per ogni file con aggiornamenti di progresso
+    // Simulate processing for each file with progress updates
     const progressCallback = (fileIndex: number, fileName: string) => {
       processedFiles = fileIndex + 1
       job.progress = Math.round((processedFiles / totalFiles) * 100)
       
-      // Aggiorna stima tempo rimanente
+      // Update the remaining time estimate
       if (job.startTime) {
         const elapsedTime = Date.now() - job.startTime.getTime()
         const avgTimePerFile = elapsedTime / processedFiles
@@ -258,17 +258,17 @@ export class ProcessingQueue extends EventEmitter {
       this.emitProgressUpdate(job, fileName)
     }
 
-    // Verifica se job è stato cancellato
+    // Check whether the job was cancelled
     const currentJob = this.jobs.get(job.id)
     if (currentJob && currentJob.status === 'cancelled') {
       throw new Error('Job cancellato dall\'utente')
     }
 
-    // Processa l'album usando AlbumProcessor
+    // Process the album using AlbumProcessor
     const result = await this.albumProcessor.processAlbum(job.files, job.options)
     
-    // Simula aggiornamenti di progresso durante il processing
-    // In una implementazione reale, questo sarebbe integrato nel AlbumProcessor
+    // Simulate progress updates during processing
+    // In a real implementation, this would be integrated into the AlbumProcessor
     for (let i = 0; i < totalFiles; i++) {
       const currentJob = this.jobs.get(job.id)
       if (currentJob && currentJob.status === 'cancelled') {
@@ -277,7 +277,7 @@ export class ProcessingQueue extends EventEmitter {
       
       progressCallback(i, job.files[i].name)
       
-      // Simula tempo di processing per demo
+      // Simulate processing time for the demo
       if (process.env.NODE_ENV !== 'test') {
         await new Promise(resolve => setTimeout(resolve, 100))
       }
@@ -287,33 +287,33 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Gestisce errori durante il processing con retry logic
+   * Handles errors during processing with retry logic
    */
   private async handleJobError(job: ProcessingJob, error: unknown): Promise<void> {
     const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
     job.error = errorMessage
     
-    // Verifica se l'errore è ritentabile
+    // Check whether the error is retryable
     const isRetryable = this.isErrorRetryable(errorMessage)
     const canRetry = job.retryCount < this.retryConfig.maxRetries && isRetryable
     
     if (canRetry) {
       job.retryCount++
-      job.status = 'pending' // Rimette in coda per retry
+      job.status = 'pending' // Requeue for retry
       
-      // Calcola delay con backoff esponenziale
+      // Compute delay with exponential backoff
       const delay = this.retryConfig.retryDelay * 
         Math.pow(this.retryConfig.backoffMultiplier, job.retryCount - 1)
       
       this.emit('jobRetrying', { job, attempt: job.retryCount, delay })
       
-      // Schedula retry dopo delay
+      // Schedule retry after the delay
       setTimeout(() => {
         this.processNextJob()
       }, delay)
       
     } else {
-      // Job fallito definitivamente
+      // Job failed permanently
       job.status = 'failed'
       job.endTime = new Date()
       job.progress = 0
@@ -325,7 +325,7 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Verifica se un errore è ritentabile
+   * Checks whether an error is retryable
    */
   private isErrorRetryable(errorMessage: string): boolean {
     return this.retryConfig.retryableErrors.some(retryableError => 
@@ -334,14 +334,14 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Stima il tempo di processing basato su dimensione file e storico
+   * Estimates processing time based on file size and history
    */
   private estimateProcessingTime(files: AudioFile[]): number {
-    // Stima base: 1 secondo per MB di audio
+    // Base estimate: 1 second per MB of audio
     const totalSizeMB = files.reduce((sum, file) => sum + (file.size / (1024 * 1024)), 0)
-    const baseEstimate = totalSizeMB * 1000 // millisecondi
+    const baseEstimate = totalSizeMB * 1000 // milliseconds
     
-    // Fattore di correzione basato su storico (se disponibile)
+    // Correction factor based on history (if available)
     const completedJobs = this.getJobs('completed')
     if (completedJobs.length > 0) {
       const avgProcessingRate = this.calculateAverageProcessingRate(completedJobs)
@@ -352,7 +352,7 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Calcola il rate medio di processing dai job completati
+   * Computes the average processing rate from completed jobs
    */
   private calculateAverageProcessingRate(completedJobs: ProcessingJob[]): number {
     let totalTime = 0
@@ -372,7 +372,7 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Emette evento di aggiornamento progresso
+   * Emits a progress update event
    */
   private emitProgressUpdate(job: ProcessingJob, currentFile?: string): void {
     const update: ProgressUpdate = {
@@ -387,32 +387,32 @@ export class ProcessingQueue extends EventEmitter {
   }
 
   /**
-   * Aggiunge un task generico alla coda (per compatibilità test)
+   * Adds a generic task to the queue (for test compatibility)
    */
   async addTask<T>(taskId: string, taskFunction: () => Promise<T>): Promise<T> {
-    // Per ora esegue direttamente il task - in futuro potrebbe usare la coda
+    // For now it runs the task directly - in the future it could use the queue
     return await taskFunction()
   }
 
   /**
-   * Configura parametri di retry
+   * Configures retry parameters
    */
   setRetryConfig(config: Partial<RetryConfig>): void {
     this.retryConfig = { ...this.retryConfig, ...config }
   }
 
   /**
-   * Configura numero massimo di job concorrenti
+   * Configures the maximum number of concurrent jobs
    */
   setMaxConcurrentJobs(max: number): void {
     this.maxConcurrentJobs = Math.max(1, max)
   }
 
   /**
-   * Ferma tutti i job attivi (per shutdown graceful)
+   * Stops all active jobs (for graceful shutdown)
    */
   async shutdown(): Promise<void> {
-    // Marca tutti i job attivi come cancellati
+    // Mark all active jobs as cancelled
     for (const jobId of this.activeJobs) {
       const job = this.jobs.get(jobId)
       if (job && job.status === 'processing') {
@@ -420,7 +420,7 @@ export class ProcessingQueue extends EventEmitter {
       }
     }
     
-    // Attende che tutti i job attivi terminino
+    // Wait for all active jobs to finish
     while (this.activeJobs.size > 0) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
@@ -430,7 +430,7 @@ export class ProcessingQueue extends EventEmitter {
 }
 
 /**
- * Factory function per creare istanza ProcessingQueue
+ * Factory function to create a ProcessingQueue instance
  */
 export function createProcessingQueue(maxConcurrentJobs?: number): ProcessingQueue {
   return new ProcessingQueue(maxConcurrentJobs)

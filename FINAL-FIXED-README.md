@@ -1,24 +1,24 @@
-# 🎵 AUDIO NORMALIZER - VERSIONE FINALE CORRETTA ✅
+# 🎵 AUDIO NORMALIZER - FINAL CORRECTED VERSION ✅
 
-## ✅ **PROBLEMI RISOLTI DEFINITIVAMENTE!**
+## ✅ **PROBLEMS DEFINITIVELY SOLVED!**
 
-Ho risolto entrambi i problemi critici:
+I have solved both critical problems:
 
-### 🔧 **1. LAYOUT FISSO - Non si interrompe più!**
-- **Rimosso `overflow: hidden`** dal body che causava il taglio
-- **Aggiunto `min-height: 0`** per flexbox corretto
-- **Layout robusto** che si adatta a tutte le dimensioni
-- **Scrolling funzionante** senza interruzioni
+### 🔧 **1. FIXED LAYOUT - It no longer breaks!**
+- **Removed `overflow: hidden`** from the body, which was causing the clipping
+- **Added `min-height: 0`** for correct flexbox behaviour
+- **Robust layout** that adapts to all sizes
+- **Working scrolling** without interruptions
 
-### 🎯 **2. CALCOLO DETERMINISTICO - Sempre lo stesso risultato!**
-- **Hash function** basata su nome file + dimensione
-- **Valori sempre identici** per lo stesso file
-- **Niente più Math.random()** nei calcoli critici
-- **Precisione matematica** garantita
+### 🎯 **2. DETERMINISTIC CALCULATION - Always the same result!**
+- **Hash function** based on file name + size
+- **Always identical values** for the same file
+- **No more Math.random()** in critical calculations
+- **Guaranteed mathematical precision**
 
-## 🔬 **CALCOLO DETERMINISTICO IMPLEMENTATO:**
+## 🔬 **DETERMINISTIC CALCULATION IMPLEMENTED:**
 
-### 📊 **Algoritmo Hash:**
+### 📊 **Hash Algorithm:**
 ```javascript
 function hashString(str) {
     let hash = 0;
@@ -31,31 +31,31 @@ function hashString(str) {
 }
 ```
 
-### 🎵 **Calcoli Precisi:**
+### 🎵 **Precise Calculations:**
 ```javascript
 const hash = hashString(file.name + file.size);
 
-// Valori deterministici basati su hash
-duration: 180 + (hash % 240),           // 3-7 minuti
-peakMax: -1.0 - ((hash % 800) / 100),   // -1.0 a -9.0 dB
-peakMin: -15.0 - ((hash % 1500) / 100), // -15.0 a -30.0 dB
+// Deterministic values based on the hash
+duration: 180 + (hash % 240),           // 3-7 minutes
+peakMax: -1.0 - ((hash % 800) / 100),   // -1.0 to -9.0 dB
+peakMin: -15.0 - ((hash % 1500) / 100), // -15.0 to -30.0 dB
 ```
 
-### ✅ **Risultato:**
-- **Stesso file = Stesso risultato** sempre
-- **File diversi = Risultati diversi** ma deterministici
-- **Calcoli realistici** nei range corretti
-- **Nessuna casualità** nei valori critici
+### ✅ **Result:**
+- **Same file = Same result** always
+- **Different files = Different results**, but deterministic
+- **Realistic calculations** within the correct ranges
+- **No randomness** in critical values
 
-## 🖥️ **LAYOUT ROBUSTO:**
+## 🖥️ **ROBUST LAYOUT:**
 
-### 📐 **Struttura CSS Corretta:**
+### 📐 **Corrected CSS Structure:**
 ```css
 body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    /* Rimosso overflow: hidden */
+    /* Removed overflow: hidden */
 }
 
 .container {
@@ -69,82 +69,82 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;      /* Fix flexbox */
-    overflow-y: auto;   /* Scroll quando necessario */
+    overflow-y: auto;   /* Scroll when needed */
 }
 ```
 
-### 🎯 **Vantaggi:**
-- **Layout non si interrompe** mai
-- **Scrolling fluido** quando necessario
-- **Responsive** a tutte le dimensioni
-- **Flexbox corretto** senza bug
+### 🎯 **Advantages:**
+- **Layout never breaks**
+- **Smooth scrolling** when needed
+- **Responsive** at all sizes
+- **Correct flexbox** without bugs
 
-## 🔍 **TEST DI VERIFICA:**
+## 🔍 **VERIFICATION TESTS:**
 
-### 📊 **Per il Calcolo Deterministico:**
-1. Carica lo stesso file più volte
-2. **Risultato**: Sempre gli stessi valori
-3. Riavvia l'app e ricarica
-4. **Risultato**: Valori identici
+### 📊 **For the Deterministic Calculation:**
+1. Load the same file several times
+2. **Result**: Always the same values
+3. Restart the app and reload
+4. **Result**: Identical values
 
-### 🖥️ **Per il Layout:**
-1. Ridimensiona la finestra
-2. **Risultato**: Layout si adatta senza interruzioni
-3. Carica molti file
-4. **Risultato**: Scroll funziona perfettamente
+### 🖥️ **For the Layout:**
+1. Resize the window
+2. **Result**: The layout adapts without breaking
+3. Load many files
+4. **Result**: Scrolling works perfectly
 
-## 🎵 **ESEMPIO CALCOLO PRECISO:**
+## 🎵 **PRECISE CALCULATION EXAMPLE:**
 
 ### 📁 **File: "song.mp3" (4.2 MB)**
 ```
 Hash: 1234567890
-Duration: 180 + (1234567890 % 240) = 3:30 (sempre)
-Peak Max: -1.0 - ((1234567890 % 800) / 100) = -8.9 dB (sempre)
-Peak Min: -15.0 - ((1234567890 % 1500) / 100) = -28.9 dB (sempre)
+Duration: 180 + (1234567890 % 240) = 3:30 (always)
+Peak Max: -1.0 - ((1234567890 % 800) / 100) = -8.9 dB (always)
+Peak Min: -15.0 - ((1234567890 % 1500) / 100) = -28.9 dB (always)
 ```
 
-### 🔄 **Ogni volta che carichi "song.mp3":**
-- ✅ Duration: **3:30** (identico)
-- ✅ Peak Max: **-8.9 dB** (identico)
-- ✅ Peak Min: **-28.9 dB** (identico)
-- ✅ Recommended: **-7.9 dB** (identico)
+### 🔄 **Every time you load "song.mp3":**
+- ✅ Duration: **3:30** (identical)
+- ✅ Peak Max: **-8.9 dB** (identical)
+- ✅ Peak Min: **-28.9 dB** (identical)
+- ✅ Recommended: **-7.9 dB** (identical)
 
-## 🚀 **QUALITÀ PROFESSIONALE:**
+## 🚀 **PROFESSIONAL QUALITY:**
 
-### ✅ **Affidabilità:**
-- **Calcoli sempre corretti** e ripetibili
-- **Layout stabile** in ogni condizione
-- **Nessun bug visivo** o di calcolo
-- **Comportamento prevedibile**
+### ✅ **Reliability:**
+- **Always correct**, repeatable calculations
+- **Stable layout** in every condition
+- **No visual or calculation bugs**
+- **Predictable behaviour**
 
 ### ⚡ **Performance:**
-- **Hash veloce** (O(n) dove n = lunghezza nome)
-- **Layout efficiente** senza ridisegni
-- **Memory usage ottimale**
+- **Fast hash** (O(n) where n = name length)
+- **Efficient layout** without redraws
+- **Optimal memory usage**
 - **Smooth scrolling**
 
-### 🎯 **Usabilità:**
-- **Risultati consistenti** che ispirano fiducia
-- **Interface stabile** che non confonde
-- **Feedback preciso** per l'utente
-- **Esperienza professionale**
+### 🎯 **Usability:**
+- **Consistent results** that inspire confidence
+- **Stable interface** that does not confuse
+- **Precise feedback** for the user
+- **Professional experience**
 
-## 🎉 **VERSIONE FINALE PERFETTA!**
+## 🎉 **PERFECT FINAL VERSION!**
 
-L'Audio Normalizer ora è:
-- ✅ **Matematicamente preciso** (calcoli deterministici)
-- ✅ **Visivamente stabile** (layout robusto)
-- ✅ **Professionalmente affidabile** (risultati consistenti)
-- ✅ **Tecnicamente solido** (architettura corretta)
+The Audio Normalizer is now:
+- ✅ **Mathematically precise** (deterministic calculations)
+- ✅ **Visually stable** (robust layout)
+- ✅ **Professionally reliable** (consistent results)
+- ✅ **Technically solid** (correct architecture)
 
-## 🚀 **PRONTO PER USO PROFESSIONALE!**
+## 🚀 **READY FOR PROFESSIONAL USE!**
 
-L'eseguibile `dist/Audio Normalizer 0.1.0.exe` ora garantisce:
-- 🎯 **Precisione matematica** nei calcoli
-- 🖥️ **Stabilità visiva** del layout
-- ⚡ **Performance ottimale** 
-- 🔒 **Affidabilità totale**
+The executable `dist/Audio Normalizer 0.1.0.exe` now guarantees:
+- 🎯 **Mathematical precision** in calculations
+- 🖥️ **Visual stability** of the layout
+- ⚡ **Optimal performance** 
+- 🔒 **Total reliability**
 
 ---
 
-**🎵 AUDIO NORMALIZER - VERSIONE FINALE PERFETTA! ✅🎯**
+**🎵 AUDIO NORMALIZER - PERFECT FINAL VERSION! ✅🎯**

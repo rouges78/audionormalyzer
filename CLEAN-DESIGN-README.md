@@ -1,132 +1,132 @@
 # 🎵 AUDIO NORMALIZER - CLEAN MODERN DESIGN ✨
 
-## ✅ **DESIGN COMPLETAMENTE RINNOVATO!**
+## ✅ **DESIGN COMPLETELY REVAMPED!**
 
-Ho rifatto completamente l'interfaccia con un design pulito e moderno:
-- 🎨 **Colori minimal** - Solo nero, grigio e blu accento
-- 🖥️ **Layout pulito** - Stile Windows 11/macOS moderno
-- 📱 **Scrollbar moderne** - Sottili e discrete
-- ✨ **Zero confusione** - Design essenziale e funzionale
+I completely redid the interface with a clean, modern design:
+- 🎨 **Minimal colors** - Only black, gray and an accent blue
+- 🖥️ **Clean layout** - Modern Windows 11/macOS style
+- 📱 **Modern scrollbars** - Thin and unobtrusive
+- ✨ **Zero clutter** - Essential, functional design
 
-## 🎨 **NUOVO DESIGN SYSTEM:**
+## 🎨 **NEW DESIGN SYSTEM:**
 
-### 🖤 **Palette Colori Minimal:**
-- **Background**: `#0a0a0a` (nero profondo)
-- **Cards**: `#161616` (grigio scuro)
-- **Borders**: `#222` (grigio medio)
-- **Text**: `#ffffff` (bianco puro)
-- **Accent**: `#007acc` (blu Microsoft)
-- **Danger**: `#d13438` (rosso moderno)
+### 🖤 **Minimal Color Palette:**
+- **Background**: `#0a0a0a` (deep black)
+- **Cards**: `#161616` (dark gray)
+- **Borders**: `#222` (medium gray)
+- **Text**: `#ffffff` (pure white)
+- **Accent**: `#007acc` (Microsoft blue)
+- **Danger**: `#d13438` (modern red)
 
-### 📐 **Layout Moderno:**
-- **Font**: Inter (stesso di GitHub/Discord)
-- **Border radius**: 6-8px (angoli morbidi)
-- **Spacing**: 16-24px (spaziatura consistente)
-- **Grid system**: CSS Grid per layout perfetti
-- **No animations**: Zero effetti fastidiosi
+### 📐 **Modern Layout:**
+- **Font**: Inter (same as GitHub/Discord)
+- **Border radius**: 6-8px (soft corners)
+- **Spacing**: 16-24px (consistent spacing)
+- **Grid system**: CSS Grid for perfect layouts
+- **No animations**: Zero annoying effects
 
-## 🖥️ **INTERFACCIA PULITA:**
+## 🖥️ **CLEAN INTERFACE:**
 
-### 📋 **Header Minimal:**
+### 📋 **Minimal Header:**
 ```
 🎵 Audio Normalizer
 Professional Audio Level Normalization
 ```
-- Titolo semplice senza effetti
-- Sottotitolo discreto in grigio
-- Bordo sottile per separazione
+- Simple title with no effects
+- Unobtrusive gray subtitle
+- Thin border for separation
 
 ### 📂 **Upload Section:**
-- **Grid 2 colonne** per Individual Files + Album Folder
-- **Bordi dashed** discreti che diventano blu al hover
-- **Testo pulito** senza maiuscole eccessive
-- **Padding consistente** per allineamento perfetto
+- **2-column grid** for Individual Files + Album Folder
+- **Unobtrusive dashed borders** that turn blue on hover
+- **Clean text** without excessive capitals
+- **Consistent padding** for perfect alignment
 
-### 🎵 **Track Cards Essenziali:**
+### 🎵 **Essential Track Cards:**
 ```
 ┌─────────────────────────────────────────────┐
-│ 🎵 Nome_Canzone.mp3           🗑️ REMOVE    │
+│ 🎵 Song_Name.mp3              🗑️ REMOVE    │
 ├─────────────────────────────────────────────┤
 │ Duration │ Max Peak │ Min Peak │ File Size  │
 │   3:45   │ -2.1 dB  │ -18.3 dB │   4.2 MB   │
 └─────────────────────────────────────────────┘
 ```
-- **Background grigio scuro** con bordi sottili
-- **Grid 4 colonne** per statistiche
-- **Testo bianco** su sfondo scuro
-- **Hover effect** discreto
+- **Dark gray background** with thin borders
+- **4-column grid** for statistics
+- **White text** on a dark background
+- **Unobtrusive hover effect**
 
-### 🎛️ **Controlli Semplici:**
-- **Pulsanti blu** con hover più scuro
-- **Select/Input** con stile moderno
-- **Progress bar** pulita senza effetti
-- **Layout verticale** organizzato
+### 🎛️ **Simple Controls:**
+- **Blue buttons** that darken on hover
+- **Select/Input** with a modern style
+- **Clean progress bar** with no effects
+- **Organized vertical layout**
 
-## 📱 **SCROLLBAR MODERNE:**
+## 📱 **MODERN SCROLLBARS:**
 
 ### 🎯 **Custom Scrollbar:**
 ```css
 ::-webkit-scrollbar {
-    width: 8px;              /* Sottile */
+    width: 8px;              /* Thin */
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #333;        /* Grigio discreto */
-    border-radius: 4px;      /* Angoli morbidi */
+    background: #333;        /* Unobtrusive gray */
+    border-radius: 4px;      /* Soft corners */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;        /* Più chiaro al hover */
+    background: #555;        /* Lighter on hover */
 }
 ```
 
-## 🚀 **VANTAGGI DEL NUOVO DESIGN:**
+## 🚀 **ADVANTAGES OF THE NEW DESIGN:**
 
-### ✅ **Usabilità:**
-- **Leggibilità perfetta** - Contrasto ottimale
-- **Focus sui contenuti** - Zero distrazioni
-- **Navigazione intuitiva** - Layout familiare
-- **Responsive** - Si adatta a tutte le dimensioni
+### ✅ **Usability:**
+- **Perfect readability** - Optimal contrast
+- **Focus on content** - Zero distractions
+- **Intuitive navigation** - Familiar layout
+- **Responsive** - Adapts to every size
 
 ### ⚡ **Performance:**
-- **Zero animazioni** - Nessun lag o distrazione
-- **CSS minimal** - Caricamento veloce
-- **Layout stabile** - Nessun movimento indesiderato
-- **Memory efficient** - Meno risorse utilizzate
+- **Zero animations** - No lag or distraction
+- **Minimal CSS** - Fast loading
+- **Stable layout** - No unwanted movement
+- **Memory efficient** - Fewer resources used
 
-### 🎨 **Estetica:**
-- **Professionale** - Stile enterprise/developer
-- **Moderno** - Trend 2024/2025
-- **Consistente** - Stesso stile ovunque
-- **Accessibile** - Contrasti WCAG compliant
+### 🎨 **Aesthetics:**
+- **Professional** - Enterprise/developer style
+- **Modern** - 2024/2025 trends
+- **Consistent** - Same style everywhere
+- **Accessible** - WCAG-compliant contrast
 
-## 🖥️ **ISPIRAZIONE DESIGN:**
+## 🖥️ **DESIGN INSPIRATION:**
 
-### 📱 **Stile Simile A:**
-- **VS Code** - Editor pulito e funzionale
-- **GitHub Desktop** - Interface minimal
-- **Discord** - Layout moderno
-- **Windows 11** - Design system Microsoft
-- **macOS Big Sur** - Elementi puliti
+### 📱 **Style Similar To:**
+- **VS Code** - Clean, functional editor
+- **GitHub Desktop** - Minimal interface
+- **Discord** - Modern layout
+- **Windows 11** - Microsoft design system
+- **macOS Big Sur** - Clean elements
 
-## 🎯 **RISULTATO FINALE:**
+## 🎯 **FINAL RESULT:**
 
-L'Audio Normalizer ora ha:
-- ✅ **Design professionale** senza fronzoli
-- ✅ **Colori minimal** che non stancano gli occhi
-- ✅ **Layout stabile** che non si muove
-- ✅ **Scrollbar moderne** discrete
-- ✅ **Usabilità perfetta** per uso quotidiano
-- ✅ **Zero confusione** visiva
+Audio Normalizer now has:
+- ✅ **Professional design** with no frills
+- ✅ **Minimal colors** that do not tire the eyes
+- ✅ **Stable layout** that does not move
+- ✅ **Unobtrusive modern scrollbars**
+- ✅ **Perfect usability** for everyday use
+- ✅ **Zero** visual **clutter**
 
-## 🚀 **PRONTO PER L'USO PROFESSIONALE!**
+## 🚀 **READY FOR PROFESSIONAL USE!**
 
-L'eseguibile `dist/Audio Normalizer 0.1.0.exe` ora ha un design:
-- 🎨 **Pulito e moderno** come le app professionali
-- 📱 **Familiare** per utenti Windows/macOS
-- ⚡ **Veloce** senza animazioni inutili
-- 🎯 **Funzionale** con focus sui contenuti
+The executable `dist/Audio Normalizer 0.1.0.exe` now has a design that is:
+- 🎨 **Clean and modern** like professional apps
+- 📱 **Familiar** to Windows/macOS users
+- ⚡ **Fast** with no needless animations
+- 🎯 **Functional** with a focus on content
 
 ---
 
-**🎵 AUDIO NORMALIZER - DESIGN PERFETTO! ✨🖤**
+**🎵 AUDIO NORMALIZER - PERFECT DESIGN! ✨🖤**

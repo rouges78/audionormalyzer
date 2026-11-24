@@ -1,6 +1,6 @@
 @echo off
 REM Audio Normalizer - Fix File Locking Issues
-REM Risolve i problemi di file locking durante la creazione dell'EXE
+REM Fixes file locking problems during EXE creation
 
 title Audio Normalizer - Fix File Locking
 
@@ -9,12 +9,12 @@ echo    Audio Normalizer - Fix File Locking Issues
 echo =====================================================
 echo.
 
-echo ⚠️  Questo script risolverà i problemi di file locking
-echo    che impediscono la creazione dell'EXE
+echo ⚠️  This script will fix the file locking problems
+echo    that prevent the EXE from being created
 echo.
 
 REM Step 1: Kill all related processes with more force
-echo 🧨 Terminazione processi in corso...
+echo 🧨 Terminating running processes...
 echo.
 
 REM Kill Electron processes
@@ -38,15 +38,15 @@ taskkill /f /im "app-builder.exe" 2>nul
 taskkill /f /im "app-builder-bin.exe" 2>nul
 
 REM Wait for processes to terminate
-echo ⏳ Attendere la chiusura dei processi...
+echo ⏳ Waiting for the processes to close...
 timeout /t 5 /nobreak >nul
 
 echo.
-echo ✅ Processi terminati
+echo ✅ Processes terminated
 echo.
 
 REM Step 2: Clean all build directories with force
-echo 🧹 Pulizia cartelle build...
+echo 🧹 Cleaning build folders...
 echo.
 
 REM Remove dist directory with multiple attempts
@@ -79,29 +79,29 @@ if exist "node_modules\.cache" (
 )
 
 echo.
-echo ✅ Pulizia completata
+echo ✅ Cleanup completed
 echo.
 
 REM Step 3: Wait and stabilize system
-echo ⏸️  Stabilizzazione sistema...
+echo ⏸️  Stabilizing the system...
 echo.
 
 REM Use ping instead of timeout for better compatibility
 ping 127.0.0.1 -n 6 >nul
 
 REM Step 4: Check if files are still locked
-echo 🔍 Controllo file ancora in uso...
+echo 🔍 Checking files still in use...
 echo.
 
 set locked=0
 if exist "dist\win-unpacked\resources\app.asar" (
-    echo ⚠️  File app.asar ancora presente
+    echo ⚠️  app.asar file still present
     set locked=1
 )
 
 if "%locked%"=="1" (
-    echo ⚠️  Alcuni file sono ancora bloccati
-    echo 💡 Provo con metodi alternativi...
+    echo ⚠️  Some files are still locked
+    echo 💡 Trying alternative methods...
     
     REM Try to unlock files with handle utility (if available)
     if exist "handle.exe" (
@@ -114,26 +114,26 @@ if "%locked%"=="1" (
 )
 
 echo.
-echo ✅ Sistema stabilizzato
+echo ✅ System stabilized
 echo.
 
 REM Step 5: Rebuild with optimized settings
-echo 🔨 Ricostruzione con impostazioni ottimizzate...
+echo 🔨 Rebuilding with optimized settings...
 echo.
 
 REM Build Next.js app first
 echo Building Next.js application...
 call npm run build
 if errorlevel 1 (
-    echo ❌ Build Next.js fallito
+    echo ❌ Next.js build failed
     echo.
-    echo 💡 Controlla errori nel codice prima di continuare
+    echo 💡 Check for errors in the code before continuing
     pause
     exit /b 1
 )
 
 echo.
-echo ✅ Build Next.js completato
+echo ✅ Next.js build completed
 echo.
 
 REM Wait before electron build
@@ -146,35 +146,35 @@ echo.
 REM Use the minimal config that we know works
 call npx electron-builder --config electron-builder-minimal.config.js --win portable --publish never
 if errorlevel 1 (
-    echo ❌ Creazione EXE fallita
+    echo ❌ EXE creation failed
     echo.
-    echo 💡 Tentativi alternativi:
-    echo    1. Riavvia il computer
-    echo    2. Disabilita antivirus temporaneamente  
-    echo    3. Esegui come amministratore
-    echo    4. Sposta il progetto in una cartella più corta
+    echo 💡 Alternative attempts:
+    echo    1. Restart the computer
+    echo    2. Temporarily disable the antivirus  
+    echo    3. Run as administrator
+    echo    4. Move the project to a shorter folder
     pause
     exit /b 1
 )
 
 echo.
-echo 🎉 SUCCESSO! EXE creato con successo!
+echo 🎉 SUCCESS! EXE created successfully!
 echo.
 
 REM Show created files
-echo 📁 File creati:
+echo 📁 Files created:
 if exist "dist" (
     dir "dist\*.exe" /b
     echo.
-    echo 🚀 Aprendo cartella dist...
+    echo 🚀 Opening dist folder...
     explorer dist
 ) else (
-    echo ⚠️  Nessuna cartella dist trovata
-    echo Cercando file EXE in altre cartelle...
+    echo ⚠️  No dist folder found
+    echo Looking for EXE files in other folders...
     dir "*.exe" /s /b | findstr /i "audio\|normalizer"
 )
 
 echo.
-echo ✅ Processo completato!
+echo ✅ Process completed!
 echo.
 pause

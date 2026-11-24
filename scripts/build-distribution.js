@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Audio Normalizer - Complete Distribution Builder
- * Script per creare tutte le distribuzioni (web, desktop, docker)
+ * Script to create all the distributions (web, desktop, docker)
  */
 
 const { execSync } = require('child_process')

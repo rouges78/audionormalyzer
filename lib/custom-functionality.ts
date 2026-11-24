@@ -1,5 +1,5 @@
 // Custom Functionality Support System
-// Sistema per supportare funzionalità personalizzate definite dall'utente
+// System to support user-defined custom functionality
 
 import { EventEmitter } from 'events'
 import { pluginManager, BasePlugin, PluginMetadata } from './plugin-system'

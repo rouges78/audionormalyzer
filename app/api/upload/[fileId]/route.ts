@@ -49,7 +49,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Errore nel recupero informazioni file:', error)
+    console.error('Error retrieving file info:', error)
     
     return NextResponse.json(
       { 
@@ -111,7 +111,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Errore nell\'eliminazione file:', error)
+    console.error('Error deleting file:', error)
     
     return NextResponse.json(
       { 

@@ -19,7 +19,7 @@ describe('Upload API Simple Tests', () => {
     // Should return error for no files
     expect(response.status).toBe(400)
     expect(data.success).toBe(false)
-    // Envelope di withErrorHandling: { success, error: { message, code, ... } }
+    // withErrorHandling envelope: { success, error: { message, code, ... } }
     expect(data.error.code).toBe('NO_FILES')
   })
 

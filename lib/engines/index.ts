@@ -1,11 +1,11 @@
 /**
- * Punto d'ingresso dell'astrazione engine.
+ * Entry point of the engine abstraction.
  *
- * `createAudioEngine()`  → selezione sincrona (euristica sul runtime).
- * `resolveAudioEngine()` → selezione asincrona che, lato server, preferisce
- *                          l'engine nativo se davvero disponibile.
+ * `createAudioEngine()`  → synchronous selection (runtime heuristic).
+ * `resolveAudioEngine()` → asynchronous selection that, server side, prefers
+ *                          the native engine if it is really available.
  *
- * Override esplicito: opzione `kind`, oppure variabile d'ambiente
+ * Explicit override: the `kind` option, or the environment variable
  * `AUDIO_ENGINE` = "wasm" | "native" | "web-audio".
  */
 
@@ -20,7 +20,7 @@ export { WebAudioEngine, createWebAudioEngine } from './web-audio-engine'
 export { NativeEngine, createNativeEngine } from './native-engine'
 
 export interface EngineSelectionOptions {
-  /** Forza un engine specifico, ignorando l'euristica di runtime. */
+  /** Forces a specific engine, ignoring the runtime heuristic. */
   kind?: EngineKind
 }
 
@@ -46,9 +46,9 @@ function instantiate(kind: EngineKind): AudioEngine {
 }
 
 /**
- * Selezione sincrona. Rispetta l'override esplicito/env; altrimenti sceglie
- * per runtime: browser → Web Audio, server → WASM. Non verifica la
- * disponibilità dell'engine nativo (usa `resolveAudioEngine` per quello).
+ * Synchronous selection. Honors the explicit/env override; otherwise it picks
+ * by runtime: browser → Web Audio, server → WASM. It does not check the
+ * availability of the native engine (use `resolveAudioEngine` for that).
  */
 export function createAudioEngine(
   opts: EngineSelectionOptions = {},
@@ -59,10 +59,10 @@ export function createAudioEngine(
 }
 
 /**
- * Selezione asincrona. Come sopra, ma lato server prova prima l'engine nativo
- * e vi ricade sul WASM solo se il nativo non è disponibile. Se un engine
- * forzato non risulta disponibile, viene comunque restituito (scelta
- * esplicita dell'utente) così l'errore emerge all'uso.
+ * Asynchronous selection. As above, but server side it tries the native engine first
+ * and falls back to WASM only if native is not available. If a
+ * forced engine turns out to be unavailable, it is returned anyway (an explicit
+ * user choice) so the error surfaces on use.
  */
 export async function resolveAudioEngine(
   opts: EngineSelectionOptions = {},

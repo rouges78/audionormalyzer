@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { ProcessingQueue, ProcessingJob, ProgressUpdate } from '../processing-queue'
 import { AudioFile, AlbumOptions } from '@/types/audio'
 
-// Mock del AlbumProcessor
+// Mock the AlbumProcessor
 vi.mock('../album-processor', () => ({
   AlbumProcessorImpl: vi.fn().mockImplementation(() => ({
     processAlbum: vi.fn()
@@ -23,7 +23,7 @@ describe('ProcessingQueue', () => {
   })
 
   describe('addJob', () => {
-    it('dovrebbe aggiungere un job alla coda', async () => {
+    it('should add a job to the queue', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -42,7 +42,7 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock processAlbum per evitare processing automatico
+      // Mock processAlbum to avoid automatic processing
       mockAlbumProcessor.processAlbum.mockImplementation(() => 
         new Promise(resolve => setTimeout(resolve, 1000))
       )
@@ -51,7 +51,7 @@ describe('ProcessingQueue', () => {
 
       expect(jobId).toMatch(/^job_\d+_[a-z0-9]+$/)
       
-      // Attende un momento per permettere l'inizializzazione
+      // Wait a moment to allow initialization
       await new Promise(resolve => setTimeout(resolve, 10))
       
       const job = queue.getJob(jobId)
@@ -63,7 +63,7 @@ describe('ProcessingQueue', () => {
       expect(job!.retryCount).toBe(0)
     })
 
-    it('dovrebbe emettere evento jobAdded', async () => {
+    it('should emit the jobAdded event', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -82,7 +82,7 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock processAlbum per evitare processing automatico
+      // Mock processAlbum to avoid automatic processing
       mockAlbumProcessor.processAlbum.mockImplementation(() => 
         new Promise(resolve => setTimeout(resolve, 1000))
       )
@@ -102,7 +102,7 @@ describe('ProcessingQueue', () => {
   })
 
   describe('removeJob', () => {
-    it('dovrebbe rimuovere un job pending', async () => {
+    it('should remove a pending job', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -121,14 +121,14 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock processAlbum per evitare processing automatico
+      // Mock processAlbum to avoid automatic processing
       mockAlbumProcessor.processAlbum.mockImplementation(() => 
         new Promise(resolve => setTimeout(resolve, 1000))
       )
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende un momento per permettere l'inizializzazione
+      // Wait a moment to allow initialization
       await new Promise(resolve => setTimeout(resolve, 10))
       
       const job = queue.getJob(jobId)
@@ -137,7 +137,7 @@ describe('ProcessingQueue', () => {
         expect(removed).toBe(true)
         expect(queue.getJob(jobId)).toBeUndefined()
       } else {
-        // Se il job è già in processing, testa la cancellazione
+        // If the job is already processing, test the cancellation
         const removed = queue.removeJob(jobId)
         expect(removed).toBe(true)
         const updatedJob = queue.getJob(jobId)
@@ -145,7 +145,7 @@ describe('ProcessingQueue', () => {
       }
     })
 
-    it('dovrebbe marcare come cancelled un job in processing', async () => {
+    it('should mark a processing job as cancelled', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -164,14 +164,14 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock processAlbum per simulare processing lungo
+      // Mock processAlbum to simulate long processing
       mockAlbumProcessor.processAlbum.mockImplementation(() => 
         new Promise(resolve => setTimeout(resolve, 1000))
       )
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende che il job inizi
+      // Wait for the job to start
       await new Promise(resolve => setTimeout(resolve, 50))
       
       const job = queue.getJob(jobId)
@@ -182,14 +182,14 @@ describe('ProcessingQueue', () => {
       }
     })
 
-    it('dovrebbe restituire false per job inesistente', () => {
+    it('should return false for a nonexistent job', () => {
       const removed = queue.removeJob('nonexistent')
       expect(removed).toBe(false)
     })
   })
 
   describe('getQueueStats', () => {
-    it('dovrebbe restituire statistiche corrette della coda', () => {
+    it('should return correct queue statistics', () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -208,7 +208,7 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Aggiunge alcuni job
+      // Add a few jobs
       queue.addJob('Album 1', mockFiles, options)
       queue.addJob('Album 2', mockFiles, options)
 
@@ -224,7 +224,7 @@ describe('ProcessingQueue', () => {
   })
 
   describe('cleanupOldJobs', () => {
-    it('dovrebbe pulire job completati vecchi', async () => {
+    it('should clean up old completed jobs', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -243,7 +243,7 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock processAlbum per completamento immediato
+      // Mock processAlbum for immediate completion
       mockAlbumProcessor.processAlbum.mockResolvedValue({
         fileId: 'album-123',
         success: true,
@@ -255,26 +255,26 @@ describe('ProcessingQueue', () => {
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende completamento
+      // Wait for completion
       await new Promise(resolve => {
         queue.on('jobCompleted', () => resolve(undefined))
       })
 
-      // Simula job vecchio modificando endTime
+      // Simulate an old job by changing endTime
       const job = queue.getJob(jobId)
       if (job) {
-        job.endTime = new Date(Date.now() - 25 * 60 * 60 * 1000) // 25 ore fa
+        job.endTime = new Date(Date.now() - 25 * 60 * 60 * 1000) // 25 hours ago
       }
 
-      const cleaned = queue.cleanupOldJobs(24 * 60 * 60 * 1000) // 24 ore
+      const cleaned = queue.cleanupOldJobs(24 * 60 * 60 * 1000) // 24 hours
       
       expect(cleaned).toBe(1)
       expect(queue.getJob(jobId)).toBeUndefined()
     })
   })
 
-  describe('processing con progress tracking', () => {
-    it('dovrebbe emettere eventi di progresso durante processing', async () => {
+  describe('processing with progress tracking', () => {
+    it('should emit progress events during processing', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -318,20 +318,20 @@ describe('ProcessingQueue', () => {
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende completamento
+      // Wait for completion
       await new Promise(resolve => {
         queue.on('jobCompleted', () => resolve(undefined))
       })
 
       expect(progressUpdates.length).toBeGreaterThan(0)
       
-      // Verifica che il progresso sia aumentato
+      // Check that progress increased
       const finalUpdate = progressUpdates[progressUpdates.length - 1]
       expect(finalUpdate.progress).toBe(100)
       expect(finalUpdate.status).toBe('completed')
     })
 
-    it('dovrebbe stimare il tempo rimanente', async () => {
+    it('should estimate the remaining time', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -350,7 +350,7 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock processAlbum con delay per permettere la stima del tempo
+      // Mock processAlbum with a delay to allow the time estimate
       mockAlbumProcessor.processAlbum.mockImplementation(() => 
         new Promise(resolve => setTimeout(() => resolve({
           fileId: 'album-123',
@@ -364,14 +364,14 @@ describe('ProcessingQueue', () => {
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende che il job inizi e abbia una stima
+      // Wait for the job to start and have an estimate
       await new Promise(resolve => setTimeout(resolve, 50))
       
       const job = queue.getJob(jobId)
-      // Il job dovrebbe avere una stima iniziale basata sulla dimensione del file
+      // The job should have an initial estimate based on the file size
       expect(job?.estimatedTimeRemaining).toBeGreaterThanOrEqual(0)
       
-      // Se il job è in processing, dovrebbe avere una stima > 0
+      // If the job is processing, it should have an estimate > 0
       if (job?.status === 'processing') {
         expect(job.estimatedTimeRemaining).toBeGreaterThan(0)
       }
@@ -379,7 +379,7 @@ describe('ProcessingQueue', () => {
   })
 
   describe('retry logic', () => {
-    it('dovrebbe ritentare job falliti con errori ritentabili', async () => {
+    it('should retry failed jobs with retryable errors', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -398,7 +398,7 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock errore ritentabile al primo tentativo, successo al secondo
+      // Mock a retryable error on the first attempt, success on the second
       let callCount = 0
       mockAlbumProcessor.processAlbum.mockImplementation(() => {
         callCount++
@@ -417,7 +417,7 @@ describe('ProcessingQueue', () => {
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende eventi di retry e completamento
+      // Wait for retry and completion events
       const events: string[] = []
       queue.on('jobRetrying', () => events.push('retry'))
       queue.on('jobCompleted', () => events.push('completed'))
@@ -434,7 +434,7 @@ describe('ProcessingQueue', () => {
       expect(job?.retryCount).toBe(1)
     })
 
-    it('dovrebbe fallire definitivamente dopo max retry', async () => {
+    it('should fail permanently after max retries', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -453,15 +453,15 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Configura retry con max 2 tentativi
+      // Configure retry with max 2 attempts
       queue.setRetryConfig({ maxRetries: 2, retryDelay: 10 })
 
-      // Mock errore sempre ritentabile
+      // Mock an always-retryable error
       mockAlbumProcessor.processAlbum.mockRejectedValue(new Error('ENOENT: file not found'))
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende fallimento definitivo
+      // Wait for the final failure
       await new Promise(resolve => {
         queue.on('jobFailed', () => resolve(undefined))
       })
@@ -471,7 +471,7 @@ describe('ProcessingQueue', () => {
       expect(job?.retryCount).toBe(2)
     })
 
-    it('dovrebbe fallire immediatamente per errori non ritentabili', async () => {
+    it('should fail immediately for non-retryable errors', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -490,24 +490,24 @@ describe('ProcessingQueue', () => {
         outputFormat: 'mp3'
       }
 
-      // Mock errore non ritentabile
+      // Mock a non-retryable error
       mockAlbumProcessor.processAlbum.mockRejectedValue(new Error('Invalid audio format'))
 
       const jobId = queue.addJob('Test Album', mockFiles, options)
       
-      // Attende fallimento
+      // Wait for the failure
       await new Promise(resolve => {
         queue.on('jobFailed', () => resolve(undefined))
       })
 
       const job = queue.getJob(jobId)
       expect(job?.status).toBe('failed')
-      expect(job?.retryCount).toBe(0) // Nessun retry per errore non ritentabile
+      expect(job?.retryCount).toBe(0) // No retry for a non-retryable error
     })
   })
 
   describe('concurrent processing', () => {
-    it('dovrebbe limitare job concorrenti al massimo configurato', async () => {
+    it('should limit concurrent jobs to the configured maximum', async () => {
       const mockFiles: AudioFile[] = [
         {
           id: '1',
@@ -538,7 +538,7 @@ describe('ProcessingQueue', () => {
         }), 200))
       )
 
-      // Aggiunge 4 job (max concurrent = 2)
+      // Add 4 jobs (max concurrent = 2)
       const jobIds = [
         queue.addJob('Album 1', mockFiles, options),
         queue.addJob('Album 2', mockFiles, options),
@@ -546,12 +546,12 @@ describe('ProcessingQueue', () => {
         queue.addJob('Album 4', mockFiles, options)
       ]
 
-      // Attende un po' per permettere l'avvio
+      // Wait a bit to allow startup
       await new Promise(resolve => setTimeout(resolve, 50))
 
       const stats = queue.getQueueStats()
-      expect(stats.processing).toBeLessThanOrEqual(2) // Max 2 concorrenti
-      expect(stats.pending + stats.processing).toBe(4) // Tutti i job sono pending o processing
+      expect(stats.processing).toBeLessThanOrEqual(2) // Max 2 concurrent
+      expect(stats.pending + stats.processing).toBe(4) // All jobs are pending or processing
     })
   })
 })

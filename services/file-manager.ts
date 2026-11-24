@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto'
 
 /**
  * FileManager service implementation
- * Gestisce upload, validazione e organizzazione dei file audio
+ * Handles upload, validation and organization of audio files
  */
 export class FileManagerImpl implements FileManager {
   private readonly tempDir = path.join(process.cwd(), 'temp', 'audio')
@@ -19,28 +19,28 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Assicura che le directory necessarie esistano
+   * Ensures the required directories exist
    */
   private async ensureDirectoriesExist(): Promise<void> {
     try {
       await fs.mkdir(this.tempDir, { recursive: true })
       await fs.mkdir(this.outputDir, { recursive: true })
     } catch (error) {
-      console.warn('Errore nella creazione delle directory:', error)
+      console.warn('Error creating directories:', error)
     }
   }
 
   /**
-   * Carica e processa file audio multipli
-   * @param files Array di file da caricare
-   * @returns Promise<UploadResult[]> Risultati dell'upload
+   * Uploads and processes multiple audio files
+   * @param files Array of files to upload
+   * @returns Promise<UploadResult[]> Upload results
    */
   async uploadFiles(files: File[]): Promise<UploadResult[]> {
     if (!files || files.length === 0) {
       throw new Error('Nessun file fornito per l\'upload')
     }
 
-    // Verifica dimensione totale album
+    // Check the total album size
     const totalSize = files.reduce((sum, file) => sum + file.size, 0)
     if (totalSize > this.maxAlbumSize) {
       throw new Error(`Dimensione totale album troppo grande: ${this.formatFileSize(totalSize)} (limite: ${this.formatFileSize(this.maxAlbumSize)})`)
@@ -59,7 +59,7 @@ export class FileManagerImpl implements FileManager {
       }
     }
 
-    // Se ci sono errori, pulisci i file caricati con successo e lancia errore
+    // If there are errors, clean up the successfully uploaded files and throw
     if (errors.length > 0) {
       await this.cleanupFiles(results.map(r => r.tempPath))
       throw new Error(`Errori durante l'upload:\n${errors.join('\n')}`)
@@ -69,31 +69,31 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Carica un singolo file audio
+   * Uploads a single audio file
    */
   private async uploadSingleFile(file: File): Promise<UploadResult> {
-    // Validazione preliminare
+    // Preliminary validation
     const validation = await this.validateAudioFile(file)
     if (!validation.isValid) {
       throw new Error(validation.error || 'File non valido')
     }
 
-    // Genera ID univoco e percorso temporaneo
+    // Generate a unique ID and temporary path
     const fileId = randomUUID()
     const fileExtension = this.getFileExtension(file.name)
     const tempFileName = `${fileId}${fileExtension}`
     const tempPath = path.join(this.tempDir, tempFileName)
 
     try {
-      // Assicura che la directory temporanea esista
+      // Ensure the temporary directory exists
       await this.ensureDirectoriesExist()
 
-      // Converte File in Buffer e salva
+      // Convert File to Buffer and save
       const arrayBuffer = await file.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
       await fs.writeFile(tempPath, buffer)
 
-      // Verifica che il file sia stato scritto correttamente
+      // Check that the file was written correctly
       const stats = await fs.stat(tempPath)
       if (stats.size !== file.size) {
         throw new Error('Errore durante la scrittura del file')
@@ -107,24 +107,24 @@ export class FileManagerImpl implements FileManager {
         format: validation.format || 'Unknown'
       }
     } catch (error) {
-      // Pulisci il file in caso di errore
+      // Clean up the file on error
       try {
         await fs.unlink(tempPath)
       } catch {
-        // Ignora errori di cleanup
+        // Ignore cleanup errors
       }
       throw new Error(`Errore durante l'upload di ${file.name}: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`)
     }
   }
 
   /**
-   * Valida un file audio
-   * @param file File da validare
-   * @returns Promise<ValidationResult> Risultato della validazione
+   * Validates an audio file
+   * @param file File to validate
+   * @returns Promise<ValidationResult> Validation result
    */
   async validateAudioFile(file: File): Promise<ValidationResult> {
     try {
-      // Verifica che sia un oggetto File valido
+      // Check that it is a valid File object
       if (!file || (typeof file !== 'object')) {
         return {
           isValid: false,
@@ -132,7 +132,7 @@ export class FileManagerImpl implements FileManager {
         }
       }
 
-      // In ambiente di test, accetta oggetti mock che hanno le proprietà necessarie
+      // In the test environment, accept mock objects that have the required properties
       if (process.env.NODE_ENV === 'test') {
         if (!('name' in file) || !('size' in file)) {
           return {
@@ -147,7 +147,7 @@ export class FileManagerImpl implements FileManager {
         }
       }
 
-      // Verifica nome file
+      // Check the file name
       if (!file.name || file.name.trim() === '') {
         return {
           isValid: false,
@@ -155,7 +155,7 @@ export class FileManagerImpl implements FileManager {
         }
       }
 
-      // Verifica dimensione file
+      // Check the file size
       if (file.size === 0) {
         return {
           isValid: false,
@@ -170,7 +170,7 @@ export class FileManagerImpl implements FileManager {
         }
       }
 
-      // Verifica formato
+      // Check the format
       const formatInfo = this.detectAudioFormat(file.name)
       if (!formatInfo.isSupported) {
         return {
@@ -179,7 +179,7 @@ export class FileManagerImpl implements FileManager {
         }
       }
 
-      // Verifica MIME type se disponibile
+      // Check the MIME type if available
       if (file.type && !this.isValidMimeType(file.type)) {
         return {
           isValid: false,
@@ -200,16 +200,16 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Crea directory di output per un album
-   * @param albumName Nome dell'album
-   * @returns Promise<string> Percorso della directory creata
+   * Creates an output directory for an album
+   * @param albumName Album name
+   * @returns Promise<string> Path of the created directory
    */
   async createOutputDirectory(albumName: string): Promise<string> {
     if (!albumName || albumName.trim() === '') {
       throw new Error('Nome album richiesto')
     }
 
-    // Sanitizza il nome dell'album per il filesystem
+    // Sanitize the album name for the filesystem
     const sanitizedName = this.sanitizeFileName(albumName)
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const dirName = `${sanitizedName}_${timestamp}`
@@ -218,7 +218,7 @@ export class FileManagerImpl implements FileManager {
     try {
       await fs.mkdir(outputPath, { recursive: true })
       
-      // Verifica che la directory sia stata creata
+      // Check that the directory was created
       const stats = await fs.stat(outputPath)
       if (!stats.isDirectory()) {
         throw new Error('Impossibile creare la directory di output')
@@ -231,16 +231,16 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Costruisce il percorso di uscita per un singolo file normalizzato,
-   * assicurandosi che la directory di output esista.
+   * Builds the output path for a single normalized file,
+   * making sure the output directory exists.
    *
-   * La rotta /api/normalize chiamava questo metodo da sempre, ma non esisteva:
-   * il bug era mascherato perché il fileManager vi era tipizzato `any` e i test
-   * lo sostituiscono con un mock. In produzione sarebbe esploso con
+   * The /api/normalize route had always called this method, but it did not exist:
+   * the bug was masked because fileManager was typed `any` there and the tests
+   * replace it with a mock. In production it would have blown up with
    * "fileManager.createOutputPath is not a function".
    *
-   * @param fileName Nome del file desiderato (viene sanificato)
-   * @returns Percorso assoluto del file di uscita
+   * @param fileName Desired file name (it gets sanitized)
+   * @returns Absolute path of the output file
    */
   async createOutputPath(fileName: string): Promise<string> {
     if (!fileName || fileName.trim() === '') {
@@ -259,31 +259,31 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Preserva i metadati da un file sorgente a uno di destinazione
-   * @param sourcePath Percorso del file sorgente
-   * @param targetPath Percorso del file di destinazione
+   * Preserves the metadata from a source file to a destination one
+   * @param sourcePath Path of the source file
+   * @param targetPath Path of the destination file
    */
   async preserveMetadata(sourcePath: string, targetPath: string): Promise<void> {
     try {
       await fs.access(sourcePath, fsConstants.R_OK)
       await fs.access(targetPath, fsConstants.R_OK)
       
-      // Usa MetadataManager per preservare i metadati
+      // Use MetadataManager to preserve the metadata
       const { createMetadataManager } = await import('./metadata-manager')
       const metadataManager = createMetadataManager()
       
-      // Verifica che entrambi i file supportino metadati
+      // Check that both files support metadata
       if (!metadataManager.supportsMetadata(sourcePath)) {
-        console.warn(`File sorgente ${sourcePath} non supporta metadati`)
+        console.warn(`Source file ${sourcePath} does not support metadata`)
         return
       }
       
       if (!metadataManager.supportsMetadata(targetPath)) {
-        console.warn(`File destinazione ${targetPath} non supporta metadati`)
+        console.warn(`Destination file ${targetPath} does not support metadata`)
         return
       }
       
-      // Preserva metadati con opzioni predefinite
+      // Preserve metadata with default options
       await metadataManager.preserveMetadata(sourcePath, targetPath, {
         preserveArtwork: true,
         preserveComments: true,
@@ -297,8 +297,8 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Pulisce file temporanei
-   * @param filePaths Array di percorsi file da eliminare
+   * Cleans up temporary files
+   * @param filePaths Array of file paths to delete
    */
   async cleanupFiles(filePaths: string[]): Promise<void> {
     const errors: string[] = []
@@ -312,13 +312,13 @@ export class FileManagerImpl implements FileManager {
     }
 
     if (errors.length > 0) {
-      console.warn('Errori durante la pulizia dei file:', errors.join(', '))
+      console.warn('Errors while cleaning up files:', errors.join(', '))
     }
   }
 
   /**
-   * Pulisce tutti i file temporanei più vecchi di un certo tempo
-   * @param maxAgeHours Età massima in ore (default: 24)
+   * Cleans up all temporary files older than a certain time
+   * @param maxAgeHours Maximum age in hours (default: 24)
    */
   async cleanupOldTempFiles(maxAgeHours: number = 24): Promise<void> {
     try {
@@ -333,18 +333,18 @@ export class FileManagerImpl implements FileManager {
             await fs.unlink(filePath)
           }
         } catch {
-          // Ignora errori per file individuali
+          // Ignore errors for individual files
         }
       }
     } catch (error) {
-      console.warn('Errore durante la pulizia dei file temporanei:', error)
+      console.warn('Error while cleaning up temporary files:', error)
     }
   }
 
   /**
-   * Ottiene informazioni su un file temporaneo
-   * @param fileId ID del file
-   * @returns Informazioni sul file o null se non trovato
+   * Gets info about a temporary file
+   * @param fileId File ID
+   * @returns File info or null if not found
    */
   async getTempFileInfo(fileId: string): Promise<{
     path: string
@@ -372,7 +372,7 @@ export class FileManagerImpl implements FileManager {
     }
   }
 
-  // Metodi di utilità privati
+  // Private utility methods
 
   private detectAudioFormat(fileName: string): {
     isSupported: boolean
@@ -415,13 +415,13 @@ export class FileManagerImpl implements FileManager {
     const validMimeTypes = [
       'audio/mpeg',      // MP3
       'audio/wav',       // WAV
-      'audio/wave',      // WAV alternativo
-      'audio/x-wav',     // WAV alternativo
+      'audio/wave',      // alternative WAV
+      'audio/x-wav',     // alternative WAV
       'audio/flac',      // FLAC
-      'audio/x-flac',    // FLAC alternativo
+      'audio/x-flac',    // alternative FLAC
       'audio/aac',       // AAC
       'audio/mp4',       // M4A
-      'audio/x-m4a',     // M4A alternativo
+      'audio/x-m4a',     // alternative M4A
       'audio/ogg',       // OGG
       'audio/vorbis'     // OGG Vorbis
     ]
@@ -431,11 +431,11 @@ export class FileManagerImpl implements FileManager {
 
   private sanitizeFileName(fileName: string): string {
     return fileName
-      .replace(/[<>:"/\\|?*]/g, '_')  // Caratteri non validi per filesystem
-      .replace(/\s+/g, '_')          // Spazi multipli
-      .replace(/_{2,}/g, '_')        // Underscore multipli
-      .replace(/^_|_$/g, '')         // Underscore all'inizio/fine
-      .substring(0, 100)             // Limita lunghezza
+      .replace(/[<>:"/\\|?*]/g, '_')  // Characters invalid for the filesystem
+      .replace(/\s+/g, '_')          // Multiple spaces
+      .replace(/_{2,}/g, '_')        // Multiple underscores
+      .replace(/^_|_$/g, '')         // Leading/trailing underscores
+      .substring(0, 100)             // Limit length
   }
 
   private formatFileSize(bytes: number): string {
@@ -452,9 +452,9 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Estrae metadati da un file audio
-   * @param filePath Percorso del file
-   * @returns Metadati estratti o null se non supportati
+   * Extracts metadata from an audio file
+   * @param filePath File path
+   * @returns Extracted metadata or null if not supported
    */
   async extractFileMetadata(filePath: string): Promise<any | null> {
     try {
@@ -467,15 +467,15 @@ export class FileManagerImpl implements FileManager {
       
       return await metadataManager.extractMetadata(filePath)
     } catch (error) {
-      console.warn(`Errore nell'estrazione metadati da ${filePath}:`, error)
+      console.warn(`Error extracting metadata from ${filePath}:`, error)
       return null
     }
   }
 
   /**
-   * Verifica se un file supporta metadati
-   * @param filePath Percorso del file
-   * @returns True se il file supporta metadati
+   * Checks whether a file supports metadata
+   * @param filePath File path
+   * @returns True if the file supports metadata
    */
   fileSupportsMetadata(filePath: string): boolean {
     const supportedExtensions = ['.mp3', '.flac', '.ogg', '.m4a', '.aac']
@@ -484,9 +484,9 @@ export class FileManagerImpl implements FileManager {
   }
 
   /**
-   * Ottiene informazioni sui metadati supportati per un file
-   * @param filePath Percorso del file
-   * @returns Informazioni sul supporto metadati
+   * Gets info about the metadata supported for a file
+   * @param filePath File path
+   * @returns Metadata support info
    */
   async getMetadataSupport(filePath: string): Promise<{
     format: string
@@ -512,7 +512,7 @@ export class FileManagerImpl implements FileManager {
 }
 
 /**
- * Factory function per creare istanza FileManager
+ * Factory function to create a FileManager instance
  */
 export function createFileManager(): FileManager {
   return new FileManagerImpl()

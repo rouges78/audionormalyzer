@@ -40,9 +40,9 @@ describe('Upload API Integration Tests', () => {
 
       expect(response.status).toBe(400)
       expect(data.success).toBe(false)
-      // POST /api/upload passa per withErrorHandling, che incapsula l'errore
-      // in { success, error: { message, code, requestId, ... } }. Le rotte
-      // [fileId] e validate/ non lo usano e restano a { error: '...' }.
+      // POST /api/upload goes through withErrorHandling, which wraps the error
+      // in { success, error: { message, code, requestId, ... } }. The
+      // [fileId] and validate/ routes do not use it and stay at { error: '...' }.
       expect(data.error.code).toBe('NO_FILES')
       expect(data.error.message).toBe('Nessun file fornito per l\'upload')
     })

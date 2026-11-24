@@ -1,5 +1,5 @@
 // GPU-accelerated Audio Processing Worker
-// Utilizza Web Workers per offload computazioni pesanti dalla main thread
+// Uses Web Workers to offload heavy computations from the main thread
 
 interface AudioProcessingTask {
   type: 'FFT' | 'SPECTROGRAM' | 'WAVEFORM' | 'ANALYSIS' | 'NORMALIZATION'

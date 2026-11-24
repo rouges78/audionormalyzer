@@ -95,7 +95,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Errore nello stream SSE:', error)
+    console.error('SSE stream error:', error)
     return new NextResponse('Internal server error', { status: 500 })
   }
 }

@@ -1,25 +1,25 @@
 /**
- * Engine nativo: analisi e normalizzazione con un ffmpeg vero (core-04).
+ * Native engine: analysis and normalization with a real ffmpeg (core-04).
  *
- * È l'unico engine che **misura davvero** la loudness. Gli altri due
- * dichiarano stime: WebAudio applica un guadagno costante, e l'analisi lato
- * server senza ffmpeg restituiva finora valori di comodo marcati come
- * `estimated` (vedi core-03). Qui i numeri vengono dal filtro `ebur128`, che è
- * l'implementazione di riferimento di EBU R128 dentro ffmpeg.
+ * It is the only engine that **really measures** loudness. The other two
+ * declare estimates: WebAudio applies a constant gain, and server-side analysis
+ * without ffmpeg so far returned placeholder values marked as
+ * `estimated` (see core-03). Here the numbers come from the `ebur128` filter, which is
+ * the reference implementation of EBU R128 inside ffmpeg.
  *
- * COSA MISURA, E CON COSA
- *   `ebur128=peak=sample+true` → I (LUFS integrata), LRA, sample peak, true peak
- *   `volumedetect`             → mean_volume, che usiamo come livello RMS
+ * WHAT IT MEASURES, AND WITH WHAT
+ *   `ebur128=peak=sample+true` → I (integrated LUFS), LRA, sample peak, true peak
+ *   `volumedetect`             → mean_volume, which we use as the RMS level
  *
- * I due filtri stanno in catena in una sola passata: `ebur128` lascia passare
- * l'audio invariato, quindi `volumedetect` a valle misura comunque l'originale.
- * Una passata sola invece di due dimezza il costo su file lunghi.
+ * The two filters are chained in a single pass: `ebur128` passes the
+ * audio through unchanged, so `volumedetect` downstream still measures the original.
+ * A single pass instead of two halves the cost on long files.
  *
- * COSA NON FA (ancora)
- * La normalizzazione di loudness è a **passata singola**: `loudnorm` stima e
- * corregge nello stesso passaggio. È conforme e centra il target su materiale
- * omogeneo, ma su musica con dinamica ampia la doppia passata è più precisa.
- * Quella è core-09, e resta aperta di proposito.
+ * WHAT IT DOES NOT DO (yet)
+ * Loudness normalization is **single-pass**: `loudnorm` estimates and
+ * corrects in the same pass. It is compliant and hits the target on
+ * homogeneous material, but on music with wide dynamics two-pass is more precise.
+ * That is core-09, and it stays open on purpose.
  */
 
 import { spawn } from 'child_process'
@@ -39,32 +39,32 @@ import {
 } from './types'
 
 /**
- * `ebur128` scrive una riga di log **per ogni frame** analizzato: su una
- * traccia di cinque minuti sono decine di migliaia di righe e diversi MB di
- * stderr, per poi usarne venti alla fine. L'opzione `framelog=quiet` che
- * risolverebbe la cosa non esiste in tutte le versioni di ffmpeg (in 4.4 fa
- * fallire l'inizializzazione del filtro), quindi invece di dipendere dalla
- * versione scartiamo le righe per-frame mentre arrivano: sono riconoscibili
- * dal marcatore ` t: ` seguito dal timestamp.
+ * `ebur128` writes a log line **for every frame** analyzed: on a
+ * five-minute track that is tens of thousands of lines and several MB of
+ * stderr, only to use twenty of them at the end. The `framelog=quiet` option that
+ * would fix this does not exist in every ffmpeg version (in 4.4 it makes
+ * filter initialization fail), so instead of depending on the
+ * version we drop the per-frame lines as they arrive: they are recognizable
+ * by the ` t: ` marker followed by the timestamp.
  */
 const PER_FRAME_LINE = /\]\s+t:\s/
 
-/** Tetto di sicurezza su quanto stderr teniamo in memoria. */
+/** Safety cap on how much stderr we keep in memory. */
 const MAX_STDERR_BYTES = 256 * 1024
 
-/** Esito grezzo di una invocazione di ffmpeg. */
+/** Raw outcome of an ffmpeg invocation. */
 interface FfmpegRun {
   code: number | null
   stderr: string
 }
 
 /**
- * Esegue ffmpeg raccogliendo stderr, che è dove ffmpeg scrive **tutto**:
- * diagnostica, errori e output dei filtri di misura.
+ * Runs ffmpeg collecting stderr, which is where ffmpeg writes **everything**:
+ * diagnostics, errors and the output of the measurement filters.
  *
- * Usiamo `spawn` e non `execFile` proprio per poter filtrare in streaming: con
- * execFile lo stderr si accumula per intero prima di essere consegnato, e su
- * file lunghi si sfonda il maxBuffer.
+ * We use `spawn` and not `execFile` precisely to be able to filter while streaming: with
+ * execFile stderr accumulates in full before being delivered, and on
+ * long files it blows the maxBuffer.
  */
 function runFfmpeg(bin: string, args: string[]): Promise<FfmpegRun> {
   return new Promise((resolve, reject) => {
@@ -76,7 +76,7 @@ function runFfmpeg(bin: string, args: string[]): Promise<FfmpegRun> {
     child.stderr.on('data', (chunk: Buffer) => {
       pending += chunk.toString()
       const lines = pending.split('\n')
-      // L'ultimo elemento può essere una riga incompleta: resta in attesa.
+      // The last element may be an incomplete line: it waits for more.
       pending = lines.pop() ?? ''
       for (const line of lines) {
         if (PER_FRAME_LINE.test(line)) continue
@@ -92,14 +92,14 @@ function runFfmpeg(bin: string, args: string[]): Promise<FfmpegRun> {
   })
 }
 
-/** Converte in numero, restituendo undefined per `-inf`, `nan` e simili. */
+/** Converts to a number, returning undefined for `-inf`, `nan` and the like. */
 function finite(raw: string | undefined): number | undefined {
   if (raw === undefined) return undefined
   const n = Number.parseFloat(raw)
   return Number.isFinite(n) ? n : undefined
 }
 
-/** Misure estratte dallo stderr di ffmpeg. Tutti i campi possono mancare. */
+/** Measurements extracted from ffmpeg's stderr. Every field may be missing. */
 export interface LoudnessMeasurements {
   lufsIntegrated?: number
   loudnessRange?: number
@@ -109,15 +109,15 @@ export interface LoudnessMeasurements {
 }
 
 /**
- * Estrae le misure dal riepilogo di `ebur128` e da `volumedetect`.
+ * Extracts the measurements from the `ebur128` summary and from `volumedetect`.
  *
- * Il riepilogo di ebur128 è indentato e diviso in sezioni, e la chiave `Peak:`
- * compare **due volte** — una sotto "Sample peak", una sotto "True peak" — con
- * lo stesso identico testo. Non si può quindi cercare `Peak:` da solo: bisogna
- * sapere in quale sezione si sta leggendo. Da qui il piccolo automa a stati.
+ * The ebur128 summary is indented and split into sections, and the `Peak:` key
+ * appears **twice** — once under "Sample peak", once under "True peak" — with
+ * the exact same text. So you cannot search for `Peak:` alone: you have to
+ * know which section you are reading. Hence the small state machine.
  *
- * Esportata perché il parsing è la parte più fragile dell'engine e merita test
- * propri, senza dover eseguire ffmpeg.
+ * Exported because parsing is the most fragile part of the engine and deserves its own
+ * tests, without having to run ffmpeg.
  */
 export function parseLoudness(stderr: string): LoudnessMeasurements {
   const out: LoudnessMeasurements = {}
@@ -147,8 +147,8 @@ export function parseLoudness(stderr: string): LoudnessMeasurements {
     const mean = line.match(/mean_volume:\s*(-?[\d.]+|-?inf)\s*dB/i)
     if (mean) { out.rmsLevel = finite(mean[1]); continue }
 
-    // Rete di sicurezza: se ebur128 non ha prodotto il sample peak (dipende
-    // dalle opzioni supportate dalla versione), volumedetect lo dà comunque.
+    // Safety net: if ebur128 did not produce the sample peak (it depends
+    // on the options supported by the version), volumedetect gives it anyway.
     const max = line.match(/max_volume:\s*(-?[\d.]+|-?inf)\s*dB/i)
     if (max && out.samplePeak === undefined) out.samplePeak = finite(max[1])
   }
@@ -156,7 +156,7 @@ export function parseLoudness(stderr: string): LoudnessMeasurements {
   return out
 }
 
-/** Dati di contenitore letti dall'header, non stimati. */
+/** Container data read from the header, not estimated. */
 interface ContainerInfo {
   duration: number
   sampleRate: number
@@ -166,9 +166,9 @@ interface ContainerInfo {
 }
 
 /**
- * Legge i dati di contenitore con `music-metadata`, la stessa libreria che
- * `audio-processor` usa dal 27/07 (core-03). Non si duplica la logica e
- * soprattutto non si introduce una seconda verità sugli stessi campi.
+ * Reads the container data with `music-metadata`, the same library that
+ * `audio-processor` has used since 27/07 (core-03). The logic is not duplicated and,
+ * above all, no second truth about the same fields is introduced.
  */
 async function readContainer(filePath: string): Promise<ContainerInfo> {
   const { parseFile } = await import('music-metadata')
@@ -195,7 +195,7 @@ export class NativeEngine implements AudioEngine {
     accepts: ['path'],
   }
 
-  /** Disponibile solo lato server e solo se un ffmpeg risponde davvero. */
+  /** Available only server side and only if an ffmpeg really responds. */
   async isAvailable(): Promise<boolean> {
     if (typeof window !== 'undefined') return false
     return (await resolveFfmpeg()) !== null
@@ -213,8 +213,8 @@ export class NativeEngine implements AudioEngine {
   }
 
   /**
-   * Misura loudness e picchi in una sola passata, senza produrre output audio
-   * (`-f null -`): a ffmpeg serve una destinazione, ma i byte li buttiamo.
+   * Measures loudness and peaks in a single pass, without producing audio output
+   * (`-f null -`): ffmpeg needs a destination, but we throw the bytes away.
    */
   async measure(filePath: string): Promise<LoudnessMeasurements> {
     const bin = await this.requireBinary()
@@ -241,9 +241,9 @@ export class NativeEngine implements AudioEngine {
       this.measure(filePath),
     ])
 
-    // `source` dice all'interfaccia quanto fidarsi dei numeri (core-03). Qui è
-    // 'measured' solo se la LUFS c'è davvero: su un file corrotto o vuoto
-    // ebur128 non produce nulla, e sarebbe scorretto dichiarare una misura.
+    // `source` tells the interface how far to trust the numbers (core-03). Here it is
+    // 'measured' only if the LUFS is really there: on a corrupt or empty file
+    // ebur128 produces nothing, and it would be wrong to declare a measurement.
     const measured = m.lufsIntegrated !== undefined
 
     return {
@@ -257,8 +257,8 @@ export class NativeEngine implements AudioEngine {
       lufsIntegrated: m.lufsIntegrated ?? 0,
       truePeak: m.truePeak ?? m.samplePeak ?? 0,
       loudnessRange: m.loudnessRange,
-      // Clipping: sample peak a 0 dBFS o oltre. La soglia non è a zero esatto
-      // perché la quantizzazione a 16 bit produce massimi come -0.0.
+      // Clipping: sample peak at 0 dBFS or above. The threshold is not exactly zero
+      // because 16-bit quantization produces maxima like -0.0.
       hasClipping: (m.samplePeak ?? -Infinity) >= -0.1,
       source: measured ? 'measured' : 'partial',
     }
@@ -278,10 +278,10 @@ export class NativeEngine implements AudioEngine {
 
       const filter =
         options.method === 'loudness'
-          ? // TP=-1.0 è il tetto di true peak raccomandato da EBU R128 per la
-            // distribuzione; LRA=11 è il valore di riferimento del filtro.
+          ? // TP=-1.0 is the true peak ceiling recommended by EBU R128 for
+            // distribution; LRA=11 is the filter's reference value.
             `loudnorm=I=${options.targetLevel}:TP=-1.0:LRA=11.0`
-          : // Metodo peak: guadagno costante che porta il picco al target.
+          : // Peak method: constant gain that brings the peak to the target.
             `volume=${(options.targetLevel - before.peakLevel).toFixed(2)}dB`
 
       const args = [
@@ -294,10 +294,10 @@ export class NativeEngine implements AudioEngine {
         filter,
       ]
 
-      // TRAPPOLA: `loudnorm` lavora internamente a 192 kHz e, se non gli si
-      // dice altro, **scrive l'output a 192 kHz**. Un file 44.1 kHz tornava
-      // indietro quadruplicato di peso e con un sample rate che l'utente non
-      // ha mai chiesto. Riforziamo il rate d'origine.
+      // TRAP: `loudnorm` works internally at 192 kHz and, unless told
+      // otherwise, **writes the output at 192 kHz**. A 44.1 kHz file came
+      // back four times heavier and with a sample rate the user never
+      // asked for. We enforce the source rate again.
       if (before.sampleRate > 0) args.push('-ar', String(before.sampleRate))
 
       args.push(options.outputPath)
@@ -309,7 +309,7 @@ export class NativeEngine implements AudioEngine {
         )
       }
 
-      // Misura reale del risultato: è l'unico modo onesto di dire "finalLoudness".
+      // Real measurement of the result: it is the only honest way to say "finalLoudness".
       const after = await this.measure(options.outputPath)
 
       const reference =
@@ -341,9 +341,9 @@ export class NativeEngine implements AudioEngine {
 }
 
 /**
- * Ultima riga non vuota dello stderr: quando ffmpeg fallisce, il motivo vero
- * ("No such file or directory", "Invalid data found...") è quasi sempre lì.
- * Meglio di un generico "processo fallito" (err-02).
+ * Last non-empty line of stderr: when ffmpeg fails, the real reason
+ * ("No such file or directory", "Invalid data found...") is almost always there.
+ * Better than a generic "process failed" (err-02).
  */
 function lastMeaningfulLine(stderr: string): string {
   const lines = stderr.split('\n').map((l) => l.trim()).filter(Boolean)

@@ -10,8 +10,8 @@ describe('Large Album Performance Integration Tests', () => {
 
   beforeEach(() => {
     audioProcessor = new AudioProcessorImpl()
-    // L'album processor deve usare LA STESSA istanza su cui i test mettono gli
-    // spy, altrimenti ne costruisce una propria e analizza file inesistenti.
+    // The album processor must use THE SAME instance the tests put their
+    // spies on, otherwise it builds its own and analyzes nonexistent files.
     albumProcessor = new AlbumProcessorImpl(audioProcessor)
     processingQueue = new ProcessingQueueImpl()
   })
@@ -74,8 +74,8 @@ describe('Large Album Performance Integration Tests', () => {
       // Performance metrics
       const avgTimePerTrack = totalTime / albumSize
       expect(avgTimePerTrack).toBeLessThan(600) // Less than 600ms per track
-      // Il processing è sequenziale: 50 tracce × ~80ms superano il timeout
-      // predefinito di 5s di Vitest. Il budget vero lo assertano le righe sopra.
+      // Processing is sequential: 50 tracks × ~80ms exceed Vitest's default
+      // 5s timeout. The real budget is asserted by the lines above.
     }, 40000)
 
     it('should handle 100-track compilation efficiently', async () => {
@@ -215,11 +215,11 @@ describe('Large Album Performance Integration Tests', () => {
   })
 
   describe('Concurrent Processing Limits', () => {
-    // SALTATO: questo test non è rotto, descrive una funzionalità che non
-    // esiste ancora. processAlbum elabora le tracce in un semplice ciclo
-    // sequenziale, quindi maxConcurrentTasks resta 1 e l'asserzione
-    // `toBeGreaterThan(1)` non può passare. Riattivare quando il pipeline
-    // dell'album userà una concorrenza limitata (vedi perf-08 in roadmap).
+    // SKIPPED: this test is not broken, it describes a feature that does not
+    // exist yet. processAlbum processes tracks in a simple sequential
+    // loop, so maxConcurrentTasks stays 1 and the assertion
+    // `toBeGreaterThan(1)` cannot pass. Re-enable when the album
+    // pipeline uses bounded concurrency (see perf-08 in the roadmap).
     it.skip('should respect concurrent processing limits', async () => {
       const albumSize = 30
       let maxConcurrentTasks = 0
@@ -339,11 +339,11 @@ describe('Large Album Performance Integration Tests', () => {
   describe('Error Handling in Large Albums', () => {
     it('should handle partial failures in large albums', async () => {
       const albumSize = 40
-      // Fallimenti DETERMINISTICI: prima erano estratti con Math.random(), e il
-      // test passava o falliva a caso (l'ultima esecuzione rossa era proprio
-      // sul confine 32 > 32). Ora falliscono le tracce con indice multiplo di
-      // 10 in analisi (4 su 40) e i multipli di 15 in normalizzazione (2 su 40),
-      // per un totale atteso di 6 fallimenti.
+      // DETERMINISTIC failures: they used to be drawn with Math.random(), and the
+      // test passed or failed at random (the last red run was right
+      // on the 32 > 32 boundary). Now tracks with an index that is a multiple of
+      // 10 fail in analysis (4 of 40) and multiples of 15 in normalization (2 of 40),
+      // for an expected total of 6 failures.
       const analysisFailures = new Set([10, 20, 30, 40])
       const normalizeFailures = new Set([15, 35])
       const indexOf = (filePath: string) =>
@@ -403,12 +403,12 @@ describe('Large Album Performance Integration Tests', () => {
       console.log(`Success rate: ${(result.successfulFiles / albumSize * 100).toFixed(1)}%`)
     })
 
-    // SALTATO: come il test sui limiti di concorrenza, descrive una
-    // funzionalità assente. Non esiste alcuna logica di retry in
-    // album-processor.ts né in audio-processor.ts: un errore "temporaneo"
-    // affonda definitivamente la traccia, quindi con 5 fallimenti su 25 il
-    // tasso di successo non può superare il 90% richiesto. Riattivare quando
-    // il processing riproverà le tracce fallite (vedi perf-09 in roadmap).
+    // SKIPPED: like the concurrency limits test, it describes a missing
+    // feature. There is no retry logic in
+    // album-processor.ts nor in audio-processor.ts: a "temporary" error
+    // sinks the track for good, so with 5 failures out of 25 the
+    // success rate cannot exceed the required 90%. Re-enable when
+    // processing retries failed tracks (see perf-09 in the roadmap).
     it.skip('should recover from temporary processing errors', async () => {
       const albumSize = 25
       let temporaryFailureCount = 0
@@ -487,9 +487,9 @@ describe('Large Album Performance Integration Tests', () => {
       let completedFiles = 0
 
       // Mock processing with progress tracking.
-      // Conta SOLO le analisi dei file in ingresso: processAlbumFile richiama
-      // analyzeAudio anche sul file prodotto, per verificare l'esito, quindi
-      // contare ogni chiamata dava 120 aggiornamenti invece di 60.
+      // Counts ONLY the analyses of the input files: processAlbumFile also calls
+      // analyzeAudio on the produced file, to check the outcome, so
+      // counting every call gave 120 updates instead of 60.
       vi.spyOn(audioProcessor, 'analyzeAudio').mockImplementation(async (filePath: string) => {
         await new Promise(resolve => setTimeout(resolve, 25))
 

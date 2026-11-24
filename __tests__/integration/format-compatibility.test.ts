@@ -9,11 +9,11 @@ describe('Audio Format Compatibility Integration Tests', () => {
   let audioProcessor: AudioProcessorImpl
   let fileManager: FileManagerImpl
 
-  // validateFormat NON si limita a guardare l'estensione: verifica che il file
-  // esista, sia leggibile e non sia vuoto. I test usavano percorsi inventati
-  // come '/test/audio.flac' e quindi ricevevano sempre false. Creiamo dei file
-  // veri in una cartella temporanea, così la validazione viene esercitata sul
-  // serio invece di essere aggirata.
+  // validateFormat does NOT just look at the extension: it checks that the file
+  // exists, is readable and is not empty. The tests used made-up paths
+  // like '/test/audio.flac' and so always got false. We create real files
+  // in a temporary folder, so validation is actually exercised
+  // instead of being bypassed.
   let fixtureDir: string
   const fixture = (name: string) => path.join(fixtureDir, name)
 
@@ -351,13 +351,13 @@ describe('Audio Format Compatibility Integration Tests', () => {
     })
 
     it('should detect and handle corrupted format files', async () => {
-      // Il test precedente mockava analyzeAudio per farlo fallire e poi
-      // verificava il messaggio: non esercitava alcun codice di produzione.
-      // Qui usiamo file veri con contenuto non audio. Il comportamento
-      // documentato in audio-processor.ts è il DEGRADO, non l'eccezione:
-      // quando l'header non è leggibile l'analisi restituisce valori di
-      // ripiego marcati `source: 'estimated'`, così la UI può avvisare
-      // l'utente invece di far esplodere il flusso.
+      // The previous test mocked analyzeAudio to make it fail and then
+      // checked the message: it exercised no production code.
+      // Here we use real files with non-audio content. The behavior
+      // documented in audio-processor.ts is DEGRADATION, not an exception:
+      // when the header is unreadable the analysis returns fallback
+      // values marked `source: 'estimated'`, so the UI can warn
+      // the user instead of blowing up the flow.
       const corruptedFiles = [
         fixture('truncated.mp3'),
         fixture('header-damaged.flac'),

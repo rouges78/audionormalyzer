@@ -356,9 +356,9 @@ describe('Process API Integration Tests', () => {
         totalFiles: 1,
         processedFiles: 1,
         results: [],
-        // La finestra di ritenzione di ProcessingStorage.cleanup() è di 24 ore,
-        // non di poche ore: con 3 ore questo record non veniva rimosso e il
-        // test si aspettava comunque 1 cancellazione. Usiamo 25 ore.
+        // The ProcessingStorage.cleanup() retention window is 24 hours,
+        // not a few hours: with 3 hours this record was not removed and the
+        // test still expected 1 deletion. We use 25 hours.
         startTime: Date.now() - 25 * 60 * 60 * 1000,
         error: null
       }

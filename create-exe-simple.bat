@@ -1,87 +1,87 @@
 @echo off
-REM Audio Normalizer - Creazione EXE Semplificata
-REM Approccio step-by-step per garantire la creazione dell'EXE
+REM Audio Normalizer - Simplified EXE Creation
+REM Step-by-step approach to guarantee the EXE gets created
 
 echo =====================================================
-echo    Audio Normalizer - Creazione EXE Semplificata
+echo    Audio Normalizer - Simplified EXE Creation
 echo =====================================================
 echo.
 
-echo 🧹 Pulizia veloce...
+echo 🧹 Quick cleanup...
 taskkill /f /im electron.exe >nul 2>&1
 taskkill /f /im node.exe >nul 2>&1
 if exist "dist" rmdir /s /q "dist" >nul 2>&1
 
-echo ✅ Pulizia completata
+echo ✅ Cleanup completed
 echo.
 
-echo 🎯 Metodo 1: Electron Builder con configurazione minimale
+echo 🎯 Method 1: Electron Builder with minimal configuration
 call npx electron-builder --config electron-builder-minimal.config.js --win portable
 if not errorlevel 1 (
-    echo ✅ METODO 1 RIUSCITO!
+    echo ✅ METHOD 1 SUCCEEDED!
     goto :success
 )
 
-echo ⚠️ Metodo 1 fallito, provo Metodo 2...
+echo ⚠️ Method 1 failed, trying Method 2...
 echo.
 
-echo 🎯 Metodo 2: Comando diretto senza configurazione
+echo 🎯 Method 2: Direct command without configuration
 call npx electron-builder --win --dir
 if not errorlevel 1 (
-    echo ✅ METODO 2 RIUSCITO!
+    echo ✅ METHOD 2 SUCCEEDED!
     goto :success
 )
 
-echo ⚠️ Metodo 2 fallito, provo Metodo 3...
+echo ⚠️ Method 2 failed, trying Method 3...
 echo.
 
-echo 🎯 Metodo 3: Solo package senza build
+echo 🎯 Method 3: Package only, without build
 call npx electron-packager . "Audio Normalizer" --platform=win32 --arch=x64 --out=dist
 if not errorlevel 1 (
-    echo ✅ METODO 3 RIUSCITO!
+    echo ✅ METHOD 3 SUCCEEDED!
     goto :success
 )
 
-echo ⚠️ Metodo 3 fallito, provo Metodo 4...
+echo ⚠️ Method 3 failed, trying Method 4...
 echo.
 
-echo 🎯 Metodo 4: Build manuale con Electron Forge
+echo 🎯 Method 4: Manual build with Electron Forge
 npm install @electron-forge/cli --save-dev
 call npx electron-forge import
 call npx electron-forge make
 if not errorlevel 1 (
-    echo ✅ METODO 4 RIUSCITO!
+    echo ✅ METHOD 4 SUCCEEDED!
     goto :success
 )
 
-echo ❌ TUTTI I METODI FALLITI
+echo ❌ ALL METHODS FAILED
 echo.
-echo 💡 POSSIBILI CAUSE:
-echo   - Antivirus blocca la creazione
-echo   - Permessi insufficienti  
-echo   - Spazio disco insufficiente
-echo   - Dipendenze mancanti
+echo 💡 POSSIBLE CAUSES:
+echo   - Antivirus blocks the creation
+echo   - Insufficient permissions  
+echo   - Insufficient disk space
+echo   - Missing dependencies
 echo.
-echo 🔧 SOLUZIONI:
-echo   1. Esegui come amministratore
-echo   2. Disabilita temporaneamente antivirus
-echo   3. Controlla spazio disco disponibile
-echo   4. Riavvia il computer
+echo 🔧 SOLUTIONS:
+echo   1. Run as administrator
+echo   2. Temporarily disable the antivirus
+echo   3. Check available disk space
+echo   4. Restart the computer
 echo.
 pause
 exit /b 1
 
 :success
 echo.
-echo 🎉 EXE CREATO CON SUCCESSO!
+echo 🎉 EXE CREATED SUCCESSFULLY!
 echo.
 
 REM Find and show the created file
-echo 📁 File creati:
+echo 📁 Files created:
 for /r %%i in (*.exe) do echo %%i
 
 echo.
-echo 🚀 Aprendo cartella con i file...
+echo 🚀 Opening the folder with the files...
 
 if exist "dist" explorer dist
 if exist "out" explorer out

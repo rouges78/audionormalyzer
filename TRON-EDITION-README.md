@@ -1,67 +1,67 @@
 # 🎵 AUDIO NORMALIZER - TRON EDITION ⚡
 
-## ✅ **VERSIONE TRON COMPLETA - FIGATA TOTALE!**
+## ✅ **COMPLETE TRON VERSION - TOTALLY AWESOME!**
 
-Ho creato una versione completamente rinnovata con:
-- 🎨 **Design TRON** con colori neon e animazioni fighe
-- 📂 **Selezione cartella automatica** per album normalization
-- 🤖 **Calcolo automatico del peak** medio dell'album
-- ⚡ **Effetti visivi spettacolari** con glow e animazioni
+I have created a completely revamped version with:
+- 🎨 **TRON design** with neon colors and cool animations
+- 📂 **Automatic folder selection** for album normalization
+- 🤖 **Automatic calculation of the album's average peak**
+- ⚡ **Spectacular visual effects** with glow and animations
 
-## 🎨 **DESIGN TRON FEATURES:**
+## 🎨 **TRON DESIGN FEATURES:**
 
-### 🌈 **Colori Neon:**
-- **Cyan (#00ffff)** - Elementi principali e bordi
-- **Yellow (#ffff00)** - Titoli e highlights  
-- **Orange (#ff6600)** - Pulsanti e accenti
-- **Green (#00ff00)** - Status positivi e successi
-- **Red (#ff0000)** - Errori e pulsanti danger
+### 🌈 **Neon Colors:**
+- **Cyan (#00ffff)** - Main elements and borders
+- **Yellow (#ffff00)** - Titles and highlights  
+- **Orange (#ff6600)** - Buttons and accents
+- **Green (#00ff00)** - Positive statuses and successes
+- **Red (#ff0000)** - Errors and danger buttons
 
-### ✨ **Effetti Visivi:**
-- **Grid Background** - Griglia TRON animata
-- **Glow Effects** - Bagliori neon sui pulsanti
-- **Shimmer Animations** - Effetti di scintillio
-- **Scanning Lines** - Linee che scorrono
-- **Pulse Effects** - Pulsazioni luminose
-- **Neon Text** - Testo con effetto neon
+### ✨ **Visual Effects:**
+- **Grid Background** - Animated TRON grid
+- **Glow Effects** - Neon glows on the buttons
+- **Shimmer Animations** - Shimmering effects
+- **Scanning Lines** - Scrolling lines
+- **Pulse Effects** - Luminous pulses
+- **Neon Text** - Text with a neon effect
 
-## 🚀 **NUOVE FUNZIONALITÀ:**
+## 🚀 **NEW FEATURES:**
 
 ### 📂 **Album Normalization:**
-1. **Selezione Cartella** - Click su "ALBUM FOLDER" 
-2. **Auto-Detection** - Rileva automaticamente tutti i file audio
-3. **Peak Analysis** - Analizza il peak di ogni traccia
-4. **Calcolo Automatico** - Calcola il target level ottimale
-5. **Normalizzazione Album** - Applica lo stesso livello a tutto l'album
+1. **Folder Selection** - Click "ALBUM FOLDER" 
+2. **Auto-Detection** - Automatically detects all audio files
+3. **Peak Analysis** - Analyzes the peak of each track
+4. **Automatic Calculation** - Calculates the optimal target level
+5. **Album Normalization** - Applies the same level to the whole album
 
-### 🤖 **Analisi Automatica:**
-- **Max Peak** - Peak massimo dell'album
-- **Average Peak** - Peak medio di tutte le tracce  
-- **Recommended Level** - Livello consigliato automaticamente
-- **Headroom** - Margine di sicurezza (1dB)
+### 🤖 **Automatic Analysis:**
+- **Max Peak** - The album's maximum peak
+- **Average Peak** - Average peak of all tracks  
+- **Recommended Level** - Automatically recommended level
+- **Headroom** - Safety margin (1dB)
 
-### 🎛️ **Modalità Disponibili:**
-- **PEAK NORMALIZATION** - Normalizzazione classica
+### 🎛️ **Available Modes:**
+- **PEAK NORMALIZATION** - Classic normalization
 - **LOUDNESS NORMALIZATION** - EBU R128 compliant
-- **ALBUM NORMALIZATION** - Auto-calcolo per album
+- **ALBUM NORMALIZATION** - Automatic calculation for albums
 
-## 📁 **Come Usare:**
+## 📁 **How To Use:**
 
-### 🎵 **Per Singoli File:**
-1. Trascina file nella zona "INDIVIDUAL FILES"
-2. Seleziona modalità di normalizzazione
-3. Imposta target level manualmente
+### 🎵 **For Single Files:**
+1. Drag files into the "INDIVIDUAL FILES" zone
+2. Select the normalization mode
+3. Set the target level manually
 4. Click "NORMALIZE AUDIO"
 
-### 📂 **Per Album Completi:**
-1. Click su "ALBUM FOLDER" 
-2. Seleziona cartella con l'album
-3. L'app analizza automaticamente tutti i file
-4. Calcola il peak ottimale per l'album
-5. Modalità "ALBUM NORMALIZATION" si attiva automaticamente
-6. Click "NORMALIZE AUDIO" per processare tutto
+### 📂 **For Whole Albums:**
+1. Click "ALBUM FOLDER" 
+2. Select the folder with the album
+3. The app automatically analyzes all the files
+4. It calculates the optimal peak for the album
+5. The "ALBUM NORMALIZATION" mode switches on automatically
+6. Click "NORMALIZE AUDIO" to process everything
 
-## 🎯 **Interfaccia TRON:**
+## 🎯 **TRON Interface:**
 
 ### 🖥️ **Layout:**
 ```
@@ -79,52 +79,52 @@ Ho creato una versione completamente rinnovata con:
 └─────────────────┴───────────────────────────────┘
 ```
 
-### 🎨 **Effetti Speciali:**
-- **Hover Effects** - Glow al passaggio del mouse
-- **Button Animations** - Effetti shimmer sui pulsanti
-- **Progress Bar** - Barra con effetti neon
-- **Status Messages** - Messaggi con bordi colorati
-- **File List** - Lista con animazioni di hover
+### 🎨 **Special Effects:**
+- **Hover Effects** - Glow on mouse-over
+- **Button Animations** - Shimmer effects on the buttons
+- **Progress Bar** - Bar with neon effects
+- **Status Messages** - Messages with colored borders
+- **File List** - List with hover animations
 
 ## 🔧 **Build & Run:**
 
 ```bash
-# Build nuova versione TRON
+# Build the new TRON version
 npm run build:standalone
 
-# Run direttamente
+# Run directly
 "dist/Audio Normalizer 0.1.0.exe"
 ```
 
-## ✅ **Funzionalità Testate:**
+## ✅ **Tested Features:**
 
-- ✅ **Design TRON completo** con effetti neon
-- ✅ **Selezione cartella** per album
-- ✅ **Analisi automatica** dei peak
-- ✅ **Calcolo target level** automatico
-- ✅ **Modalità album normalization**
-- ✅ **Animazioni e effetti** spettacolari
-- ✅ **Drag & drop** per cartelle
-- ✅ **Progress bar** animata
-- ✅ **Status messages** colorati
+- ✅ **Complete TRON design** with neon effects
+- ✅ **Folder selection** for albums
+- ✅ **Automatic peak analysis**
+- ✅ **Automatic target level calculation**
+- ✅ **Album normalization mode**
+- ✅ **Spectacular animations and effects**
+- ✅ **Drag & drop** for folders
+- ✅ **Animated progress bar**
+- ✅ **Colored status messages**
 
-## 🎉 **RISULTATO FINALE:**
+## 🎉 **FINAL RESULT:**
 
-L'Audio Normalizer ora è:
-- 🎨 **Visivamente Spettacolare** (design TRON)
-- 🤖 **Completamente Automatico** (analisi album)
-- 📂 **Facile da Usare** (drag & drop cartelle)
-- ⚡ **Pieno di Effetti** (animazioni fighe)
-- 🎵 **Professionale** (calcoli precisi)
+The Audio Normalizer is now:
+- 🎨 **Visually Spectacular** (TRON design)
+- 🤖 **Fully Automatic** (album analysis)
+- 📂 **Easy to Use** (folder drag & drop)
+- ⚡ **Packed with Effects** (cool animations)
+- 🎵 **Professional** (precise calculations)
 
-## 🚀 **PRONTO PER L'USO!**
+## 🚀 **READY TO USE!**
 
-L'eseguibile `dist/Audio Normalizer 0.1.0.exe` ora ha:
-- **Design TRON completo** con colori neon
-- **Album normalization automatica**
-- **Interfaccia figissima** con effetti speciali
-- **Funzionalità professionali** per audio
+The executable `dist/Audio Normalizer 0.1.0.exe` now has:
+- **Complete TRON design** with neon colors
+- **Automatic album normalization**
+- **Super-cool interface** with special effects
+- **Professional features** for audio
 
 ---
 
-**🎵 TRON AUDIO NORMALIZER - FIGATA TOTALE! ⚡✨**
+**🎵 TRON AUDIO NORMALIZER - TOTALLY AWESOME! ⚡✨**

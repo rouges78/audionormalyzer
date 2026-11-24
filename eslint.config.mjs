@@ -8,24 +8,24 @@ const __dirname = dirname(__filename)
 const compat = new FlatCompat({ baseDirectory: __dirname })
 
 /**
- * Configurazione ESLint del progetto (flat config, ESLint 9).
+ * ESLint configuration of the project (flat config, ESLint 9).
  *
- * Prima di questo file il progetto NON aveva alcun linting: nessuna
- * dipendenza `eslint`, nessuna configurazione, e `next.config.js`
- * silenziava il passo di lint in build con `eslint.ignoreDuringBuilds`.
- * Quel flag resta attivo finché non si decide cosa correggere fra i
- * problemi che questa configurazione fa emergere (vedi qual-13 in
- * ROADMAP.html): toglierlo adesso farebbe fallire ogni build.
+ * Before this file the project had NO linting at all: no
+ * `eslint` dependency, no configuration, and `next.config.js`
+ * silenced the lint step in the build with `eslint.ignoreDuringBuilds`.
+ * That flag stays on until it is decided what to fix among the
+ * problems this configuration brings up (see qual-13 in
+ * ROADMAP.html): removing it now would make every build fail.
  *
- * Il preset è quello ufficiale di Next 15 — `core-web-vitals` per le
- * regole React/Next e `typescript` per quelle TypeScript — senza
- * personalizzazioni: la prima misura va fatta sullo standard, non su
- * una selezione di regole scelta per far tornare i conti.
+ * The preset is the official Next 15 one — `core-web-vitals` for the
+ * React/Next rules and `typescript` for the TypeScript ones — without
+ * customizations: the first measurement must be made on the standard, not on
+ * a selection of rules picked to make the numbers add up.
  */
 export default [
   {
     ignores: [
-      // Artefatti di build e cartelle di lavoro
+      // Build artifacts and working folders
       '.next/**',
       'dist/**',
       'out/**',
@@ -36,14 +36,14 @@ export default [
       'coverage/**',
       'node_modules/**',
 
-      // Materiale archiviato o di scorta, non più in esecuzione
+      // Archived or spare material, no longer running
       '_backup/**',
       'electron/legacy/**',
 
-      // Script di build/diagnostica: Node puro, fuori dal perimetro Next
+      // Build/diagnostic scripts: plain Node, outside the Next perimeter
       'scripts/**',
 
-      // File generati
+      // Generated files
       'next-env.d.ts',
       'tsconfig.tsbuildinfo',
     ],

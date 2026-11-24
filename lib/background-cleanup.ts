@@ -1,37 +1,37 @@
 /**
- * Timer di manutenzione in background.
+ * Background maintenance timers.
  *
- * Diversi moduli (storage in memoria, download manager, rate limiter)
- * registrano un `setInterval` al momento dell'import per fare pulizia
- * periodica. Fatto ingenuamente questo ha due effetti indesiderati:
+ * Several modules (in-memory storage, download manager, rate limiter)
+ * register a `setInterval` at import time to do periodic
+ * cleanup. Done naively this has two unwanted effects:
  *
- *  1. il timer tiene vivo l'event loop di Node anche quando non resta altro
- *     da fare — è la ragione per cui `vitest run` non terminava mai e andava
- *     ucciso a mano (task test-08);
- *  2. in un test ogni import fa partire un timer che nessuno spegne.
+ *  1. the timer keeps Node's event loop alive even when nothing else is left
+ *     to do — it is the reason `vitest run` never terminated and had to be
+ *     killed by hand (task test-08);
+ *  2. in a test every import starts a timer that nobody stops.
  *
- * `scheduleBackgroundCleanup` centralizza il comportamento corretto:
- * non registra nulla in ambiente di test o lato browser, e marca il timer
- * come `unref` così Node può uscire liberamente.
+ * `scheduleBackgroundCleanup` centralizes the correct behavior:
+ * it registers nothing in the test environment or in the browser, and marks the timer
+ * as `unref` so Node can exit freely.
  */
 
 export type BackgroundCleanupTask = () => void | Promise<void>
 
-/** Vero quando siamo lato server e non dentro una run di test. */
+/** True when we are server-side and not inside a test run. */
 function shouldSchedule(): boolean {
-  if (typeof window !== 'undefined') return false // solo lato server
-  if (process.env.NODE_ENV === 'test') return false // Vitest imposta NODE_ENV=test
-  if (process.env.VITEST) return false // cintura e bretelle
+  if (typeof window !== 'undefined') return false // server-side only
+  if (process.env.NODE_ENV === 'test') return false // Vitest sets NODE_ENV=test
+  if (process.env.VITEST) return false // belt and braces
   return true
 }
 
 /**
- * Registra una pulizia periodica che non impedisce al processo di terminare.
+ * Registers a periodic cleanup that does not prevent the process from exiting.
  *
- * @param task Funzione da eseguire a ogni tick; se rigetta, l'errore viene
- *             loggato e ignorato — una pulizia fallita non deve far cadere il server.
- * @param intervalMs Intervallo in millisecondi.
- * @returns Il timer registrato, oppure null se non è stato registrato nulla.
+ * @param task Function to run on every tick; if it rejects, the error is
+ *             logged and ignored — a failed cleanup must not bring the server down.
+ * @param intervalMs Interval in milliseconds.
+ * @returns The registered timer, or null if nothing was registered.
  */
 export function scheduleBackgroundCleanup(
   task: BackgroundCleanupTask,
@@ -44,15 +44,15 @@ export function scheduleBackgroundCleanup(
       const result = task()
       if (result instanceof Promise) {
         result.catch((error) => {
-          console.error('Errore nella pulizia periodica:', error)
+          console.error('Periodic cleanup error:', error)
         })
       }
     } catch (error) {
-      console.error('Errore nella pulizia periodica:', error)
+      console.error('Periodic cleanup error:', error)
     }
   }, intervalMs)
 
-  // unref esiste su Node ma non in tutti i runtime (es. edge runtime).
+  // unref exists on Node but not in every runtime (e.g. edge runtime).
   if (typeof timer.unref === 'function') {
     timer.unref()
   }

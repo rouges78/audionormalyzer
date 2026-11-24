@@ -306,8 +306,8 @@ describe('Analysis Results API Integration Tests', () => {
         totalFiles: 1,
         processedFiles: 1,
         results: [],
-        // La finestra di ritenzione di cleanup() è di 24 ore: con 2 ore questo
-        // record restava e il test si aspettava comunque 1 cancellazione.
+        // The cleanup() retention window is 24 hours: with 2 hours this
+        // record stayed and the test still expected 1 deletion.
         startTime: Date.now() - 25 * 60 * 60 * 1000,
         error: null
       }

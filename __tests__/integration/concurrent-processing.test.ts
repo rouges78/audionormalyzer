@@ -11,7 +11,7 @@ describe('Concurrent Processing Integration Tests', () => {
   beforeEach(() => {
     processingQueue = new ProcessingQueueImpl()
     audioProcessor = new AudioProcessorImpl()
-    // Stessa istanza su cui i test mettono gli spy (vedi album-processor.ts).
+    // Same instance the tests put their spies on (see album-processor.ts).
     albumProcessor = new AlbumProcessorImpl(audioProcessor)
   })
 

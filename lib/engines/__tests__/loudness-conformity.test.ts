@@ -1,24 +1,24 @@
 /**
- * Conformità EBU R128 su file audio VERI (test-02).
+ * EBU R128 conformance on REAL audio files (test-02).
  *
- * Fino a oggi la suite copriva la normalizzazione solo con mock: si verificava
- * che ffmpeg venisse invocato con certi argomenti, mai che il file uscito
- * avesse la loudness richiesta. Sono due domande diverse, e la seconda è
- * l'unica che interessa a chi usa il programma.
+ * Until now the suite covered normalization only with mocks: it checked
+ * that ffmpeg was invoked with certain arguments, never that the output file
+ * had the requested loudness. Those are two different questions, and the second is
+ * the only one that matters to whoever uses the program.
  *
- * Qui i file vengono generati con ffmpeg, normalizzati dal NativeEngine e poi
- * **rimisurati**: l'asserzione è sul risultato, non sul comando.
+ * Here the files are generated with ffmpeg, normalized by the NativeEngine and then
+ * **measured again**: the assertion is on the result, not on the command.
  *
- * DUE SCELTE DA GIUSTIFICARE
+ * TWO CHOICES THAT NEED JUSTIFYING
  *
- * 1. I test si saltano da soli se ffmpeg non c'è. Un rosso in quel caso non
- *    direbbe nulla sul codice, direbbe solo che la macchina non ha ffmpeg —
- *    ed è la condizione normale in cui l'app ricade sull'engine WASM.
+ * 1. The tests skip themselves if ffmpeg is missing. A red in that case would
+ *    say nothing about the code, it would only say the machine has no ffmpeg —
+ *    and that is the normal condition in which the app falls back to the WASM engine.
  *
- * 2. I file temporanei stanno in `os.tmpdir()` e non sotto la cartella del
- *    progetto. Sulla cartella di lavoro montata via FUSE `unlink()` è vietato
- *    e ogni pulizia fallisce con EPERM (test-09): scrivere altrove è il modo
- *    più semplice per non falsare la misura.
+ * 2. The temporary files live in `os.tmpdir()` and not under the project
+ *    folder. On the working folder mounted via FUSE `unlink()` is forbidden
+ *    and every cleanup fails with EPERM (test-09): writing elsewhere is the
+ *    simplest way not to skew the measurement.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
@@ -36,19 +36,19 @@ let workDir = ''
 let ffmpeg: string | null = null
 
 /**
- * Tolleranza sul target di loudness, in LU.
+ * Tolerance on the loudness target, in LU.
  *
- * EBU R128 ammette ±0.5 LU sulla loudness di programma, ma quella tolleranza
- * vale per la misura, non per una correzione a passata singola. `loudnorm` in
- * un solo passaggio stima e corregge insieme, quindi su materiale reale scarta
- * un po' di più. 1.0 LU è stretto abbastanza da smascherare un errore vero
- * (un segno sbagliato, un target ignorato) e largo abbastanza da non
- * lampeggiare rosso a ogni versione di ffmpeg. La doppia passata, che
- * permetterebbe di stringere, è core-09.
+ * EBU R128 allows ±0.5 LU on programme loudness, but that tolerance
+ * applies to the measurement, not to a single-pass correction. Single-pass
+ * `loudnorm` estimates and corrects together, so on real material it deviates
+ * a bit more. 1.0 LU is tight enough to expose a real error
+ * (a wrong sign, an ignored target) and loose enough not to
+ * flash red with every ffmpeg version. Two-pass, which
+ * would allow tightening it, is core-09.
  */
 const TOLLERANZA_LU = 1.0
 
-/** Genera un file di prova con ffmpeg. */
+/** Generates a test file with ffmpeg. */
 async function genera(
   nome: string,
   opts: { freq: number; durata: number; gainDb: number; rate?: number; canali?: number },
@@ -77,26 +77,26 @@ afterAll(async () => {
   if (workDir) await fs.rm(workDir, { recursive: true, force: true })
 })
 
-// `describe.skipIf` valuta la condizione alla raccolta dei test, quando
-// beforeAll non è ancora passato: la disponibilità va quindi ricontrollata
-// dentro i test. Usiamo invece un flag calcolato qui, sincrono.
+// `describe.skipIf` evaluates the condition at test collection time, when
+// beforeAll has not run yet: availability would then have to be rechecked
+// inside the tests. Instead we use a flag computed here, synchronously.
 const senzaFfmpeg = () => ffmpeg === null
 
-describe('Conformità EBU R128 su file reali (test-02)', () => {
-  it('misura una loudness plausibile invece di un valore inventato', async () => {
+describe('EBU R128 conformance on real files (test-02)', () => {
+  it('measures a plausible loudness instead of an invented value', async () => {
     if (senzaFfmpeg()) return
     const src = await genera('misura.wav', { freq: 440, durata: 6, gainDb: -8 })
     const engine = new NativeEngine()
     const a = await engine.analyze({ kind: 'path', path: src })
 
-    // Un seno a -8 dB sta molto sotto lo zero: se il valore fosse un
-    // segnaposto (0, -23 fisso, NaN) questo controllo lo prenderebbe.
+    // A sine at -8 dB sits well below zero: if the value were a
+    // placeholder (0, fixed -23, NaN) this check would catch it.
     expect(a.lufsIntegrated).toBeLessThan(-5)
     expect(a.lufsIntegrated).toBeGreaterThan(-40)
     expect(a.source).toBe('measured')
 
-    // Il true peak non può stare sotto il sample peak: se il parsing avesse
-    // confuso le due sezioni omonime del riepilogo, si vedrebbe qui.
+    // The true peak cannot be below the sample peak: if parsing had
+    // confused the two same-named sections of the summary, it would show here.
     expect(a.truePeak).toBeGreaterThanOrEqual(a.peakLevel - 0.1)
 
     expect(a.sampleRate).toBe(44100)
@@ -120,19 +120,19 @@ describe('Conformità EBU R128 su file reali (test-02)', () => {
       )
       expect(res.success).toBe(true)
 
-      // La verifica che conta: rimisurare il file prodotto.
+      // The check that matters: measuring the produced file again.
       const dopo = await engine.analyze({ kind: 'path', path: out })
       expect(Math.abs(dopo.lufsIntegrated - target)).toBeLessThanOrEqual(TOLLERANZA_LU)
 
-      // `finalLoudness` deve essere la misura reale, non il target ricopiato.
+      // `finalLoudness` must be the real measurement, not the target copied back.
       expect(Math.abs(res.finalLoudness - dopo.lufsIntegrated)).toBeLessThan(0.5)
     },
     120_000,
   )
 
-  it('non supera il tetto di true peak a -1 dBTP', async () => {
+  it('does not exceed the -1 dBTP true peak ceiling', async () => {
     if (senzaFfmpeg()) return
-    // Sorgente quasi in clipping: senza limiting il true peak sfonderebbe.
+    // Source almost clipping: without limiting the true peak would break through.
     const src = await genera('forte.wav', { freq: 440, durata: 6, gainDb: -0.5 })
     const out = path.join(workDir, 'forte-out.wav')
     const engine = new NativeEngine()
@@ -144,16 +144,16 @@ describe('Conformità EBU R128 su file reali (test-02)', () => {
     expect(res.success).toBe(true)
 
     const dopo = await engine.analyze({ kind: 'path', path: out })
-    // Margine di 0.5 dB: il limiter di loudnorm lavora sul true peak stimato.
+    // 0.5 dB margin: the loudnorm limiter works on the estimated true peak.
     expect(dopo.truePeak).toBeLessThanOrEqual(-0.5)
   }, 120_000)
 
-  it('conserva il sample rate originale invece di riscriverlo a 192 kHz', async () => {
+  it('keeps the original sample rate instead of rewriting it at 192 kHz', async () => {
     if (senzaFfmpeg()) return
-    // Questo è il test che protegge da una trappola vera di `loudnorm`: il
-    // filtro lavora internamente a 192 kHz e, senza un `-ar` esplicito,
-    // scrive l'output a quel rate. Il file tornava indietro pesando quattro
-    // volte tanto, con un sample rate che nessuno aveva chiesto.
+    // This is the test that guards against a real `loudnorm` trap: the
+    // filter works internally at 192 kHz and, without an explicit `-ar`,
+    // writes the output at that rate. The file came back weighing four
+    // times as much, with a sample rate nobody had asked for.
     const src = await genera('rate.wav', { freq: 440, durata: 4, gainDb: -10, rate: 44100 })
     const out = path.join(workDir, 'rate-out.wav')
     const engine = new NativeEngine()
@@ -169,7 +169,7 @@ describe('Conformità EBU R128 su file reali (test-02)', () => {
     expect(dopo.channels).toBe(2)
   }, 120_000)
 
-  it('con il metodo peak porta il picco al livello richiesto', async () => {
+  it('with the peak method brings the peak to the requested level', async () => {
     if (senzaFfmpeg()) return
     const src = await genera('peak.wav', { freq: 440, durata: 4, gainDb: -12 })
     const out = path.join(workDir, 'peak-out.wav')
@@ -185,7 +185,7 @@ describe('Conformità EBU R128 su file reali (test-02)', () => {
     expect(Math.abs(dopo.peakLevel - -3)).toBeLessThanOrEqual(0.5)
   }, 120_000)
 
-  it('riporta un errore leggibile sui file illeggibili, senza sollevare', async () => {
+  it('reports a readable error on unreadable files, without throwing', async () => {
     if (senzaFfmpeg()) return
     const rotto = path.join(workDir, 'rotto.wav')
     await fs.writeFile(rotto, 'questo non è audio')
@@ -196,7 +196,7 @@ describe('Conformità EBU R128 su file reali (test-02)', () => {
       { method: 'loudness', targetLevel: -16, preserveFormat: true, outputPath: path.join(workDir, 'mai.wav') },
     )
     expect(res.success).toBe(false)
-    // Il messaggio deve dire qualcosa, non essere una stringa vuota (err-02).
+    // The message must say something, not be an empty string (err-02).
     expect(res.error && res.error.length).toBeGreaterThan(10)
   }, 60_000)
 })
