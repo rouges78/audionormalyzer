@@ -2,27 +2,27 @@
 
 ## Overview
 
-Il sistema di normalizzazione audio è progettato come un'applicazione web Next.js che combina un'interfaccia utente React moderna con un backend Node.js per il processing audio. L'architettura utilizza Web Workers per il processing intensivo e librerie specializzate per l'analisi e manipolazione audio, garantendo performance ottimali e un'esperienza utente fluida.
+The audio normalization system is designed as a Next.js web application that combines a modern React user interface with a Node.js backend for audio processing. The architecture uses Web Workers for intensive processing and specialized libraries for audio analysis and manipulation, ensuring optimal performance and a smooth user experience.
 
-Il sistema supporta il processing batch di album completi, offrendo diversi algoritmi di normalizzazione (peak e loudness-based) con anteprima in tempo reale dei risultati.
+The system supports batch processing of complete albums, offering several normalization algorithms (peak and loudness-based) with a real-time preview of the results.
 
 ## Architecture
 
 ### Frontend Architecture
-- **Framework**: Next.js 15 con React 19
-- **UI Components**: Radix UI con Tailwind CSS per styling
-- **State Management**: React hooks (useState, useContext) per gestione stato locale
-- **File Handling**: File API del browser per upload e preview
-- **Audio Processing**: Web Audio API per analisi client-side e preview
+- **Framework**: Next.js 15 with React 19
+- **UI Components**: Radix UI with Tailwind CSS for styling
+- **State Management**: React hooks (useState, useContext) for local state management
+- **File Handling**: Browser File API for upload and preview
+- **Audio Processing**: Web Audio API for client-side analysis and preview
 
 ### Backend Architecture
-- **Runtime**: Node.js con supporto per librerie native
+- **Runtime**: Node.js with support for native libraries
 - **Audio Processing**: 
-  - `node-ffmpeg` per conversione e manipolazione formati
-  - `loudness` per calcoli LUFS/EBU R128
-  - `audio-buffer-utils` per manipolazione buffer audio
-- **File System**: `fs/promises` per gestione asincrona file
-- **API Routes**: Next.js API routes per endpoints RESTful
+  - `node-ffmpeg` for format conversion and manipulation
+  - `loudness` for LUFS/EBU R128 calculations
+  - `audio-buffer-utils` for audio buffer manipulation
+- **File System**: `fs/promises` for asynchronous file management
+- **API Routes**: Next.js API routes for RESTful endpoints
 
 ### Processing Pipeline
 ```mermaid
@@ -104,19 +104,19 @@ interface AlbumOptions {
 ### UI Components Enhancement
 
 #### 1. AudioAnalysisDisplay
-- Visualizzazione waveform con Canvas API
-- Grafici di loudness range con Recharts
-- Indicatori di clipping e dynamic range
+- Waveform display with the Canvas API
+- Loudness range charts with Recharts
+- Clipping and dynamic range indicators
 
 #### 2. NormalizationPreview
-- Player audio integrato per A/B comparison
-- Slider per regolazione parametri in tempo reale
-- Visualizzazione before/after levels
+- Built-in audio player for A/B comparison
+- Sliders for real-time parameter adjustment
+- Before/after level display
 
 #### 3. ProcessingQueue
-- Progress tracking per ogni file
-- Gestione errori e retry logic
-- Stima tempo rimanente
+- Progress tracking for each file
+- Error handling and retry logic
+- Remaining time estimate
 
 ## Data Models
 
@@ -175,16 +175,16 @@ interface ProcessingResult {
 ## Error Handling
 
 ### Client-Side Error Handling
-- **File Validation Errors**: Formato non supportato, file corrotto
-- **Upload Errors**: Dimensione eccessiva, connessione interrotta
-- **Processing Errors**: Timeout, memoria insufficiente
-- **UI Error Boundaries**: Fallback components per errori React
+- **File Validation Errors**: Unsupported format, corrupted file
+- **Upload Errors**: Excessive size, interrupted connection
+- **Processing Errors**: Timeout, insufficient memory
+- **UI Error Boundaries**: Fallback components for React errors
 
 ### Server-Side Error Handling
-- **Audio Processing Errors**: Codec non supportato, file danneggiato
-- **File System Errors**: Permessi, spazio disco insufficiente
-- **Memory Management**: Cleanup automatico file temporanei
-- **Graceful Degradation**: Fallback per funzionalità avanzate
+- **Audio Processing Errors**: Unsupported codec, damaged file
+- **File System Errors**: Permissions, insufficient disk space
+- **Memory Management**: Automatic cleanup of temporary files
+- **Graceful Degradation**: Fallback for advanced features
 
 ### Error Recovery Strategies
 ```typescript
@@ -199,50 +199,50 @@ interface ErrorRecoveryStrategy {
 ## Testing Strategy
 
 ### Unit Testing
-- **Audio Processing Functions**: Test con file audio di esempio
-- **Loudness Calculations**: Validazione contro reference standards
-- **File Operations**: Mock file system per test isolati
-- **UI Components**: React Testing Library per interazioni
+- **Audio Processing Functions**: Tests with sample audio files
+- **Loudness Calculations**: Validation against reference standards
+- **File Operations**: Mocked file system for isolated tests
+- **UI Components**: React Testing Library for interactions
 
 ### Integration Testing
 - **End-to-End Processing**: Upload → Analysis → Normalization → Download
-- **Format Compatibility**: Test con diversi formati audio
-- **Error Scenarios**: Simulazione errori di processing
-- **Performance Testing**: Processing di album di grandi dimensioni
+- **Format Compatibility**: Tests with different audio formats
+- **Error Scenarios**: Simulation of processing errors
+- **Performance Testing**: Processing of large albums
 
 ### Test Data
-- **Reference Audio Files**: Set di file con loudness note
-- **Edge Cases**: File mono/stereo, sample rate diversi, formati compressi
-- **Corrupted Files**: Test robustezza error handling
+- **Reference Audio Files**: Set of files with known loudness
+- **Edge Cases**: Mono/stereo files, different sample rates, compressed formats
+- **Corrupted Files**: Error handling robustness tests
 
 ### Performance Benchmarks
-- **Processing Speed**: Target < 2x durata reale per normalizzazione
-- **Memory Usage**: Limite 500MB per album di 20 tracce
-- **Concurrent Processing**: Supporto per 3-5 file simultanei
-- **UI Responsiveness**: Aggiornamenti progress < 100ms
+- **Processing Speed**: Target < 2x real duration for normalization
+- **Memory Usage**: Limit of 500MB for a 20-track album
+- **Concurrent Processing**: Support for 3-5 simultaneous files
+- **UI Responsiveness**: Progress updates < 100ms
 
 ## Security Considerations
 
 ### File Upload Security
-- **File Type Validation**: Whitelist formati audio supportati
-- **Size Limits**: Limite 100MB per file, 2GB per album
-- **Virus Scanning**: Integrazione con servizi di scanning
-- **Temporary File Cleanup**: Rimozione automatica dopo processing
+- **File Type Validation**: Whitelist of supported audio formats
+- **Size Limits**: Limit of 100MB per file, 2GB per album
+- **Virus Scanning**: Integration with scanning services
+- **Temporary File Cleanup**: Automatic removal after processing
 
 ### Data Privacy
-- **Local Processing**: Nessun upload su server esterni
-- **Metadata Handling**: Preservazione solo metadati audio essenziali
-- **File Encryption**: Crittografia file temporanei sensibili
+- **Local Processing**: No uploads to external servers
+- **Metadata Handling**: Only essential audio metadata is preserved
+- **File Encryption**: Encryption of sensitive temporary files
 
 ## Deployment Architecture
 
 ### Development Environment
-- **Local Development**: Next.js dev server con hot reload
-- **Audio Libraries**: Installazione native dependencies
-- **Test Environment**: Docker container per consistency
+- **Local Development**: Next.js dev server with hot reload
+- **Audio Libraries**: Installation of native dependencies
+- **Test Environment**: Docker container for consistency
 
 ### Production Considerations
-- **Server Requirements**: CPU multi-core, RAM 8GB+, SSD storage
-- **Scaling Strategy**: Horizontal scaling con load balancer
-- **Monitoring**: Logging processing times e error rates
-- **Backup Strategy**: Backup configurazioni e file temporanei critici
+- **Server Requirements**: Multi-core CPU, 8GB+ RAM, SSD storage
+- **Scaling Strategy**: Horizontal scaling with a load balancer
+- **Monitoring**: Logging of processing times and error rates
+- **Backup Strategy**: Backup of configurations and critical temporary files

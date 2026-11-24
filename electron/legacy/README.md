@@ -1,33 +1,33 @@
-# Electron main — file legacy archiviati
+# Electron main — archived legacy files
 
-Questi file erano varianti dell'entry-point Electron nate durante il
-troubleshooting delle build (portable exe, antivirus, self-contained, ecc.).
+These files were variants of the Electron entry point that came about during
+build troubleshooting (portable exe, antivirus, self-contained, etc.).
 
-A partire dal 15/07/2026 l'entry-point **autorevole e unico** è:
+As of 15/07/2026 the **single, authoritative** entry point is:
 
-    electron/main.js   (ex electron/main-professional-viz.js)
+    electron/main.js   (formerly electron/main-professional-viz.js)
 
-dichiarato in `package.json` (`"main"`) e in `electron-builder.config.js`.
+declared in `package.json` (`"main"`) and in `electron-builder.config.js`.
 
-## Contenuto di questa cartella
+## Contents of this folder
 
-| File                        | Origine / scopo storico                          |
+| File                        | Origin / historical purpose                      |
 |-----------------------------|--------------------------------------------------|
-| main.js                     | vecchio main generico (spawn del server Next)    |
-| main-simple.js              | versione minimale di debug                        |
-| main-full.js                | variante "full UI"                                |
-| main-fixed.js               | fix intermedio                                    |
-| main-fixed-final.js         | fix "finale" self-contained                       |
-| main-standalone.js          | server HTTP embedded standalone                   |
-| main-selfcontained.js       | versione completamente self-contained             |
-| main-with-real-audio.js     | edizione "real audio processing"                  |
+| main.js                     | old generic main (spawns the Next server)        |
+| main-simple.js              | minimal debug version                             |
+| main-full.js                | "full UI" variant                                 |
+| main-fixed.js               | intermediate fix                                  |
+| main-fixed-final.js         | "final" self-contained fix                        |
+| main-standalone.js          | standalone embedded HTTP server                   |
+| main-selfcontained.js       | fully self-contained version                      |
+| main-with-real-audio.js     | "real audio processing" edition                   |
 
-## Note
+## Notes
 
-- Sono conservati per **storico**, non vengono inclusi nel pacchetto della build
-  (rimossi dai `files` in `package.json` ed `electron-builder.config.js`).
-- Alcuni script legacy in `scripts/` (build-minimal, build-full-ui, build-no-icon,
-  build-real-audio-exe, simple-build, fix-and-rebuild) puntano ancora a questi file
-  qui in `legacy/`. Tali script sono candidati alla rimozione nel task **qual-02**
-  della roadmap.
-- Per costruire il desktop usa gli script raccomandati: `build:exe:quick` o `build:desktop`.
+- They are kept for **history** and are not included in the build package
+  (removed from `files` in `package.json` and `electron-builder.config.js`).
+- Some legacy scripts in `scripts/` (build-minimal, build-full-ui, build-no-icon,
+  build-real-audio-exe, simple-build, fix-and-rebuild) still point to these files
+  here in `legacy/`. Those scripts are candidates for removal in task **qual-02**
+  of the roadmap.
+- To build the desktop app use the recommended scripts: `build:exe:quick` or `build:desktop`.

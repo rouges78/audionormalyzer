@@ -1,63 +1,63 @@
-# 🎵 AUDIO NORMALIZER - DESKTOP APP DEFINITIVA 🚀
+# 🎵 AUDIO NORMALIZER - DEFINITIVE DESKTOP APP 🚀
 
-## ✅ **APP DESKTOP PROFESSIONALE COMPLETATA!**
+## ✅ **PROFESSIONAL DESKTOP APP COMPLETED!**
 
-Ecco la tua **app desktop definitiva** con tutte le funzionalità professionali:
+Here is your **definitive desktop app** with all the professional features:
 
-### 🎯 **CARATTERISTICHE PRINCIPALI:**
-- 🖥️ **App Desktop Nativa** - Electron con Next.js integrato
-- ⚡ **Processing Audio Reale** - FFmpeg completo incluso
-- 📊 **Normalizzazione Professionale** - Peak & Loudness (EBU R128)
-- 🎵 **Formati Multipli** - MP3, WAV, FLAC, AAC, M4A, OGG
-- 📁 **Batch Processing** - Album completi automaticamente
-- 💾 **File Sicuri** - Non sovrascrive mai gli originali
+### 🎯 **MAIN FEATURES:**
+- 🖥️ **Native Desktop App** - Electron with Next.js built in
+- ⚡ **Real Audio Processing** - Full FFmpeg included
+- 📊 **Professional Normalization** - Peak & Loudness (EBU R128)
+- 🎵 **Multiple Formats** - MP3, WAV, FLAC, AAC, M4A, OGG
+- 📁 **Batch Processing** - Whole albums automatically
+- 💾 **Safe Files** - Never overwrites the originals
 
-## 🚀 **COME USARE:**
+## 🚀 **HOW TO USE:**
 
-### 📱 **Avvio Semplice:**
+### 📱 **Simple Startup:**
 ```bash
-# Esegui l'app desktop
+# Run the desktop app
 "dist/Audio Normalizer 0.1.0.exe"
 ```
 
-### 🔄 **Cosa Succede:**
-1. **Electron si avvia** - Finestra desktop nativa
-2. **Next.js server parte** - Backend completo automatico
-3. **Interface carica** - App web professionale
-4. **FFmpeg ready** - Processing audio attivo
-5. **Tutto funziona** - Normalizzazione reale!
+### 🔄 **What Happens:**
+1. **Electron starts** - Native desktop window
+2. **Next.js server starts** - Full backend, automatic
+3. **Interface loads** - Professional web app
+4. **FFmpeg ready** - Audio processing active
+5. **Everything works** - Real normalization!
 
-## 🎵 **FUNZIONALITÀ COMPLETE:**
+## 🎵 **COMPLETE FEATURES:**
 
-### 📊 **Normalizzazione Professionale:**
-- **Peak Normalization** - Controllo preciso del volume massimo
-- **Loudness Normalization** - Standard EBU R128 per broadcast
-- **Album Normalization** - Volume consistente per tutto l'album
-- **Calcoli Precisi** - Analisi matematica dei livelli audio
+### 📊 **Professional Normalization:**
+- **Peak Normalization** - Precise control of the maximum volume
+- **Loudness Normalization** - EBU R128 standard for broadcast
+- **Album Normalization** - Consistent volume across the whole album
+- **Precise Calculations** - Mathematical analysis of audio levels
 
-### 🔧 **Processing Avanzato:**
-- **FFmpeg Integration** - Engine audio professionale
-- **Multi-format Support** - Tutti i formati audio principali
-- **Batch Processing** - Elabora album interi automaticamente
-- **Quality Preservation** - Mantiene la qualità originale
-- **Metadata Preservation** - Conserva tag e informazioni
+### 🔧 **Advanced Processing:**
+- **FFmpeg Integration** - Professional audio engine
+- **Multi-format Support** - All the main audio formats
+- **Batch Processing** - Processes whole albums automatically
+- **Quality Preservation** - Keeps the original quality
+- **Metadata Preservation** - Keeps tags and information
 
-### 🖥️ **Interface Desktop:**
-- **Native Window** - Integrazione perfetta con Windows
-- **Drag & Drop** - Trascina file e cartelle
-- **Progress Tracking** - Monitoraggio in tempo reale
-- **Professional UI** - Design pulito e funzionale
-- **Error Handling** - Gestione errori robusta
+### 🖥️ **Desktop Interface:**
+- **Native Window** - Seamless integration with Windows
+- **Drag & Drop** - Drag files and folders
+- **Progress Tracking** - Real-time monitoring
+- **Professional UI** - Clean, functional design
+- **Error Handling** - Robust error handling
 
-## 📁 **GESTIONE FILE SICURA:**
+## 📁 **SAFE FILE MANAGEMENT:**
 
-### 🛡️ **File Originali Protetti:**
-- **Mai sovrascritti** - Gli originali rimangono intatti
-- **Output separato** - File processati in cartella dedicata
-- **Backup automatico** - Sicurezza garantita
-- **Naming intelligente** - Nomi file chiari e organizzati
+### 🛡️ **Original Files Protected:**
+- **Never overwritten** - The originals stay intact
+- **Separate output** - Processed files in a dedicated folder
+- **Automatic backup** - Guaranteed safety
+- **Smart naming** - Clear, organized file names
 
-### 📂 **Struttura Output:**
+### 📂 **Output Structure:**
 ```
 Output/
 ├── Normalized/
@@ -71,70 +71,70 @@ Output/
         └── album_report.txt
 ```
 
-## ⚡ **PERFORMANCE OTTIMIZZATE:**
+## ⚡ **OPTIMIZED PERFORMANCE:**
 
-### 🚀 **Velocità:**
-- **Multi-threading** - Usa tutti i core CPU
-- **Memory efficient** - Gestione RAM ottimizzata
-- **Streaming processing** - File grandi gestiti perfettamente
-- **Cache intelligente** - Riutilizzo calcoli quando possibile
+### 🚀 **Speed:**
+- **Multi-threading** - Uses all CPU cores
+- **Memory efficient** - Optimized RAM management
+- **Streaming processing** - Large files handled perfectly
+- **Smart cache** - Reuses calculations when possible
 
-### 📊 **Qualità:**
-- **Lossless processing** - Zero perdita qualità
-- **Bit-perfect output** - Precisione matematica
-- **Professional algorithms** - Standard industria audio
-- **EBU R128 compliant** - Certificazione broadcast
+### 📊 **Quality:**
+- **Lossless processing** - Zero quality loss
+- **Bit-perfect output** - Mathematical precision
+- **Professional algorithms** - Audio industry standard
+- **EBU R128 compliant** - Broadcast certification
 
-## 🎯 **CASI D'USO PROFESSIONALI:**
+## 🎯 **PROFESSIONAL USE CASES:**
 
-### 🎵 **Musicisti & Producer:**
-- **Album mastering** - Volume consistente
-- **Demo preparation** - Livelli professionali
-- **Distribution ready** - Standard streaming platforms
+### 🎵 **Musicians & Producers:**
+- **Album mastering** - Consistent volume
+- **Demo preparation** - Professional levels
+- **Distribution ready** - Streaming platform standards
 
 ### 📻 **Broadcast & Media:**
-- **EBU R128 compliance** - Standard TV/Radio
-- **Loudness matching** - Contenuti uniformi
-- **Batch processing** - Librerie audio massive
+- **EBU R128 compliance** - TV/Radio standard
+- **Loudness matching** - Uniform content
+- **Batch processing** - Massive audio libraries
 
 ### 🎧 **Audio Engineers:**
-- **Precise control** - Controllo millimetrico
-- **Professional analysis** - Metriche dettagliate
-- **Quality assurance** - Verifica standard
+- **Precise control** - Fine-grained control
+- **Professional analysis** - Detailed metrics
+- **Quality assurance** - Standards verification
 
-## 🔧 **SPECIFICHE TECNICHE:**
+## 🔧 **TECHNICAL SPECIFICATIONS:**
 
-### 💻 **Requisiti Sistema:**
+### 💻 **System Requirements:**
 - **OS**: Windows 10/11 x64
-- **RAM**: 4GB minimo, 8GB raccomandato
-- **Storage**: 500MB spazio libero
-- **CPU**: Dual-core minimo, Quad-core raccomandato
+- **RAM**: 4GB minimum, 8GB recommended
+- **Storage**: 500MB free space
+- **CPU**: Dual-core minimum, Quad-core recommended
 
-### 📦 **Cosa Include:**
-- **Electron Runtime** - Framework desktop
-- **Next.js Server** - Backend completo
-- **FFmpeg Engine** - Processing audio
+### 📦 **What It Includes:**
+- **Electron Runtime** - Desktop framework
+- **Next.js Server** - Full backend
+- **FFmpeg Engine** - Audio processing
 - **Node.js Runtime** - JavaScript engine
-- **Tutte le dipendenze** - Zero installazioni extra
+- **All dependencies** - Zero extra installs
 
-## 🎉 **RISULTATO FINALE:**
+## 🎉 **FINAL RESULT:**
 
-L'**Audio Normalizer Desktop App** è ora:
-- ✅ **Completamente Funzionante** - Processing audio reale
-- ✅ **Professionalmente Accurata** - Standard industria
-- ✅ **Desktop Nativa** - Integrazione Windows perfetta
-- ✅ **Self-Contained** - Nessuna dipendenza esterna
-- ✅ **Production Ready** - Pronta per uso professionale
+The **Audio Normalizer Desktop App** is now:
+- ✅ **Fully Working** - Real audio processing
+- ✅ **Professionally Accurate** - Industry standard
+- ✅ **Native Desktop** - Seamless Windows integration
+- ✅ **Self-Contained** - No external dependencies
+- ✅ **Production Ready** - Ready for professional use
 
-## 🚀 **PRONTA PER L'USO PROFESSIONALE!**
+## 🚀 **READY FOR PROFESSIONAL USE!**
 
-La tua app desktop `dist/Audio Normalizer 0.1.0.exe` include:
-- 🎵 **Processing audio completo** con FFmpeg
-- 📊 **Normalizzazione professionale** EBU R128
-- 🖥️ **Interface desktop nativa** 
-- 🛡️ **File management sicuro**
-- ⚡ **Performance ottimizzate**
+Your desktop app `dist/Audio Normalizer 0.1.0.exe` includes:
+- 🎵 **Complete audio processing** with FFmpeg
+- 📊 **Professional EBU R128 normalization**
+- 🖥️ **Native desktop interface** 
+- 🛡️ **Safe file management**
+- ⚡ **Optimized performance**
 
 ---
 
-**🎵 AUDIO NORMALIZER DESKTOP - PROFESSIONALE E DEFINITIVA! 🚀✨**
+**🎵 AUDIO NORMALIZER DESKTOP - PROFESSIONAL AND DEFINITIVE! 🚀✨**

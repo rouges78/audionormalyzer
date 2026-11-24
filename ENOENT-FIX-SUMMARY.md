@@ -1,25 +1,25 @@
-# 🎵 Audio Normalizer - ENOENT Error RISOLTO ✅
+# 🎵 Audio Normalizer - ENOENT Error SOLVED ✅
 
-## ❌ **PROBLEMA IDENTIFICATO:**
-**Errore**: `spawn node ENOENT`
-- L'eseguibile tentava di avviare un processo Node.js esterno
-- Node.js non era disponibile nell'eseguibile standalone
-- Dipendenza da processi esterni che non funzionavano
+## ❌ **PROBLEM IDENTIFIED:**
+**Error**: `spawn node ENOENT`
+- The executable tried to start an external Node.js process
+- Node.js was not available inside the standalone executable
+- Dependency on external processes that did not work
 
-## ✅ **SOLUZIONE IMPLEMENTATA:**
+## ✅ **SOLUTION IMPLEMENTED:**
 
-### 🔧 **Approccio Standalone Completo:**
-1. **Eliminato spawning esterno** - Nessun processo Node.js separato
-2. **Server embedded** - Next.js integrato direttamente in Electron
-3. **Fallback statico** - Server di file statici se Next.js fallisce
-4. **Zero dipendenze esterne** - Tutto incluso nell'eseguibile
+### 🔧 **Fully Standalone Approach:**
+1. **External spawning removed** - No separate Node.js process
+2. **Embedded server** - Next.js built directly into Electron
+3. **Static fallback** - Static file server if Next.js fails
+4. **Zero external dependencies** - Everything included in the executable
 
-### 📦 **Nuovo File Principale:**
+### 📦 **New Main File:**
 - **File**: `electron/main-standalone.js`
-- **Tipo**: Server embedded senza spawning
-- **Fallback**: Server statico con interfaccia HTML
+- **Type**: Embedded server without spawning
+- **Fallback**: Static server with HTML interface
 
-### 🚀 **Configurazione Aggiornata:**
+### 🚀 **Updated Configuration:**
 ```json
 {
   "main": "electron/main-standalone.js",
@@ -28,7 +28,7 @@
       "electron/main-standalone.js",
       "electron/preload.js",
       ".next/**/*",
-      // ... altri file
+      // ... other files
     ]
   }
 }
@@ -36,112 +36,112 @@
 
 ---
 
-## 🎯 **RISULTATO FINALE:**
+## 🎯 **FINAL RESULT:**
 
-### ✅ **Eseguibile Standalone:**
+### ✅ **Standalone Executable:**
 - **File**: `dist/Audio Normalizer 0.1.0.exe` (108.38 MB)
-- **Status**: ✅ **FUNZIONANTE SENZA ERRORI**
-- **Dipendenze**: ❌ **ZERO DIPENDENZE ESTERNE**
+- **Status**: ✅ **WORKING WITHOUT ERRORS**
+- **Dependencies**: ❌ **ZERO EXTERNAL DEPENDENCIES**
 
-### 🚀 **Come Funziona Ora:**
-1. **Avvio immediato** - Nessun spawn di processi esterni
-2. **Server embedded** - Next.js integrato in Electron
-3. **Interfaccia completa** - Tutte le funzionalità disponibili
-4. **Fallback automatico** - Server statico se necessario
+### 🚀 **How It Works Now:**
+1. **Immediate startup** - No spawning of external processes
+2. **Embedded server** - Next.js built into Electron
+3. **Complete interface** - All features available
+4. **Automatic fallback** - Static server if needed
 
 ---
 
-## 🎵 **CARATTERISTICHE STANDALONE:**
+## 🎵 **STANDALONE FEATURES:**
 
-### 📊 **Funzionalità Audio:**
-- ✅ **Peak Normalization** - Controllo volume preciso
+### 📊 **Audio Features:**
+- ✅ **Peak Normalization** - Precise volume control
 - ✅ **Loudness Normalization** - EBU R128 compliant
-- ✅ **Album Processing** - Batch processing completo
+- ✅ **Album Processing** - Complete batch processing
 - ✅ **Multiple Formats** - MP3, WAV, FLAC, AAC, M4A, OGG
 
-### 🖥️ **Interfaccia:**
-- ✅ **Drag & Drop** - Upload file intuitivo
-- ✅ **Progress Tracking** - Monitoraggio real-time
-- ✅ **Professional UI** - Design pulito e moderno
-- ✅ **Error Handling** - Gestione errori robusta
+### 🖥️ **Interface:**
+- ✅ **Drag & Drop** - Intuitive file upload
+- ✅ **Progress Tracking** - Real-time monitoring
+- ✅ **Professional UI** - Clean, modern design
+- ✅ **Error Handling** - Robust error handling
 
-### 🔧 **Tecnologia:**
-- ✅ **Embedded Next.js** - Server integrato
-- ✅ **Electron Native** - App desktop nativa
-- ✅ **Static Fallback** - HTML interface di backup
-- ✅ **Zero External Deps** - Completamente autonomo
+### 🔧 **Technology:**
+- ✅ **Embedded Next.js** - Built-in server
+- ✅ **Electron Native** - Native desktop app
+- ✅ **Static Fallback** - Backup HTML interface
+- ✅ **Zero External Deps** - Fully self-sufficient
 
 ---
 
 ## 🛠️ **TROUBLESHOOTING:**
 
-### 🔍 **Se L'Eseguibile Non Si Avvia:**
-1. **Esegui come Amministratore** (tasto destro → "Esegui come amministratore")
-2. **Disabilita antivirus** temporaneamente
-3. **Controlla spazio disco** (almeno 1GB libero)
-4. **Verifica Windows Defender SmartScreen**
+### 🔍 **If The Executable Does Not Start:**
+1. **Run as Administrator** (right-click → "Run as administrator")
+2. **Disable the antivirus** temporarily
+3. **Check disk space** (at least 1GB free)
+4. **Check Windows Defender SmartScreen**
 
-### ⚡ **Se L'Interfaccia Non Carica:**
-- L'app ha un **fallback automatico** con interfaccia HTML statica
-- Mostra tutte le funzionalità principali
-- Permette upload e selezione file
-- Interface professionale anche in modalità fallback
+### ⚡ **If The Interface Does Not Load:**
+- The app has an **automatic fallback** with a static HTML interface
+- It shows all the main features
+- It allows uploading and selecting files
+- Professional interface even in fallback mode
 
 ---
 
-## 🎉 **VANTAGGI DELLA SOLUZIONE:**
+## 🎉 **ADVANTAGES OF THE SOLUTION:**
 
-### ✅ **Affidabilità:**
-- **Nessun processo esterno** da gestire
-- **Zero dipendenze** Node.js esterne
-- **Fallback automatico** se problemi
-- **Startup veloce** e stabile
+### ✅ **Reliability:**
+- **No external process** to manage
+- **Zero external** Node.js dependencies
+- **Automatic fallback** if there are problems
+- **Fast, stable startup**
 
 ### ⚡ **Performance:**
-- **Avvio immediato** senza attese
-- **Memory efficient** con server integrato
-- **Robust error handling** per stabilità
-- **Professional experience** completa
+- **Immediate startup** with no waiting
+- **Memory efficient** with the built-in server
+- **Robust error handling** for stability
+- **Complete professional experience**
 
-### 🚀 **Usabilità:**
-- **Plug & play** - funziona subito
-- **Nessuna configurazione** richiesta
-- **Interface familiare** per utenti
-- **Feedback chiaro** su operazioni
+### 🚀 **Usability:**
+- **Plug & play** - works right away
+- **No configuration** required
+- **Familiar interface** for users
+- **Clear feedback** on operations
 
 ---
 
-## 📋 **COMANDI UTILI:**
+## 📋 **USEFUL COMMANDS:**
 
-### 🔧 **Build Standalone:**
+### 🔧 **Standalone Build:**
 ```bash
-# Build completo standalone
+# Full standalone build
 npm run build && npx electron-builder --win --x64
 
-# Test eseguibile
+# Test the executable
 npm run test:exe
 ```
 
-### 🧪 **Debug se Necessario:**
-- L'eseguibile include **console logging** dettagliato
-- Menu **View → Toggle DevTools** per debug
-- **Error dialogs** informativi per problemi
-- **Fallback automatico** sempre disponibile
+### 🧪 **Debug If Needed:**
+- The executable includes detailed **console logging**
+- **View → Toggle DevTools** menu for debugging
+- Informative **error dialogs** for problems
+- **Automatic fallback** always available
 
 ---
 
-## 🎯 **CONCLUSIONE:**
+## 🎯 **CONCLUSION:**
 
-L'errore **"spawn node ENOENT"** è stato **completamente risolto** creando una versione standalone che:
+The **"spawn node ENOENT"** error has been **completely solved** by creating a standalone version that:
 
-- ✅ **Non dipende da Node.js esterno**
-- ✅ **Include server embedded**
-- ✅ **Ha fallback automatico**
-- ✅ **Funziona out-of-the-box**
+- ✅ **Does not depend on an external Node.js**
+- ✅ **Includes an embedded server**
+- ✅ **Has an automatic fallback**
+- ✅ **Works out-of-the-box**
 
-**L'Audio Normalizer è ora veramente standalone e pronto per l'uso professionale!** 🎵✨
+**The Audio Normalizer is now truly standalone and ready for professional use!** 🎵✨
 
 ---
 
-*Fix implementato: Dicembre 2024*  
-*Versione: 0.1.0 Standalone Edition*
+*Fix implemented: December 2024*  
+*Version: 0.1.0 Standalone Edition*

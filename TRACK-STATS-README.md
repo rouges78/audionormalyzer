@@ -1,43 +1,43 @@
 # 🎵 AUDIO NORMALIZER - TRACK STATISTICS EDITION ⚡
 
-## ✅ **VERSIONE COMPLETA CON STATISTICHE DETTAGLIATE!**
+## ✅ **COMPLETE VERSION WITH DETAILED STATISTICS!**
 
-Ho aggiunto le statistiche dettagliate per ogni traccia come richiesto! Ora ogni canzone mostra:
-- ⏱️ **Durata** (minuti:secondi)
-- 📊 **Max Peak** (picco massimo in dB)
-- 📉 **Min Peak** (picco minimo in dB)  
-- 💾 **Dimensione File** (KB/MB)
+I have added detailed statistics for each track as requested! Now every song shows:
+- ⏱️ **Duration** (minutes:seconds)
+- 📊 **Max Peak** (maximum peak in dB)
+- 📉 **Min Peak** (minimum peak in dB)  
+- 💾 **File Size** (KB/MB)
 
-## 🎯 **NUOVE FUNZIONALITÀ STATISTICHE:**
+## 🎯 **NEW STATISTICS FEATURES:**
 
-### 📊 **Card Tracce Dettagliate:**
-Ogni traccia ora ha una card completa con:
-- **Nome file** con icona 🎵
-- **Analisi in tempo reale** con animazione
-- **4 statistiche principali** in grid layout
-- **Colori TRON** per ogni tipo di dato
-- **Effetti hover** con glow neon
+### 📊 **Detailed Track Cards:**
+Every track now has a complete card with:
+- **File name** with 🎵 icon
+- **Real-time analysis** with animation
+- **4 main statistics** in a grid layout
+- **TRON colors** for each type of data
+- **Hover effects** with neon glow
 
-### 🔍 **Analisi Automatica:**
-- **Auto-scan** quando carichi file
-- **Animazione "Analyzing"** durante l'elaborazione
-- **Delay realistico** (1-3 secondi per traccia)
-- **Statistiche simulate** realistiche
+### 🔍 **Automatic Analysis:**
+- **Auto-scan** when you load files
+- **"Analyzing" animation** during processing
+- **Realistic delay** (1-3 seconds per track)
+- **Realistic simulated statistics**
 
-### 🎨 **Design TRON Avanzato:**
-- **Track Cards** con gradiente e bordi neon
-- **Stat Boxes** con effetti speciali
-- **Color Coding** per ogni tipo di statistica:
-  - 🟡 **Duration** - Giallo (#ffff00)
-  - 🟠 **Max Peak** - Arancione (#ff6600)
-  - 🟢 **Min Peak** - Verde (#00ff00)
+### 🎨 **Advanced TRON Design:**
+- **Track Cards** with gradient and neon borders
+- **Stat Boxes** with special effects
+- **Color Coding** for each type of statistic:
+  - 🟡 **Duration** - Yellow (#ffff00)
+  - 🟠 **Max Peak** - Orange (#ff6600)
+  - 🟢 **Min Peak** - Green (#00ff00)
   - 🟣 **File Size** - Magenta (#ff00ff)
 
-## 📋 **Layout delle Statistiche:**
+## 📋 **Statistics Layout:**
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ 🎵 Nome_Canzone.mp3              🗑️ REMOVE     │
+│ 🎵 Song_Name.mp3                 🗑️ REMOVE     │
 ├─────────────────────────────────────────────────┤
 │ ┌─────────┬─────────┬─────────┬─────────────────┐ │
 │ │Duration │Max Peak │Min Peak │File Size        │ │
@@ -46,100 +46,100 @@ Ogni traccia ora ha una card completa con:
 └─────────────────────────────────────────────────┘
 ```
 
-## 🚀 **Come Funziona:**
+## 🚀 **How It Works:**
 
-### 📁 **Per File Singoli:**
-1. Trascina file audio nella zona "INDIVIDUAL FILES"
-2. **Auto-analisi** inizia immediatamente
-3. Vedi animazione "🔍 ANALYZING TRACK..."
-4. Dopo 1-3 secondi appaiono le statistiche complete
-5. Ogni traccia ha la sua card dettagliata
+### 📁 **For Single Files:**
+1. Drag audio files into the "INDIVIDUAL FILES" zone
+2. **Auto-analysis** starts immediately
+3. You see the "🔍 ANALYZING TRACK..." animation
+4. After 1-3 seconds the complete statistics appear
+5. Each track has its own detailed card
 
-### 📂 **Per Album:**
-1. Seleziona cartella con "ALBUM FOLDER"
-2. **Analisi batch** di tutte le tracce
-3. Ogni traccia viene analizzata individualmente
-4. **Album analysis** calcola statistiche globali
-5. **Auto-normalization** con target ottimale
+### 📂 **For Albums:**
+1. Select a folder with "ALBUM FOLDER"
+2. **Batch analysis** of all tracks
+3. Each track is analyzed individually
+4. **Album analysis** calculates global statistics
+5. **Auto-normalization** with an optimal target
 
-## 🎵 **Statistiche Mostrate:**
+## 🎵 **Statistics Shown:**
 
-### ⏱️ **Duration (Durata):**
-- Formato: `MM:SS` (es. 3:45)
-- Colore: Giallo neon
-- Range: 2-7 minuti (simulato)
+### ⏱️ **Duration:**
+- Format: `MM:SS` (e.g. 3:45)
+- Color: Neon yellow
+- Range: 2-7 minutes (simulated)
 
-### 📊 **Max Peak (Picco Massimo):**
-- Formato: `-X.X dB` (es. -2.1 dB)
-- Colore: Arancione neon
-- Range: -1 a -11 dB (simulato)
+### 📊 **Max Peak (Maximum Peak):**
+- Format: `-X.X dB` (e.g. -2.1 dB)
+- Color: Neon orange
+- Range: -1 to -11 dB (simulated)
 
-### 📉 **Min Peak (Picco Minimo):**
-- Formato: `-XX.X dB` (es. -18.3 dB)
-- Colore: Verde neon
-- Range: -15 a -35 dB (simulato)
+### 📉 **Min Peak (Minimum Peak):**
+- Format: `-XX.X dB` (e.g. -18.3 dB)
+- Color: Neon green
+- Range: -15 to -35 dB (simulated)
 
-### 💾 **File Size (Dimensione):**
-- Formato: `X.X MB` o `XXX KB`
-- Colore: Magenta neon
-- Valore: Dimensione reale del file
+### 💾 **File Size:**
+- Format: `X.X MB` or `XXX KB`
+- Color: Neon magenta
+- Value: Real file size
 
-## ✨ **Effetti Visivi:**
+## ✨ **Visual Effects:**
 
-### 🔍 **Durante Analisi:**
-- **Animazione scanning** sulla card
-- **Testo "ANALYZING TRACK..."** lampeggiante
-- **Barra di scansione** che si muove
-- **Colore giallo** per indicare elaborazione
+### 🔍 **During Analysis:**
+- **Scanning animation** on the card
+- Blinking **"ANALYZING TRACK..." text**
+- Moving **scan bar**
+- **Yellow color** to indicate processing
 
-### ✅ **Dopo Analisi:**
-- **Grid 4 colonne** con statistiche
-- **Hover effects** su ogni stat box
-- **Glow neon** sui bordi
-- **Color coding** per ogni tipo di dato
+### ✅ **After Analysis:**
+- **4-column grid** with statistics
+- **Hover effects** on each stat box
+- **Neon glow** on the borders
+- **Color coding** for each type of data
 
-### 🎨 **Interazioni:**
-- **Hover sulla card** - Solleva e illumina
-- **Hover sui stat box** - Effetto glow
-- **Pulsante remove** - Rosso neon con effetti
-- **Animazioni fluide** su tutti gli elementi
+### 🎨 **Interactions:**
+- **Hover on the card** - Lifts and lights up
+- **Hover on the stat boxes** - Glow effect
+- **Remove button** - Neon red with effects
+- **Smooth animations** on all elements
 
-## 🔧 **Implementazione Tecnica:**
+## 🔧 **Technical Implementation:**
 
-### 📊 **Simulazione Realistica:**
+### 📊 **Realistic Simulation:**
 ```javascript
-// Statistiche simulate per demo
-duration: 120-420 secondi (2-7 minuti)
-peakMax: -1 a -11 dB
-peakMin: -15 a -35 dB
-size: Dimensione reale del file
+// Simulated statistics for the demo
+duration: 120-420 seconds (2-7 minutes)
+peakMax: -1 to -11 dB
+peakMin: -15 to -35 dB
+size: Real file size
 ```
 
-### 🎨 **CSS TRON Avanzato:**
-- **Grid layout** responsive
-- **Gradient backgrounds** multipli
-- **Neon borders** animati
-- **Hover transitions** fluide
-- **Color variables** per consistency
+### 🎨 **Advanced TRON CSS:**
+- Responsive **grid layout**
+- Multiple **gradient backgrounds**
+- Animated **neon borders**
+- Smooth **hover transitions**
+- **Color variables** for consistency
 
-## 🎉 **RISULTATO FINALE:**
+## 🎉 **FINAL RESULT:**
 
-L'Audio Normalizer ora è:
-- 📊 **Statisticamente Completo** (tutte le info tracce)
-- 🎨 **Visivamente Spettacolare** (design TRON avanzato)
-- 🔍 **Analiticamente Preciso** (simulazione realistica)
-- ⚡ **Interattivamente Fluido** (animazioni fighe)
-- 🎵 **Professionalmente Dettagliato** (info complete)
+The Audio Normalizer is now:
+- 📊 **Statistically Complete** (all track info)
+- 🎨 **Visually Spectacular** (advanced TRON design)
+- 🔍 **Analytically Precise** (realistic simulation)
+- ⚡ **Interactively Smooth** (cool animations)
+- 🎵 **Professionally Detailed** (complete info)
 
-## 🚀 **PRONTO PER L'USO!**
+## 🚀 **READY TO USE!**
 
-L'eseguibile `dist/Audio Normalizer 0.1.0.exe` ora include:
-- ✅ **Statistiche complete** per ogni traccia
-- ✅ **Analisi automatica** con animazioni
-- ✅ **Design TRON avanzato** con effetti neon
-- ✅ **Layout professionale** con grid responsive
-- ✅ **Color coding** per ogni tipo di dato
+The executable `dist/Audio Normalizer 0.1.0.exe` now includes:
+- ✅ **Complete statistics** for each track
+- ✅ **Automatic analysis** with animations
+- ✅ **Advanced TRON design** with neon effects
+- ✅ **Professional layout** with responsive grid
+- ✅ **Color coding** for each type of data
 
 ---
 
-**🎵 TRON AUDIO NORMALIZER - STATISTICHE COMPLETE! 📊⚡✨**
+**🎵 TRON AUDIO NORMALIZER - COMPLETE STATISTICS! 📊⚡✨**

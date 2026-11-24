@@ -1,117 +1,117 @@
 # Audio Normalizer - Distribution Guide
 
-Questa guida spiega come creare e distribuire Audio Normalizer per tutti i formati supportati.
+This guide explains how to build and distribute Audio Normalizer for all supported formats.
 
 ## 🚀 Quick Start
 
-### Build Completo (Tutti i Formati)
+### Full Build (All Formats)
 ```bash
 npm run build:all
 ```
 
-### Build Specifici
+### Specific Builds
 ```bash
-# Solo applicazione web
+# Web application only
 npm run build:dist:web
 
-# Solo applicazioni desktop
+# Desktop applications only
 npm run build:dist:desktop
 
-# Solo immagini Docker
+# Docker images only
 npm run build:dist:docker
 ```
 
-## 📦 Formati di Distribuzione
+## 📦 Distribution Formats
 
-### 1. Applicazione Web (Next.js)
+### 1. Web Application (Next.js)
 
-**Output:** `.next/` directory per deployment
-**Comando:** `npm run build:dist:web`
+**Output:** `.next/` directory for deployment
+**Command:** `npm run build:dist:web`
 
 **Deployment Options:**
-- **Vercel/Netlify:** Deploy diretto da repository
-- **Server Node.js:** Usa `npm start` dopo il build
-- **Static Export:** Configura `next.config.js` per export statico
+- **Vercel/Netlify:** Deploy directly from the repository
+- **Node.js server:** Use `npm start` after the build
+- **Static Export:** Configure `next.config.js` for static export
 
-### 2. Applicazioni Desktop (Electron)
+### 2. Desktop Applications (Electron)
 
-**Output:** `dist/` directory con installer
-**Comando:** `npm run build:dist:desktop`
+**Output:** `dist/` directory with installers
+**Command:** `npm run build:dist:desktop`
 
-**Formati per Piattaforma:**
+**Formats per Platform:**
 - **Windows:** NSIS Installer (.exe), Portable (.exe), ZIP
 - **macOS:** DMG (.dmg), ZIP (Intel & Apple Silicon)
 - **Linux:** AppImage (.AppImage), DEB (.deb), RPM (.rpm), TAR.GZ
 
-### 3. Container Docker
+### 3. Docker Containers
 
-**Output:** Immagini Docker
-**Comando:** `npm run build:dist:docker`
+**Output:** Docker images
+**Command:** `npm run build:dist:docker`
 
-**Immagini Generate:**
-- `audionormalizer/audio-normalizer:latest` - Produzione
-- `audionormalizer/audio-normalizer:dev` - Sviluppo
-- `audionormalizer/audio-normalizer:x.x.x` - Versione specifica
+**Generated Images:**
+- `audionormalizer/audio-normalizer:latest` - Production
+- `audionormalizer/audio-normalizer:dev` - Development
+- `audionormalizer/audio-normalizer:x.x.x` - Specific version
 
-## 🛠️ Configurazione Build
+## 🛠️ Build Configuration
 
 ### Electron Builder
-Configurazione in `electron-builder.config.js`:
-- Supporto multi-piattaforma
-- Code signing (quando certificati disponibili)
-- Auto-updater integrato
-- Compressione ottimizzata
+Configuration in `electron-builder.config.js`:
+- Multi-platform support
+- Code signing (when certificates are available)
+- Built-in auto-updater
+- Optimized compression
 
 ### Docker
-- **Production:** Build ottimizzato con multi-stage
-- **Development:** Hot reload e volume mounting
-- **Nginx:** Reverse proxy opzionale
+- **Production:** Optimized multi-stage build
+- **Development:** Hot reload and volume mounting
+- **Nginx:** Optional reverse proxy
 
 ### GitHub Actions
-Workflow automatico per:
-- Test completi
-- Build multi-piattaforma
-- Release automatiche
-- Pubblicazione Docker Hub
+Automated workflow for:
+- Full test runs
+- Multi-platform builds
+- Automatic releases
+- Docker Hub publishing
 
-## 📋 Requisiti di Sistema
+## 📋 System Requirements
 
-### Per Build Environment
-- **Node.js:** 18.0 o superiore
-- **NPM:** 8.0 o superiore
-- **Git:** Per clonazione repository
-- **Docker:** Per build container (opzionale)
+### For the Build Environment
+- **Node.js:** 18.0 or later
+- **NPM:** 8.0 or later
+- **Git:** For cloning the repository
+- **Docker:** For container builds (optional)
 
 ### Target Systems
 #### Desktop
-- **Windows:** 10 o superiore (64-bit)
-- **macOS:** 10.14 o superiore
-- **Linux:** Ubuntu 18.04+ o equivalente
+- **Windows:** 10 or later (64-bit)
+- **macOS:** 10.14 or later
+- **Linux:** Ubuntu 18.04+ or equivalent
 
 #### Web/Container
 - **Browser:** Chrome 90+, Firefox 88+, Safari 14+
-- **Server:** Node.js 18+, 2GB RAM minimo
+- **Server:** Node.js 18+, 2GB RAM minimum
 
-## 🔧 Script di Build
+## 🔧 Build Scripts
 
 ### `build-distribution.js`
-Script master per tutti i formati di distribuzione:
+Master script for all distribution formats:
 
 ```bash
-# Build tutto
+# Build everything
 node scripts/build-distribution.js
 
-# Build specifico
+# Specific build
 node scripts/build-distribution.js web desktop
 ```
 
-### Funzionalità:
-- ✅ Setup automatico environment
-- ✅ Test completi pre-build
-- ✅ Build multi-formato
-- ✅ Generazione note di rilascio
-- ✅ Calcolo checksums
-- ✅ Validazione output
+### Features:
+- ✅ Automatic environment setup
+- ✅ Full pre-build tests
+- ✅ Multi-format build
+- ✅ Release notes generation
+- ✅ Checksum calculation
+- ✅ Output validation
 
 ## 🚀 Deployment
 
@@ -119,31 +119,31 @@ node scripts/build-distribution.js web desktop
 
 #### Vercel
 ```bash
-# Collegamento repository
+# Link the repository
 vercel --prod
 
-# Environment variables richieste:
+# Required environment variables:
 # TEMP_AUDIO_DIR=/tmp/audio
 # OUTPUT_AUDIO_DIR=/tmp/output
 ```
 
 #### Docker
 ```bash
-# Build e run
+# Build and run
 docker build -t audionormalizer .
 docker run -p 3000:3000 audionormalizer
 
-# Con Docker Compose
+# With Docker Compose
 docker-compose up -d
 ```
 
 #### Traditional Server
 ```bash
-# Build e deploy
+# Build and deploy
 npm run build
 npm start
 
-# Con PM2
+# With PM2
 pm2 start npm --name "audio-normalizer" -- start
 ```
 
@@ -151,20 +151,20 @@ pm2 start npm --name "audio-normalizer" -- start
 
 #### Windows
 1. Build: `npm run build:dist:desktop`
-2. File generati in `dist/`:
+2. Files generated in `dist/`:
    - `Audio-Normalizer-Professional-x.x.x.exe` (NSIS)
    - `Audio-Normalizer-Professional-x.x.x-Portable.exe`
    - `Audio-Normalizer-Professional-x.x.x-win.zip`
 
 #### macOS
 1. Build: `npm run build:dist:desktop`
-2. File generati in `dist/`:
+2. Files generated in `dist/`:
    - `Audio-Normalizer-Professional-x.x.x.dmg`
    - `Audio-Normalizer-Professional-x.x.x-mac.zip`
 
 #### Linux
 1. Build: `npm run build:dist:desktop`
-2. File generati in `dist/`:
+2. Files generated in `dist/`:
    - `Audio-Normalizer-Professional-x.x.x.AppImage`
    - `audio-normalizer-professional_x.x.x_amd64.deb`
    - `audio-normalizer-professional-x.x.x.x86_64.rpm`
@@ -192,13 +192,13 @@ mac: {
 ## 📊 Monitoring Build
 
 ### Log Output
-Tutti i build generano log dettagliati:
+All builds produce detailed logs:
 - `logs/build-{timestamp}.log`
-- Console output con timestamp
-- Informazioni su durata e dimensioni
+- Console output with timestamps
+- Duration and size information
 
 ### Distribution Info
-File `dist/distribution-info.json` contiene:
+The file `dist/distribution-info.json` contains:
 ```json
 {
   "version": "0.1.0",
@@ -216,7 +216,7 @@ File `dist/distribution-info.json` contiene:
 
 ## 🐛 Troubleshooting
 
-### Build Errors Comuni
+### Common Build Errors
 
 #### Error: "electron-builder not found"
 ```bash
@@ -225,55 +225,55 @@ npm install electron-builder --save-dev
 
 #### Error: "Docker not found"
 ```bash
-# Installa Docker Desktop
-# Oppure skip: npm run build:dist web desktop
+# Install Docker Desktop
+# Or skip it: npm run build:dist web desktop
 ```
 
 #### Error: "ENOENT: no such file or directory"
 ```bash
-# Pulisci e reinstalla
+# Clean and reinstall
 npm run clean:temp
 npm ci
 ```
 
 ### Performance Issues
-- **Large files:** Aumenta memory: `--max-old-space-size=4096`
-- **Slow builds:** Usa build incrementali
-- **Disk space:** Pulisci regolarmente `dist/` e `node_modules/`
+- **Large files:** Increase memory: `--max-old-space-size=4096`
+- **Slow builds:** Use incremental builds
+- **Disk space:** Regularly clean `dist/` and `node_modules/`
 
 ## 📱 Continuous Integration
 
 ### GitHub Actions
 Workflow in `.github/workflows/build-release.yml`:
-- Trigger su tag `v*` o manualmente
-- Build parallelo multi-piattaforma
-- Test automatici
-- Release GitHub automatiche
-- Push Docker Hub
+- Triggered on `v*` tags or manually
+- Parallel multi-platform builds
+- Automated tests
+- Automatic GitHub releases
+- Docker Hub push
 
 ### Local CI
 ```bash
-# Simula CI localmente
+# Simulate CI locally
 npm run release
 ```
 
 ## 🎯 Best Practices
 
-1. **Versioning:** Usa Semantic Versioning (x.y.z)
-2. **Testing:** Run `npm run test:comprehensive` prima del build
-3. **Environment:** Usa `.env.local` per configurazioni specifiche
-4. **Security:** Non committare certificati o chiavi private
-5. **Documentation:** Aggiorna README.md per ogni release
-6. **Backup:** Mantieni backup dei file di distribuzione
+1. **Versioning:** Use Semantic Versioning (x.y.z)
+2. **Testing:** Run `npm run test:comprehensive` before the build
+3. **Environment:** Use `.env.local` for specific configurations
+4. **Security:** Do not commit certificates or private keys
+5. **Documentation:** Update README.md for every release
+6. **Backup:** Keep backups of the distribution files
 
 ## 📞 Support
 
-Per problemi con la distribuzione:
-1. Controlla i log in `logs/`
-2. Verifica i requisiti di sistema
-3. Consulta la documentazione GitHub
-4. Crea issue con log completi
+For distribution problems:
+1. Check the logs in `logs/`
+2. Verify the system requirements
+3. Consult the GitHub documentation
+4. Open an issue with full logs
 
 ---
 
-**Audio Normalizer Professional** - Distribuzione Professionale per Tutte le Piattaforme
+**Audio Normalizer Professional** - Professional Distribution for All Platforms
